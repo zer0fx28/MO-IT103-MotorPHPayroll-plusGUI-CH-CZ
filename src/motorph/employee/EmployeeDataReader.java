@@ -10,15 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class for reading and managing employee data from a CSV file
+ * Reads and manages employee data from CSV
  */
 public class EmployeeDataReader {
     private final String employeeFilePath;
     private final Map<String, Employee> employeeMap;
 
     /**
-     * Constructor initializes the reader with the employee file path
-     * @param employeeFilePath Path to the employee CSV file
+     * Create reader and load employee data
      */
     public EmployeeDataReader(String employeeFilePath) {
         this.employeeFilePath = employeeFilePath;
@@ -27,7 +26,7 @@ public class EmployeeDataReader {
     }
 
     /**
-     * Load employees from the CSV file
+     * Read employees from CSV file
      */
     private void loadEmployees() {
         System.out.println("Loading employee data...");
@@ -46,13 +45,14 @@ public class EmployeeDataReader {
                     continue;
                 }
 
-                // Handle potential quoted values with commas inside
+                // Handle commas inside quoted values
                 List<String> values = parseCSVLine(line);
 
                 // Convert to array
                 String[] dataArray = values.toArray(new String[0]);
 
                 if (dataArray.length < 19) {
+                    // Skip incomplete records
                     continue;
                 }
 
@@ -60,7 +60,7 @@ public class EmployeeDataReader {
                     Employee employee = new Employee(dataArray);
                     employeeMap.put(employee.getEmployeeId(), employee);
                 } catch (Exception e) {
-                    // Silent error handling to avoid cluttering the console
+                    // Skip bad records silently
                 }
             }
 
@@ -72,9 +72,7 @@ public class EmployeeDataReader {
     }
 
     /**
-     * More robust CSV line parsing to handle quoted values and commas in fields
-     * @param line CSV line to parse
-     * @return List of parsed values
+     * Parse CSV line handling quotes and commas
      */
     private List<String> parseCSVLine(String line) {
         List<String> result = new ArrayList<>();
@@ -100,17 +98,13 @@ public class EmployeeDataReader {
 
     /**
      * Get employee by ID
-     * @param employeeId The employee ID
-     * @return Employee object, or null if not found
      */
     public Employee getEmployee(String employeeId) {
         return employeeMap.get(employeeId);
     }
 
     /**
-     * Find employee by name (exact or partial match)
-     * @param fullName Full or partial name to search for
-     * @return Employee object, or null if not found
+     * Find employee by name
      */
     public Employee findEmployeeByName(String fullName) {
         String searchName = fullName.toLowerCase().trim();
@@ -118,7 +112,7 @@ public class EmployeeDataReader {
         for (Employee employee : employeeMap.values()) {
             String empFullName = (employee.getFirstName() + " " + employee.getLastName()).toLowerCase();
 
-            // Check for exact match or partial match
+            // Check for match or partial match
             if (empFullName.equals(searchName) ||
                     empFullName.contains(searchName) ||
                     searchName.contains(empFullName)) {
@@ -131,18 +125,16 @@ public class EmployeeDataReader {
 
     /**
      * Find employee by ID or name
-     * @param searchTerm ID or name to search for
-     * @return Employee object, or null if not found
      */
     public Employee findEmployee(String searchTerm) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
             return null;
         }
 
-        // Try by employee ID first
+        // Try by ID first
         Employee employee = getEmployee(searchTerm.trim());
 
-        // If not found by ID, try by name
+        // If not found, try by name
         if (employee == null) {
             employee = findEmployeeByName(searchTerm);
         }
@@ -152,7 +144,6 @@ public class EmployeeDataReader {
 
     /**
      * Get all employees
-     * @return List of all employees
      */
     public List<Employee> getAllEmployees() {
         return new ArrayList<>(employeeMap.values());

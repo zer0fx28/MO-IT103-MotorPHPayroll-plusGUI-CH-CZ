@@ -10,7 +10,7 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 
 /**
- * Reads and processes attendance records from CSV file
+ * Reads and processes attendance data from CSV file
  */
 public class AttendanceReader {
     private final String attendanceFilePath;
@@ -19,7 +19,7 @@ public class AttendanceReader {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     /**
-     * Constructor that loads attendance data
+     * Load attendance data from CSV file
      */
     public AttendanceReader(String attendanceFilePath) {
         this.attendanceFilePath = attendanceFilePath;
@@ -29,7 +29,7 @@ public class AttendanceReader {
     }
 
     /**
-     * Load attendance records from CSV file
+     * Read attendance data from file
      */
     private void loadAttendance() {
         List<String[]> attendanceData = new ArrayList<>();
@@ -42,7 +42,7 @@ public class AttendanceReader {
 
         // Process each row into an attendance record
         for (String[] row : attendanceData) {
-            if (row.length >= 6) {  // Ensure we have all needed columns
+            if (row.length >= 6) {  // Make sure we have all needed columns
                 try {
                     // Parse the date and times
                     LocalDate date = LocalDate.parse(row[3], DATE_FORMAT);
@@ -60,14 +60,14 @@ public class AttendanceReader {
 
                     attendanceRecords.add(record);
                 } catch (Exception e) {
-                    // Skip invalid records
+                    // Skip bad records
                 }
             }
         }
     }
 
     /**
-     * Get all attendance records for an employee
+     * Get all attendance records for one employee
      */
     public List<AttendanceRecord> getRecordsForEmployee(String employeeId) {
         List<AttendanceRecord> employeeRecords = new ArrayList<>();
@@ -82,12 +82,12 @@ public class AttendanceReader {
     }
 
     /**
-     * Get daily attendance records for an employee within a date range
+     * Get daily attendance for an employee within date range
      */
     public Map<LocalDate, Map<String, Object>> getDailyAttendanceForEmployee(
             String employeeId, LocalDate startDate, LocalDate endDate) {
 
-        // Get all attendance records for this employee
+        // Get all records for this employee
         List<AttendanceRecord> employeeRecords = getRecordsForEmployee(employeeId);
 
         // Create a map to store daily attendance: date -> details
@@ -101,22 +101,22 @@ public class AttendanceReader {
             if ((recordDate.isEqual(startDate) || recordDate.isAfter(startDate)) &&
                     (recordDate.isEqual(endDate) || recordDate.isBefore(endDate))) {
 
-                // Check if employee is late
+                // Check if employee is late or undertime
                 boolean isLate = record.isLate();
+                boolean isUndertime = record.isUndertime();
                 double lateMinutes = isLate ? record.getLateMinutes() : 0;
+                double undertimeMinutes = isUndertime ? record.getUndertimeMinutes() : 0;
 
-                // Calculate hours worked
-                double hoursWorked = hoursCalculator.calculateHoursWorked(record.getTimeIn(), record.getTimeOut());
+                // Calculate hours worked with policy applied
+                double hoursWorked = hoursCalculator.calculateHoursWorked(
+                        record.getTimeIn(), record.getTimeOut(), isLate);
 
-                // Apply policy: If late, cap hours at 8.0 and no overtime
+                // Late employees get no overtime
                 double overtimeHours = 0.0;
                 if (!isLate) {
-                    // Only calculate overtime for employees who are not late
-                    overtimeHours = hoursWorked > 8.0 ? (hoursWorked - 8.0) : 0.0;
-                    // Keep the regular hours to 8 maximum
-                    hoursWorked = Math.min(hoursWorked, 8.0);
-                } else {
-                    // For late employees, cap hours at 8.0
+                    // Only non-late employees can get overtime
+                    overtimeHours = hoursCalculator.calculateOvertimeHours(record.getTimeOut(), isLate);
+                    // Cap regular hours at 8
                     hoursWorked = Math.min(hoursWorked, 8.0);
                 }
 
@@ -126,8 +126,10 @@ public class AttendanceReader {
                 dayData.put("timeOut", TimeConverter.formatToStandardTime(record.getTimeOut()));
                 dayData.put("hours", hoursWorked);
                 dayData.put("lateMinutes", lateMinutes);
+                dayData.put("undertimeMinutes", undertimeMinutes);
                 dayData.put("overtimeHours", overtimeHours);
                 dayData.put("isLate", isLate);
+                dayData.put("isUndertime", isUndertime);
 
                 // Add to daily attendance map
                 dailyAttendance.put(recordDate, dayData);
@@ -138,7 +140,7 @@ public class AttendanceReader {
     }
 
     /**
-     * Get weekly attendance summary for an employee within a date range
+     * Get weekly attendance summary for an employee
      */
     public Map<String, Map<String, Double>> getWeeklyAttendanceForEmployee(
             String employeeId, LocalDate startDate, LocalDate endDate) {
@@ -154,7 +156,7 @@ public class AttendanceReader {
     }
 
     /**
-     * Get weekly attendance with daily logs for an employee within a date range
+     * Get weekly attendance with daily logs for an employee
      */
     public Map<String, Object> getWeeklyAttendanceWithDailyLogs(
             String employeeId, LocalDate startDate, LocalDate endDate) {
@@ -176,7 +178,7 @@ public class AttendanceReader {
             int weekOfYear = date.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
             int year = date.getYear();
 
-            // Create a week label
+            // Create a week label (e.g., "Week 1: 3/1-3/7")
             LocalDate weekStart = date.minusDays(date.getDayOfWeek().getValue() - 1);
             LocalDate weekEnd = weekStart.plusDays(6);
 
@@ -190,10 +192,12 @@ public class AttendanceReader {
             // Add this day's values to week totals
             double hoursWorked = (double) dayData.get("hours");
             double lateMinutes = (double) dayData.get("lateMinutes");
+            double undertimeMinutes = (double) dayData.getOrDefault("undertimeMinutes", 0.0);
             double overtimeHours = (double) dayData.get("overtimeHours");
 
             weekData.put("hours", weekData.getOrDefault("hours", 0.0) + hoursWorked);
             weekData.put("lateMinutes", weekData.getOrDefault("lateMinutes", 0.0) + lateMinutes);
+            weekData.put("undertimeMinutes", weekData.getOrDefault("undertimeMinutes", 0.0) + undertimeMinutes);
             weekData.put("overtimeHours", weekData.getOrDefault("overtimeHours", 0.0) + overtimeHours);
 
             // Create a copy of the day data with the date included
@@ -230,14 +234,14 @@ public class AttendanceReader {
         for (AttendanceRecord record : attendanceRecords) {
             String employeeId = record.getEmployeeId();
 
-            // Calculate hours with policy applied
+            // Apply policies
             boolean isLate = record.isLate();
-            double hours = hoursCalculator.calculateHoursWorked(record.getTimeIn(), record.getTimeOut());
+            double hours = hoursCalculator.calculateHoursWorked(record.getTimeIn(), record.getTimeOut(), isLate);
 
-            // Cap hours at 8.0 for all employees, late employees get no overtime
+            // Cap hours at 8.0
             hours = Math.min(hours, 8.0);
 
-            // Add hours to existing total or create new entry
+            // Add hours to total
             double currentTotal = hoursPerEmployee.getOrDefault(employeeId, 0.0);
             hoursPerEmployee.put(employeeId, currentTotal + hours);
         }
@@ -254,19 +258,22 @@ public class AttendanceReader {
         for (AttendanceRecord record : attendanceRecords) {
             String employeeId = record.getEmployeeId();
 
-            // Check if employee is late
+            // Check if employee is late or undertime
             boolean isLate = record.isLate();
+            boolean isUndertime = record.isUndertime();
             double lateMinutes = isLate ? record.getLateMinutes() : 0;
+            double undertimeMinutes = isUndertime ? record.getUndertimeMinutes() : 0;
 
-            // Calculate hours worked
-            double totalHours = hoursCalculator.calculateHoursWorked(record.getTimeIn(), record.getTimeOut());
+            // Calculate hours with policy applied
+            double totalHours = hoursCalculator.calculateHoursWorked(
+                    record.getTimeIn(), record.getTimeOut(), isLate);
 
-            // Apply policy: If late, cap hours at 8.0 and no overtime
+            // Apply policies
             double regularHours = 0.0;
             double overtimeHours = 0.0;
 
             if (!isLate) {
-                // Regular employees get overtime if they work more than 8 hours
+                // Regular employees get overtime after 8 hours
                 regularHours = Math.min(totalHours, 8.0);
                 overtimeHours = totalHours > 8.0 ? (totalHours - 8.0) : 0.0;
             } else {
@@ -282,10 +289,14 @@ public class AttendanceReader {
             info.regularHours += regularHours;
             info.overtimeHours += overtimeHours;
             info.lateMinutes += lateMinutes;
+            info.undertimeMinutes += undertimeMinutes;
 
-            // If employee was late on any day, mark them as late overall
+            // If late or undertime on any day, mark accordingly
             if (isLate) {
                 info.isLate = true;
+            }
+            if (isUndertime) {
+                info.isUndertime = true;
             }
 
             // Update map
@@ -296,12 +307,14 @@ public class AttendanceReader {
     }
 
     /**
-     * Inner class to store overtime information
+     * Class to store overtime information
      */
     public static class OvertimeInfo {
         public double regularHours = 0.0;
         public double overtimeHours = 0.0;
         public double lateMinutes = 0.0;
+        public double undertimeMinutes = 0.0;
         public boolean isLate = false;
+        public boolean isUndertime = false;
     }
 }

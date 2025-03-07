@@ -1,47 +1,52 @@
-// File: motorph/deductions/StatutoryDeductions.java
 package motorph.deductions;
 
 /**
- * Handles calculation of all statutory deductions
+ * Calculates all government deductions
  */
 public class StatutoryDeductions {
 
-    // Constants for pay period options
-    public static final int FIRST_HALF = 1;
-    public static final int SECOND_HALF = 2;
+    // Pay period types
+    public static final int FIRST_HALF = 1;    // 1st-15th
+    public static final int SECOND_HALF = 2;   // 16th-end of month
+
+    // Minimum deductions per pay period
+    private static final double MIN_PAGIBIG_DEDUCTION = 100.0;
 
     /**
-     * Calculate all statutory deductions based on pay period
+     * Calculate all deductions based on salary and pay period
+     *
      * @param grossSalary The gross salary for the period
      * @param payPeriod Either FIRST_HALF or SECOND_HALF
      * @return DeductionResult containing all deduction values
      */
     public static DeductionResult calculateDeductions(double grossSalary, int payPeriod) {
-        // For semi-monthly pay, we double the gross amount to get monthly equivalent for calculation
+        // Convert to monthly amount for calculations
         double monthlyEquivalent = grossSalary * 2;
 
         double sssDeduction = 0;
         double philhealthDeduction = 0;
         double pagibigDeduction = 0;
 
-        // Calculate half of each statutory deduction for the pay period
+        // Calculate for this pay period
         if (payPeriod == FIRST_HALF || payPeriod == SECOND_HALF) {
-            // SSS contribution
+            // SSS contribution (half of monthly amount)
             sssDeduction = SSS.calculateContribution(monthlyEquivalent) / 2;
 
-            // PhilHealth contribution - already calculates for semi-monthly
+            // PhilHealth (already calculated as semi-monthly)
             philhealthDeduction = PhilHealth.calculateContribution(monthlyEquivalent);
 
-            // Pag-IBIG contribution
-            pagibigDeduction = PagIBIG.calculateContribution(monthlyEquivalent) / 2;
+            // Pag-IBIG (half of monthly amount)
+            double calculatedPagibigDeduction = PagIBIG.calculateContribution(monthlyEquivalent) / 2;
+            // Ensure minimum Pag-IBIG deduction per pay period
+            pagibigDeduction = Math.max(calculatedPagibigDeduction, MIN_PAGIBIG_DEDUCTION);
         }
 
-        // For withholding tax, calculate based on monthly income less the full deductions
+        // For tax calculation, we need full monthly values
         double sssFullDeduction = SSS.calculateContribution(monthlyEquivalent);
-        double philhealthFullDeduction = PhilHealth.calculateContribution(monthlyEquivalent) * 2; // Convert from semi-monthly to monthly
+        double philhealthFullDeduction = PhilHealth.calculateContribution(monthlyEquivalent) * 2;
         double pagibigFullDeduction = PagIBIG.calculateContribution(monthlyEquivalent);
 
-        // Calculate withholding tax on the monthly equivalent
+        // Calculate withholding tax on monthly salary
         double withholdingTax = WithholdingTax.calculateTax(
                 monthlyEquivalent,
                 sssFullDeduction,
@@ -49,7 +54,7 @@ public class StatutoryDeductions {
                 pagibigFullDeduction
         );
 
-        // Split withholding tax equally between pay periods
+        // Split tax between pay periods
         double withholdingTaxForPeriod = withholdingTax / 2;
 
         // Return all calculated deductions
@@ -63,7 +68,7 @@ public class StatutoryDeductions {
     }
 
     /**
-     * Class to hold all deduction results
+     * Class to store deduction amounts
      */
     public static class DeductionResult {
         public final double sssDeduction;

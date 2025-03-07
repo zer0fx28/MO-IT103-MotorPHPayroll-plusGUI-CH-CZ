@@ -6,23 +6,19 @@ import java.time.LocalTime;
 import java.time.Duration;
 
 /**
- * Calculator for work hours, lateness, and overtime
+ * Calculates work hours, late time, undertime, and overtime
  */
 public class WorkHoursCalculator {
-    // Standard work schedule (using the constants from AttendanceRecord)
-    private static final LocalTime STANDARD_START_TIME = AttendanceRecord.STANDARD_START_TIME; // 8:00 AM
-    private static final LocalTime STANDARD_END_TIME = AttendanceRecord.STANDARD_END_TIME;     // 5:00 PM
-    private static final LocalTime GRACE_PERIOD_END = AttendanceRecord.GRACE_PERIOD_END;      // 8:10 AM (grace period)
+    // Work schedule times
+    private static final LocalTime START_TIME = AttendanceRecord.STANDARD_START_TIME; // 8:00 AM
+    private static final LocalTime END_TIME = AttendanceRecord.STANDARD_END_TIME;     // 5:00 PM
+    private static final LocalTime GRACE_PERIOD_END = AttendanceRecord.GRACE_PERIOD_END; // 8:10 AM
     private static final Duration LUNCH_BREAK = Duration.ofHours(1);         // 1 hour lunch
-    private static final Duration COFFEE_BREAK = Duration.ofMinutes(30);     // 30 min coffee break
 
     /**
      * Calculate hours worked between login and logout times
-     * @param timeIn Login time
-     * @param timeOut Logout time
-     * @return Hours worked (excluding lunch break, including coffee break)
      */
-    public double calculateHoursWorked(LocalTime timeIn, LocalTime timeOut) {
+    public double calculateHoursWorked(LocalTime timeIn, LocalTime timeOut, boolean isLate) {
         if (timeIn == null || timeOut == null) {
             return 0.0;
         }
@@ -30,12 +26,17 @@ public class WorkHoursCalculator {
         // Handle case where timeOut is earlier than timeIn (next day)
         LocalTime adjustedTimeOut = timeOut;
         if (timeOut.isBefore(timeIn)) {
-            // Add 24 hours by using a placeholder date
             adjustedTimeOut = timeOut.plusHours(24);
         }
 
+        // For late employees: cap the ending time to 5:00 PM (no overtime)
+        LocalTime effectiveTimeOut = adjustedTimeOut;
+        if (isLate && adjustedTimeOut.isAfter(END_TIME)) {
+            effectiveTimeOut = END_TIME;
+        }
+
         // Calculate total duration
-        Duration duration = Duration.between(timeIn, adjustedTimeOut);
+        Duration duration = Duration.between(timeIn, effectiveTimeOut);
 
         // Deduct lunch break (1 hour) if worked at least 5 hours
         if (duration.toHours() >= 5) {
@@ -47,100 +48,124 @@ public class WorkHoursCalculator {
     }
 
     /**
-     * Calculate number of minutes late (after grace period)
-     * @param timeIn Actual login time
-     * @return Minutes late (0 if on time or within grace period)
+     * Simplified method to calculate hours
      */
-    public double calculateLateMinutes(LocalTime timeIn) {
-        return calculateLateMinutes(timeIn, GRACE_PERIOD_END);
+    public double calculateHoursWorked(LocalTime timeIn, LocalTime timeOut) {
+        boolean isLate = isLate(timeIn);
+        return calculateHoursWorked(timeIn, timeOut, isLate);
     }
 
     /**
-     * Calculate number of minutes late (after specified grace period)
-     * @param timeIn Actual login time
-     * @param graceEndTime End of grace period time
-     * @return Minutes late (0 if on time or within grace period)
+     * Check if employee is late (after grace period)
      */
-    public double calculateLateMinutes(LocalTime timeIn, LocalTime graceEndTime) {
-        if (timeIn == null || !timeIn.isAfter(graceEndTime)) {
+    public boolean isLate(LocalTime timeIn) {
+        if (timeIn == null) {
+            return false;
+        }
+        return timeIn.isAfter(GRACE_PERIOD_END);
+    }
+
+    /**
+     * Calculate minutes late (after grace period)
+     */
+    public double calculateLateMinutes(LocalTime timeIn) {
+        if (timeIn == null || !timeIn.isAfter(GRACE_PERIOD_END)) {
             return 0; // Not late if within grace period
         }
 
-        Duration lateBy = Duration.between(graceEndTime, timeIn);
+        Duration lateBy = Duration.between(GRACE_PERIOD_END, timeIn);
         return lateBy.toMinutes();
     }
 
     /**
-     * Calculate overtime hours (after standard end time)
-     * @param timeOut Actual logout time
-     * @return Overtime hours (0 if no overtime)
+     * Calculate undertime minutes (left before 5 PM)
      */
-    public double calculateOvertimeHours(LocalTime timeOut) {
-        if (timeOut == null || !timeOut.isAfter(STANDARD_END_TIME)) {
-            return 0; // No overtime
+    public double calculateUndertimeMinutes(LocalTime timeOut) {
+        if (timeOut == null || !timeOut.isBefore(END_TIME)) {
+            return 0; // No undertime if left at or after 5 PM
         }
 
-        Duration overtime = Duration.between(STANDARD_END_TIME, timeOut);
+        Duration undertimeBy = Duration.between(timeOut, END_TIME);
+        return undertimeBy.toMinutes();
+    }
+
+    /**
+     * Calculate overtime hours (after 5 PM)
+     * Only applies to employees who are not late
+     */
+    public double calculateOvertimeHours(LocalTime timeOut, boolean isLate) {
+        if (timeOut == null || !timeOut.isAfter(END_TIME) || isLate) {
+            return 0; // No overtime if left before 5 PM or was late
+        }
+
+        Duration overtime = Duration.between(END_TIME, timeOut);
         return overtime.toMinutes() / 60.0;
     }
 
     /**
-     * Calculate hours worked for a day with specified login/logout time strings
-     * Handles standard time format conversion
-     * @param timeInStr Time in string (e.g., "8:00" or "8:00 AM")
-     * @param timeOutStr Time out string (e.g., "5:00" or "5:00 PM")
-     * @return Hours worked, considering breaks
+     * Calculate hours worked from time strings
      */
     public double calculateDailyHoursFromStrings(String timeInStr, String timeOutStr) {
         try {
-            // Parse times with intelligent format handling
             LocalTime timeIn = TimeConverter.parseUserTime(timeInStr);
             LocalTime timeOut = TimeConverter.parseUserTime(timeOutStr);
 
             if (timeIn == null || timeOut == null) {
-                System.out.println("Invalid time format. Using default 8:00 AM - 5:00 PM");
-                return 8.0; // Default to 8 hours if time parsing fails
+                return 0.0;
             }
 
-            return calculateHoursWorked(timeIn, timeOut);
+            boolean isLate = isLate(timeIn);
+            return calculateHoursWorked(timeIn, timeOut, isLate);
         } catch (Exception e) {
             System.out.println("Error calculating hours: " + e.getMessage());
-            return 8.0; // Default to 8 hours on error
+            return 0.0;
         }
     }
 
     /**
-     * Calculate late minutes from a login time string
-     * @param timeInStr Time in string (e.g., "8:15" or "8:15 AM")
-     * @return Minutes late (after grace period)
+     * Calculate late minutes from time string
      */
     public double calculateLateMinutesFromString(String timeInStr) {
         try {
             LocalTime timeIn = TimeConverter.parseUserTime(timeInStr);
-            if (timeIn == null) {
-                return 0;
-            }
-            return calculateLateMinutes(timeIn, GRACE_PERIOD_END);
+            return calculateLateMinutes(timeIn);
         } catch (Exception e) {
-            System.out.println("Error calculating lateness: " + e.getMessage());
             return 0;
         }
     }
 
     /**
-     * Calculate overtime hours from a logout time string
-     * @param timeOutStr Time out string (e.g., "6:30" or "6:30 PM")
-     * @return Overtime hours
+     * Calculate undertime minutes from time string
+     */
+    public double calculateUndertimeMinutesFromString(String timeOutStr) {
+        try {
+            LocalTime timeOut = TimeConverter.parseUserTime(timeOutStr);
+            return calculateUndertimeMinutes(timeOut);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Calculate overtime hours from time string
      */
     public double calculateOvertimeFromString(String timeOutStr) {
         try {
             LocalTime timeOut = TimeConverter.parseUserTime(timeOutStr);
-            if (timeOut == null) {
-                return 0;
-            }
-            return calculateOvertimeHours(timeOut);
+            return calculateOvertimeHours(timeOut, false); // Assuming not late
         } catch (Exception e) {
-            System.out.println("Error calculating overtime: " + e.getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Calculate overtime with lateness considered
+     */
+    public double calculateOvertimeFromStringWithLate(String timeOutStr, boolean isLate) {
+        try {
+            LocalTime timeOut = TimeConverter.parseUserTime(timeOutStr);
+            return calculateOvertimeHours(timeOut, isLate);
+        } catch (Exception e) {
             return 0;
         }
     }
