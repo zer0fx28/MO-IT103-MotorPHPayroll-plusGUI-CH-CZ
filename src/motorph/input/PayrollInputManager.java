@@ -3,8 +3,10 @@ package motorph.input;
 
 import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
+import motorph.process.PayrollDateManager;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
@@ -116,16 +118,76 @@ public class PayrollInputManager {
     }
 
     /**
-     * Determine pay period type based on end date
-     * @param endDate The end date of the period
-     * @return 1 for first half, 2 for second half of month
+     * Get year from user
+     * @return Year selected by user
      */
-    public int determinePayPeriodType(LocalDate endDate) {
-        // If day is > 15, assume second half
-        if (endDate.getDayOfMonth() > 15) {
-            return 2; // Second half
+    public int getYear() {
+        System.out.print("Enter Year (YYYY): ");
+        try {
+            int year = Integer.parseInt(scanner.nextLine().trim());
+            if (year < 2000 || year > 2100) { // Basic validation
+                throw new NumberFormatException();
+            }
+            return year;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid year. Using current year.");
+            return LocalDate.now().getYear();
         }
-        return 1; // First half
+    }
+
+    /**
+     * Get month from user
+     * @return Month selected by user (1-12)
+     */
+    public int getMonth() {
+        System.out.print("Enter Month (1-12): ");
+        try {
+            int month = Integer.parseInt(scanner.nextLine().trim());
+            if (month < 1 || month > 12) {
+                throw new NumberFormatException();
+            }
+            return month;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid month. Using current month.");
+            return LocalDate.now().getMonthValue();
+        }
+    }
+
+    /**
+     * Get pay period type from user
+     * @return PayrollDateManager.MID_MONTH or PayrollDateManager.END_MONTH
+     */
+    public int getPayPeriodType() {
+        System.out.println("\nSelect payroll type:");
+        System.out.println("1. Mid-month (15th)");
+        System.out.println("2. End-month");
+        System.out.print("Enter choice (1-2): ");
+
+        try {
+            int choice = Integer.parseInt(scanner.nextLine().trim());
+            if (choice == 1) {
+                return PayrollDateManager.MID_MONTH;
+            } else if (choice == 2) {
+                return PayrollDateManager.END_MONTH;
+            } else {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid choice. Using Mid-month.");
+            return PayrollDateManager.MID_MONTH;
+        }
+    }
+
+    /**
+     * Get cutoff date range based on year, month, and pay period type
+     * @param year Year
+     * @param month Month (1-12)
+     * @param payPeriodType PayrollDateManager.MID_MONTH or PayrollDateManager.END_MONTH
+     * @return Array with [startDate, endDate] for the cutoff period
+     */
+    public LocalDate[] getCutoffDateRange(int year, int month, int payPeriodType) {
+        LocalDate payrollDate = PayrollDateManager.getPayrollDate(year, month, payPeriodType);
+        return PayrollDateManager.getCutoffDateRange(payrollDate, payPeriodType);
     }
 
     /**

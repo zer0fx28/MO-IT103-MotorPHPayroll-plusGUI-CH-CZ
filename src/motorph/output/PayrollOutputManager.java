@@ -3,6 +3,7 @@ package motorph.output;
 
 import motorph.employee.Employee;
 import motorph.hours.AttendanceReader;
+import motorph.process.PayrollDateManager;
 import motorph.process.PayrollProcessor;
 
 import java.time.LocalDate;
@@ -35,9 +36,9 @@ public class PayrollOutputManager {
      */
     public void displayMainMenu() {
         System.out.println("\nMAIN MENU:");
-        System.out.println("1. Find Employee");
-        System.out.println("2. Show All Employee Details");
-        System.out.println("3. Process Payroll");
+        System.out.println("1. Process Payroll");
+        System.out.println("2. Find Employee");
+        System.out.println("3. View Payroll Calendar");
         System.out.println("4. Exit");
         System.out.print("Enter choice (1-4): ");
     }
@@ -52,8 +53,9 @@ public class PayrollOutputManager {
         // Options after viewing employee
         System.out.println("\nOptions:");
         System.out.println("1. Check Employee Attendance");
-        System.out.println("2. Back to Main Menu");
-        System.out.print("Enter choice (1-2): ");
+        System.out.println("2. Process Payroll for This Employee");
+        System.out.println("3. Back to Main Menu");
+        System.out.print("Enter choice (1-3): ");
     }
 
     /**
@@ -282,13 +284,31 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display payroll summary report
-     * Returns the attendance totals for further processing
+     * Display payroll information and return attendance summary
      */
-    public Map<String, Double> displayPayrollSummary(Employee employee, LocalDate startDate, LocalDate endDate) {
-        System.out.println("\n===== ATTENDANCE SUMMARY =====");
+    public Map<String, Object> displayPayrollSummary(Employee employee, LocalDate startDate, LocalDate endDate, int payPeriodType) {
+        System.out.println("\n===== PAYROLL SUMMARY =====");
         System.out.println("Employee: " + employee.getFullName() + " (ID: " + employee.getEmployeeId() + ")");
-        System.out.println("Pay Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
+
+        // Display payroll period type
+        String periodType = (payPeriodType == PayrollDateManager.MID_MONTH) ? "Mid-month" : "End-month";
+        System.out.println("Payroll Type: " + periodType);
+
+        // Display cutoff period
+        System.out.println("Cutoff Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
+
+        // Display payroll date
+        LocalDate payrollDate = PayrollDateManager.getPayrollDate(
+                startDate.getYear(), startDate.getMonthValue(), payPeriodType);
+        System.out.println("Payroll Date: " + payrollDate.format(dateFormatter));
+
+        // Display applicable deductions based on period type
+        System.out.println("Applicable Deductions:");
+        if (payPeriodType == PayrollDateManager.MID_MONTH) {
+            System.out.println("• SSS, PhilHealth, Pag-IBIG");
+        } else {
+            System.out.println("• Withholding Tax");
+        }
 
         // Get weekly attendance data with daily logs
         Map<String, Object> attendanceData = attendanceReader.getWeeklyAttendanceWithDailyLogs(
@@ -391,20 +411,20 @@ public class PayrollOutputManager {
         System.out.println("\n=================================================================================");
         System.out.printf("TOTALS:\t\t\t\t\t\t\t%.2f\t%.0f\t%.0f\t%.2f\n",
                 totalHours, totalLateMinutes, totalUndertimeMinutes, totalOvertimeHours);
-        System.out.println("* Hours are capped at 8.0 for regular pay, but employees can complete full 8 hours even if late.");
-        System.out.println("* Employees who log out before 5:00 PM get undertime deductions.");
+        System.out.println("* Hours are calculated based on actual time logs.");
         System.out.println("* Late employees (after 8:10 AM) cannot earn overtime pay.");
+        System.out.println("* Undertime deductions apply for employees who leave before 5:00 PM.");
 
-        // Return the totals for further processing
-        Map<String, Double> totals = new HashMap<>();
-        totals.put("hours", totalHours);
-        totals.put("lateMinutes", totalLateMinutes);
-        totals.put("undertimeMinutes", totalUndertimeMinutes);
-        totals.put("overtimeHours", totalOvertimeHours);
-        totals.put("isLateAnyDay", isLateAnyDay ? 1.0 : 0.0);
-        totals.put("isUndertimeAnyDay", isUndertimeAnyDay ? 1.0 : 0.0);
+        // Return the attendance summary
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("hours", totalHours);
+        summary.put("lateMinutes", totalLateMinutes);
+        summary.put("undertimeMinutes", totalUndertimeMinutes);
+        summary.put("overtimeHours", totalOvertimeHours);
+        summary.put("isLateAnyDay", isLateAnyDay);
+        summary.put("isUndertimeAnyDay", isUndertimeAnyDay);
 
-        return totals;
+        return summary;
     }
 
     /**
@@ -413,5 +433,35 @@ public class PayrollOutputManager {
     public void displaySalaryDetails(Employee employee) {
         System.out.println("\n===== SALARY DETAILS =====");
         payrollProcessor.displaySalaryDetails(employee);
+    }
+
+    /**
+     * Display payroll calendar for a year and month
+     */
+    public void displayPayrollCalendar(int year, int month) {
+        System.out.println("\n===== PAYROLL CALENDAR =====");
+        System.out.println(PayrollDateManager.getMonthName(month) + " " + year);
+
+        // Calculate the payroll dates
+        LocalDate midMonthPayDate = PayrollDateManager.getPayrollDate(year, month, PayrollDateManager.MID_MONTH);
+        LocalDate endMonthPayDate = PayrollDateManager.getPayrollDate(year, month, PayrollDateManager.END_MONTH);
+
+        // Get the cutoff periods
+        LocalDate[] midMonthCutoff = PayrollDateManager.getCutoffDateRange(midMonthPayDate, PayrollDateManager.MID_MONTH);
+        LocalDate[] endMonthCutoff = PayrollDateManager.getCutoffDateRange(endMonthPayDate, PayrollDateManager.END_MONTH);
+
+        // Display mid-month payroll information
+        System.out.println("\nMid-month Payroll:");
+        System.out.println("  Date: " + midMonthPayDate.format(dateFormatter));
+        System.out.println("  Cutoff Period: " + midMonthCutoff[0].format(dateFormatter) +
+                " to " + midMonthCutoff[1].format(dateFormatter));
+        System.out.println("  Deductions: SSS, PhilHealth, Pag-IBIG");
+
+        // Display end-month payroll information
+        System.out.println("\nEnd-month Payroll:");
+        System.out.println("  Date: " + endMonthPayDate.format(dateFormatter));
+        System.out.println("  Cutoff Period: " + endMonthCutoff[0].format(dateFormatter) +
+                " to " + endMonthCutoff[1].format(dateFormatter));
+        System.out.println("  Deductions: Withholding Tax");
     }
 }

@@ -1,74 +1,72 @@
+// File: motorph/deductions/StatutoryDeductions.java
 package motorph.deductions;
 
+import motorph.process.PayrollDateManager;
+
 /**
- * Calculates all government deductions
+ * Calculates government deductions (SSS, PhilHealth, Pag-IBIG, Tax)
  */
 public class StatutoryDeductions {
-
-    // Pay period types
-    public static final int FIRST_HALF = 1;    // 1st-15th
-    public static final int SECOND_HALF = 2;   // 16th-end of month
-
-    // Minimum deductions per pay period
-    private static final double MIN_PAGIBIG_DEDUCTION = 100.0;
+    // Constants for pay period types
+    public static final int MID_MONTH = PayrollDateManager.MID_MONTH;
+    public static final int END_MONTH = PayrollDateManager.END_MONTH;
 
     /**
-     * Calculate all deductions based on salary and pay period
+     * Calculate all deductions based on the new schedule:
+     * - SSS, PhilHealth, Pag-IBIG: deducted on mid-month payroll
+     * - Tax: deducted on end-month payroll
      *
      * @param grossSalary The gross salary for the period
-     * @param payPeriod Either FIRST_HALF or SECOND_HALF
-     * @return DeductionResult containing all deduction values
+     * @param payPeriod Either MID_MONTH or END_MONTH
+     * @param fullMonthlyGross The total monthly gross (both periods)
+     * @return DeductionResult with all the calculated deductions
      */
-    public static DeductionResult calculateDeductions(double grossSalary, int payPeriod) {
-        // Convert to monthly amount for calculations
-        double monthlyEquivalent = grossSalary * 2;
-
+    public static DeductionResult calculateDeductions(double grossSalary, int payPeriod, double fullMonthlyGross) {
+        // By default, set all deductions to zero
         double sssDeduction = 0;
         double philhealthDeduction = 0;
         double pagibigDeduction = 0;
+        double withholdingTax = 0;
 
-        // Calculate for this pay period
-        if (payPeriod == FIRST_HALF || payPeriod == SECOND_HALF) {
-            // SSS contribution (half of monthly amount)
-            sssDeduction = SSS.calculateContribution(monthlyEquivalent) / 2;
-
-            // PhilHealth (already calculated as semi-monthly)
-            philhealthDeduction = PhilHealth.calculateContribution(monthlyEquivalent);
-
-            // Pag-IBIG (half of monthly amount)
-            double calculatedPagibigDeduction = PagIBIG.calculateContribution(monthlyEquivalent) / 2;
-            // Ensure minimum Pag-IBIG deduction per pay period
-            pagibigDeduction = Math.max(calculatedPagibigDeduction, MIN_PAGIBIG_DEDUCTION);
+        // For SSS, PhilHealth, and Pag-IBIG, deduct only on mid-month payroll
+        if (payPeriod == MID_MONTH) {
+            // Calculate based on full monthly salary
+            sssDeduction = SSS.calculateContribution(fullMonthlyGross);
+            philhealthDeduction = PhilHealth.calculateContribution(fullMonthlyGross);
+            pagibigDeduction = PagIBIG.calculateContribution(fullMonthlyGross);
         }
 
-        // For tax calculation, we need full monthly values
-        double sssFullDeduction = SSS.calculateContribution(monthlyEquivalent);
-        double philhealthFullDeduction = PhilHealth.calculateContribution(monthlyEquivalent) * 2;
-        double pagibigFullDeduction = PagIBIG.calculateContribution(monthlyEquivalent);
+        // For tax, deduct only on end-month payroll
+        if (payPeriod == END_MONTH) {
+            // Calculate statutory deductions for the month
+            double monthlySSS = SSS.calculateContribution(fullMonthlyGross);
+            double monthlyPhilHealth = PhilHealth.calculateContribution(fullMonthlyGross);
+            double monthlyPagIBIG = PagIBIG.calculateContribution(fullMonthlyGross);
 
-        // Calculate withholding tax on monthly salary
-        double withholdingTax = WithholdingTax.calculateTax(
-                monthlyEquivalent,
-                sssFullDeduction,
-                philhealthFullDeduction,
-                pagibigFullDeduction
-        );
+            // Calculate tax based on full monthly income minus the deductions
+            withholdingTax = WithholdingTax.calculateTax(
+                    fullMonthlyGross,
+                    monthlySSS,
+                    monthlyPhilHealth,
+                    monthlyPagIBIG
+            );
+        }
 
-        // Split tax between pay periods
-        double withholdingTaxForPeriod = withholdingTax / 2;
+        // Calculate total deductions
+        double totalDeductions = sssDeduction + philhealthDeduction + pagibigDeduction + withholdingTax;
 
-        // Return all calculated deductions
+        // Return the deduction result
         return new DeductionResult(
                 sssDeduction,
                 philhealthDeduction,
                 pagibigDeduction,
-                withholdingTaxForPeriod,
-                sssDeduction + philhealthDeduction + pagibigDeduction + withholdingTaxForPeriod
+                withholdingTax,
+                totalDeductions
         );
     }
 
     /**
-     * Class to store deduction amounts
+     * Simple class to hold all deduction amounts
      */
     public static class DeductionResult {
         public final double sssDeduction;

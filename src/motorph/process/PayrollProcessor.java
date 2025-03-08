@@ -4,12 +4,12 @@ package motorph.process;
 import motorph.deductions.StatutoryDeductions;
 import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
+import motorph.holidays.HolidayManager;
 import motorph.hours.AttendanceReader;
 import motorph.hours.WorkHoursCalculator;
 import motorph.util.TimeConverter;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +21,7 @@ public class PayrollProcessor {
     private final EmployeeDataReader employeeDataReader;
     private final AttendanceReader attendanceReader;
     private final WorkHoursCalculator hoursCalculator;
+    private final HolidayManager holidayManager;
 
     // Storage for calculated values
     private final Map<String, Double> currentGrossPay = new HashMap<>();
@@ -35,97 +36,81 @@ public class PayrollProcessor {
         this.employeeDataReader = new EmployeeDataReader(employeeFilePath);
         this.attendanceReader = new AttendanceReader(attendanceFilePath);
         this.hoursCalculator = new WorkHoursCalculator();
+        this.holidayManager = new HolidayManager();
     }
 
     /**
-     * Calculate hours worked from time strings
-     */
-    public double calculateDailyHoursFromStrings(String timeInStr, String timeOutStr) {
-        return hoursCalculator.calculateDailyHoursFromStrings(timeInStr, timeOutStr);
-    }
-
-    /**
-     * Calculate minutes late
-     */
-    public double calculateLateMinutesFromString(String timeInStr) {
-        return hoursCalculator.calculateLateMinutesFromString(timeInStr);
-    }
-
-    /**
-     * Calculate minutes undertime (left before 5 PM)
-     */
-    public double calculateUndertimeMinutesFromString(String timeOutStr) {
-        return hoursCalculator.calculateUndertimeMinutesFromString(timeOutStr);
-    }
-
-    /**
-     * Calculate overtime hours
-     */
-    public double calculateOvertimeFromString(String timeOutStr) {
-        return hoursCalculator.calculateOvertimeFromString(timeOutStr);
-    }
-
-    /**
-     * Calculate overtime with lateness considered
-     */
-    public double calculateOvertimeFromStringWithLate(String timeOutStr, boolean isLate) {
-        return hoursCalculator.calculateOvertimeFromStringWithLate(timeOutStr, isLate);
-    }
-
-    /**
-     * Process payroll for one employee day
-     */
-    public void processIndividualPayroll(Employee employee, double hoursWorked,
-                                         double overtimeHours, double lateMinutes,
-                                         double undertimeMinutes, boolean isLate,
-                                         int payPeriod) {
-
-        processPayrollForPeriod(employee, hoursWorked, overtimeHours, lateMinutes,
-                undertimeMinutes, isLate, payPeriod, null, null);
-    }
-
-    /**
-     * Process payroll for an entire period
+     * Process payroll for a period
      */
     public void processPayrollForPeriod(Employee employee, double hoursWorked,
                                         double overtimeHours, double lateMinutes,
                                         double undertimeMinutes, boolean isLate,
-                                        int payPeriod, LocalDate startDate, LocalDate endDate) {
+                                        int payPeriodType, LocalDate startDate, LocalDate endDate,
+                                        int year, int month) {
 
         String employeeId = employee.getEmployeeId();
+        double monthlySalary = employee.getBasicSalary();
+        double semiMonthlySalary = monthlySalary / 2;  // Half of the monthly salary
         double hourlyRate = employee.getHourlyRate();
+        double dailyRate = monthlySalary / PayrollDateManager.getWorkingDaysInYear(year);
 
-        // Calculate regular pay for the total hours worked
-        double regularPay = hourlyRate * hoursWorked;
+        // Base computation is half the monthly salary
+        double basePay = semiMonthlySalary;
 
-        // Calculate overtime pay (1.5x regular rate)
-        double overtimePay = 0.0;
-        if (overtimeHours > 0) {
-            overtimePay = hourlyRate * overtimeHours * 1.5;
-        }
+        // Calculate deductions for late, undertime, and absences
 
-        // Calculate late deduction (per minute rate * late minutes)
+        // Late deduction: per minute rate × late minutes
         double lateDeduction = 0.0;
         if (lateMinutes > 0) {
             double perMinuteRate = hourlyRate / 60.0;
             lateDeduction = perMinuteRate * lateMinutes;
         }
 
-        // Calculate undertime deduction (per minute rate * undertime minutes)
+        // Undertime deduction: per minute rate × undertime minutes
         double undertimeDeduction = 0.0;
         if (undertimeMinutes > 0) {
             double perMinuteRate = hourlyRate / 60.0;
             undertimeDeduction = perMinuteRate * undertimeMinutes;
         }
 
-        // Calculate gross pay (never less than zero)
-        double grossPay = Math.max(0, regularPay + overtimePay - lateDeduction - undertimeDeduction);
+        // Calculate number of working days in the cutoff period
+        LocalDate[] cutoffRange = PayrollDateManager.getCutoffDateRange(
+                PayrollDateManager.getPayrollDate(year, month, payPeriodType),
+                payPeriodType);
 
-        // Calculate government deductions
+        // Calculate the expected working hours for the period
+        int workingDaysInPeriod = 10; // Simplified: Assume 10 working days in a period
+        double expectedHours = workingDaysInPeriod * 8.0; // 8 hours per day
+
+        // Calculate absences (if any)
+        double absentHours = Math.max(0, expectedHours - hoursWorked - (lateMinutes / 60.0) - (undertimeMinutes / 60.0));
+        double absentDays = absentHours / 8.0; // Convert hours to days
+        double absenceDeduction = absentDays * dailyRate;
+
+        // Calculate overtime pay
+        double overtimePay = 0.0;
+        if (overtimeHours > 0 && !isLate) {
+            overtimePay = hourlyRate * overtimeHours * 1.25; // 25% overtime premium
+        }
+
+        // Calculate holiday pay (simplified - would need to check each day in real implementation)
+        double holidayPay = 0.0;
+        // Not implementing full holiday check here to keep it simple
+
+        // Calculate gross pay: base pay + overtime - deductions
+        double grossPay = basePay + overtimePay + holidayPay - lateDeduction - undertimeDeduction - absenceDeduction;
+
+        // Ensure gross pay is not negative
+        grossPay = Math.max(0, grossPay);
+
+        // Full monthly gross (for tax calculation)
+        double fullMonthlyGross = grossPay * 2; // Simplified approximation
+
+        // Calculate statutory deductions
         StatutoryDeductions.DeductionResult deductions =
-                StatutoryDeductions.calculateDeductions(grossPay, payPeriod);
+                StatutoryDeductions.calculateDeductions(grossPay, payPeriodType, fullMonthlyGross);
 
-        // Calculate net pay (never less than zero)
+        // Calculate net pay
         double netPay = Math.max(0, grossPay - deductions.totalDeductions);
 
         // Save calculations
@@ -135,18 +120,25 @@ public class PayrollProcessor {
 
         // Save additional details for reports
         Map<String, Object> payDetails = new HashMap<>();
-        payDetails.put("regularPay", regularPay);
+        payDetails.put("regularPay", basePay);
         payDetails.put("overtimePay", overtimePay);
+        payDetails.put("holidayPay", holidayPay);
         payDetails.put("lateDeduction", lateDeduction);
         payDetails.put("undertimeDeduction", undertimeDeduction);
+        payDetails.put("absenceDeduction", absenceDeduction);
         payDetails.put("hoursWorked", hoursWorked);
         payDetails.put("overtimeHours", overtimeHours);
         payDetails.put("lateMinutes", lateMinutes);
         payDetails.put("undertimeMinutes", undertimeMinutes);
+        payDetails.put("expectedHours", expectedHours);
+        payDetails.put("absentHours", absentHours);
+        payDetails.put("dailyRate", dailyRate);
         payDetails.put("startDate", startDate);
         payDetails.put("endDate", endDate);
-        payDetails.put("payPeriod", payPeriod);
+        payDetails.put("payPeriod", payPeriodType);
         payDetails.put("hourlyRate", hourlyRate);
+        payDetails.put("year", year);
+        payDetails.put("month", month);
 
         currentPayDetails.put(employeeId, payDetails);
     }
@@ -190,46 +182,87 @@ public class PayrollProcessor {
         double undertimeMinutes = (double) payDetails.getOrDefault("undertimeMinutes", 0.0);
         double regularPay = (double) payDetails.get("regularPay");
         double overtimePay = (double) payDetails.get("overtimePay");
+        double holidayPay = (double) payDetails.getOrDefault("holidayPay", 0.0);
         double lateDeduction = (double) payDetails.get("lateDeduction");
         double undertimeDeduction = (double) payDetails.getOrDefault("undertimeDeduction", 0.0);
+        double absenceDeduction = (double) payDetails.getOrDefault("absenceDeduction", 0.0);
         double hourlyRate = (double) payDetails.get("hourlyRate");
+        double expectedHours = (double) payDetails.getOrDefault("expectedHours", 0.0);
+        double absentHours = (double) payDetails.getOrDefault("absentHours", 0.0);
+        double dailyRate = (double) payDetails.getOrDefault("dailyRate", 0.0);
+        int payPeriod = (int) payDetails.get("payPeriod");
+        int year = (int) payDetails.getOrDefault("year", LocalDate.now().getYear());
+        int month = (int) payDetails.getOrDefault("month", LocalDate.now().getMonthValue());
 
+        // Display payroll details
         System.out.println("\n===== SALARY CALCULATION =====");
         System.out.println("Date: " + formattedDate);
         System.out.println("Employee: " + employee.getFullName() + " (ID: " + employeeId + ")");
         System.out.println("Position: " + employee.getPosition());
-        System.out.println("Hourly Rate: ₱" + String.format("%.2f", hourlyRate) + "/hour" +
-                " (₱" + String.format("%.4f", hourlyRate/60) + "/minute)");
+        System.out.println("Basic Salary: ₱" + String.format("%,.2f", employee.getBasicSalary()) + "/month");
+        System.out.println("Hourly Rate: ₱" + String.format("%.2f", hourlyRate) + "/hour");
+        System.out.println("Daily Rate: ₱" + String.format("%.2f", dailyRate) + "/day");
 
-        if (!periodStr.isEmpty()) {
-            System.out.println(periodStr);
+        // Show cutoff period and payroll date
+        if (startDate != null && endDate != null) {
+            System.out.println("Cutoff Period: " + startDate.format(dateFormatter) +
+                    " to " + endDate.format(dateFormatter));
+
+            LocalDate payrollDate = PayrollDateManager.getPayrollDate(year, month, payPeriod);
+            System.out.println("Payroll Date: " + payrollDate.format(dateFormatter) +
+                    (payPeriod == PayrollDateManager.MID_MONTH ? " (Mid-month)" : " (End-month)"));
         }
 
         System.out.println("\n--- WORK SUMMARY ---");
-        System.out.println("Regular Hours: " + String.format("%.2f", hoursWorked) + " hours");
+        System.out.println("Expected Work Hours: " + String.format("%.2f", expectedHours) + " hours");
+        System.out.println("Actual Hours Worked: " + String.format("%.2f", hoursWorked) + " hours");
         System.out.println("Overtime Hours: " + String.format("%.2f", overtimeHours) + " hours");
         System.out.println("Late: " + String.format("%.0f", lateMinutes) + " minutes");
         System.out.println("Undertime: " + String.format("%.0f", undertimeMinutes) + " minutes");
+        System.out.println("Absent Hours: " + String.format("%.2f", absentHours) +
+                " hours (" + String.format("%.2f", absentHours/8) + " days)");
 
         System.out.println("\n--- EARNINGS ---");
-        System.out.println("Basic Pay: ₱" + String.format("%,.2f", regularPay) +
-                " (" + String.format("%.2f", hoursWorked) + " hrs × ₱" +
-                String.format("%.2f", hourlyRate) + ")");
-        System.out.println("Overtime Pay: ₱" + String.format("%,.2f", overtimePay) +
-                (overtimeHours > 0 ? " (" + String.format("%.2f", overtimeHours) +
-                        " hrs × ₱" + String.format("%.2f", hourlyRate * 1.5) + ")" : ""));
+        System.out.println("Basic Pay: ₱" + String.format("%,.2f", regularPay));
+
+        if (overtimePay > 0) {
+            System.out.println("Overtime Pay: ₱" + String.format("%,.2f", overtimePay) +
+                    " (" + String.format("%.2f", overtimeHours) + " hrs × ₱" +
+                    String.format("%.2f", hourlyRate * 1.25) + ")");
+        } else {
+            System.out.println("Overtime Pay: ₱0.00");
+        }
+
+        if (holidayPay > 0) {
+            System.out.println("Holiday Pay: ₱" + String.format("%,.2f", holidayPay));
+        }
 
         System.out.println("\n--- DEDUCTIONS ---");
         System.out.println("Late Deduction: ₱" + String.format("%,.2f", lateDeduction) +
                 (lateMinutes > 0 ? " (" + String.format("%.0f", lateMinutes) +
                         " mins × ₱" + String.format("%.4f", hourlyRate/60) + ")" : ""));
+
         System.out.println("Undertime Deduction: ₱" + String.format("%,.2f", undertimeDeduction) +
                 (undertimeMinutes > 0 ? " (" + String.format("%.0f", undertimeMinutes) +
                         " mins × ₱" + String.format("%.4f", hourlyRate/60) + ")" : ""));
-        System.out.println("SSS: ₱" + String.format("%.2f", deductions.sssDeduction));
-        System.out.println("PhilHealth: ₱" + String.format("%.2f", deductions.philhealthDeduction));
-        System.out.println("Pag-IBIG: ₱" + String.format("%.2f", deductions.pagibigDeduction));
-        System.out.println("Withholding Tax: ₱" + String.format("%.2f", deductions.withholdingTax));
+
+        System.out.println("Absence Deduction: ₱" + String.format("%,.2f", absenceDeduction) +
+                (absentHours > 0 ? " (" + String.format("%.2f", absentHours/8) +
+                        " days × ₱" + String.format("%.2f", dailyRate) + ")" : ""));
+
+        // Show statutory deductions based on period
+        if (payPeriod == PayrollDateManager.MID_MONTH) {
+            System.out.println("SSS: ₱" + String.format("%.2f", deductions.sssDeduction));
+            System.out.println("PhilHealth: ₱" + String.format("%.2f", deductions.philhealthDeduction));
+            System.out.println("Pag-IBIG: ₱" + String.format("%.2f", deductions.pagibigDeduction));
+            System.out.println("Withholding Tax: ₱" + String.format("%.2f", deductions.withholdingTax) + " (Deducted on End-month)");
+        } else {
+            System.out.println("SSS: ₱0.00 (Deducted on Mid-month)");
+            System.out.println("PhilHealth: ₱0.00 (Deducted on Mid-month)");
+            System.out.println("Pag-IBIG: ₱0.00 (Deducted on Mid-month)");
+            System.out.println("Withholding Tax: ₱" + String.format("%.2f", deductions.withholdingTax));
+        }
+
         System.out.println("Total Deductions: ₱" + String.format("%.2f", deductions.totalDeductions));
 
         System.out.println("\n--- NET PAY ---");
@@ -237,12 +270,19 @@ public class PayrollProcessor {
         System.out.println("Net Pay: ₱" + String.format("%,.2f", netPay));
 
         // Show notes about policies
-        System.out.println("\n--- NOTES ---");
-        if (lateMinutes > 0) {
-            System.out.println("- Employee was late. No overtime allowed.");
+        System.out.println("\n--- POLICIES ---");
+        if (payPeriod == PayrollDateManager.MID_MONTH) {
+            System.out.println("- SSS, PhilHealth, and Pag-IBIG are deducted on Mid-month payroll.");
+        } else {
+            System.out.println("- Withholding Tax is deducted on End-month payroll.");
         }
+
+        if (lateMinutes > 0) {
+            System.out.println("- Late employees cannot earn overtime pay.");
+        }
+
         if (undertimeMinutes > 0) {
-            System.out.println("- Employee left before 5:00 PM. Undertime deduction applied.");
+            System.out.println("- Early departure deductions apply for leaving before 5:00 PM.");
         }
     }
 }

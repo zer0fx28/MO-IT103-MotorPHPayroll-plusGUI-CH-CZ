@@ -3,12 +3,15 @@ package motorph.output;
 
 import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
+import motorph.holidays.HolidayManager;
 import motorph.hours.AttendanceReader;
 import motorph.input.PayrollInputManager;
+import motorph.process.PayrollDateManager;
 import motorph.process.PayrollProcessor;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Main class for the MotorPH Payroll System
@@ -17,14 +20,13 @@ public class Main {
     // For user input
     private static Scanner scanner;
 
-    // Manager classes
-    private static PayrollOutputManager outputManager;
-    private static PayrollInputManager inputManager;
-
-    // Data and processing classes
+    // System components
     private static EmployeeDataReader employeeDataReader;
     private static AttendanceReader attendanceReader;
     private static PayrollProcessor payrollProcessor;
+    private static PayrollOutputManager outputManager;
+    private static PayrollInputManager inputManager;
+    private static HolidayManager holidayManager;
 
     public static void main(String[] args) {
         System.out.println("===== MOTORPH PAYROLL SYSTEM =====");
@@ -37,10 +39,11 @@ public class Main {
             // Initialize scanner
             scanner = new Scanner(System.in);
 
-            // Load data
+            // Load data and initialize components
             System.out.println("Loading data...");
             employeeDataReader = new EmployeeDataReader(employeeFilePath);
             attendanceReader = new AttendanceReader(attendanceFilePath);
+            holidayManager = new HolidayManager();
             payrollProcessor = new PayrollProcessor(employeeFilePath, attendanceFilePath);
 
             // Initialize managers
@@ -57,13 +60,13 @@ public class Main {
 
                 switch (choice) {
                     case "1":
-                        findEmployee();
+                        processPayroll();
                         break;
                     case "2":
-                        showAllEmployeeDetails();
+                        findEmployee();
                         break;
                     case "3":
-                        processPayroll();
+                        viewPayrollCalendar();
                         break;
                     case "4":
                         exit = true;
@@ -85,42 +88,133 @@ public class Main {
     }
 
     /**
-     * Find and show employee details
+     * Process payroll for an employee
      */
-    private static void findEmployee() {
-        System.out.println("\n===== FIND EMPLOYEE =====");
+    private static void processPayroll() {
+        System.out.println("\n===== PROCESS PAYROLL =====");
 
-        // Find the employee
+        // Get year and month
+        int year = inputManager.getYear();
+        int month = inputManager.getMonth();
+
+        // Get payroll type
+        int payrollType = inputManager.getPayPeriodType();
+
+        // Get cutoff dates
+        LocalDate[] cutoffDates = inputManager.getCutoffDateRange(year, month, payrollType);
+        LocalDate startDate = cutoffDates[0];
+        LocalDate endDate = cutoffDates[1];
+
+        // Get employee to process
+        System.out.print("\n");
         Employee employee = inputManager.findEmployee();
         if (employee == null) {
             return;
         }
 
-        // Show employee details
-        outputManager.displayEmployeeDetails(employee);
-        String choice = inputManager.getMenuChoice();
+        // Display attendance summary and get attendance data
+        Map<String, Object> attendanceSummary = outputManager.displayPayrollSummary(
+                employee, startDate, endDate, payrollType);
 
-        if (choice.equals("1")) {
-            checkEmployeeAttendance(employee);
+        if (attendanceSummary == null) {
+            return;
         }
-        // Any other choice returns to main menu
+
+        // Get confirmation
+        if (!inputManager.getConfirmation("\nAre these records accurate? (Y/N): ")) {
+            System.out.println("Please double check the attendance file and try again.");
+            return;
+        }
+
+        System.out.println("\nCalculating salary...");
+
+        // Extract attendance data
+        double totalHours = (double) attendanceSummary.get("hours");
+        double overtimeHours = (double) attendanceSummary.get("overtimeHours");
+        double lateMinutes = (double) attendanceSummary.get("lateMinutes");
+        double undertimeMinutes = (double) attendanceSummary.get("undertimeMinutes");
+        boolean isLateAnyDay = (boolean) attendanceSummary.get("isLateAnyDay");
+
+        // Process payroll
+        payrollProcessor.processPayrollForPeriod(
+                employee, totalHours, overtimeHours, lateMinutes, undertimeMinutes,
+                isLateAnyDay, payrollType, startDate, endDate, year, month);
+
+        // Display salary details
+        outputManager.displaySalaryDetails(employee);
+
+        // Final confirmation
+        if (inputManager.getConfirmation("\nConfirm payroll for processing (Y/N): ")) {
+            System.out.println("\nPayroll confirmed and processed.");
+            System.out.println("Payment will be issued according to the company schedule.");
+        } else {
+            System.out.println("\nPayroll processing canceled.");
+        }
     }
 
     /**
-     * Check attendance for an employee
+     * Find and show employee details
+     */
+    private static void findEmployee() {
+        System.out.println("\n===== FIND EMPLOYEE =====");
+
+        Employee employee = inputManager.findEmployee();
+        if (employee == null) {
+            return;
+        }
+
+        outputManager.displayEmployeeDetails(employee);
+        String choice = inputManager.getMenuChoice();
+
+        switch (choice) {
+            case "1":
+                checkEmployeeAttendance(employee);
+                break;
+            case "2":
+                // Go directly to process payroll for this employee
+                System.out.println("\n===== PROCESS PAYROLL =====");
+
+                // Get year and month
+                int year = inputManager.getYear();
+                int month = inputManager.getMonth();
+
+                // Get payroll type
+                int payrollType = inputManager.getPayPeriodType();
+
+                // Get cutoff dates
+                LocalDate[] cutoffDates = inputManager.getCutoffDateRange(year, month, payrollType);
+                LocalDate startDate = cutoffDates[0];
+                LocalDate endDate = cutoffDates[1];
+
+                // Process this employee
+                Map<String, Object> attendanceSummary = outputManager.displayPayrollSummary(
+                        employee, startDate, endDate, payrollType);
+
+                if (attendanceSummary != null) {
+                    processEmployeePayroll(employee, attendanceSummary, payrollType, startDate, endDate, year, month);
+                }
+                break;
+            case "3":
+                // Return to main menu
+                break;
+            default:
+                System.out.println("Invalid option. Returning to main menu.");
+                break;
+        }
+    }
+
+    /**
+     * Check employee attendance
      */
     private static void checkEmployeeAttendance(Employee employee) {
-        // Show attendance options
         outputManager.displayAttendanceOptions(employee);
         String viewType = inputManager.getMenuChoice();
 
-        // Get date range
         LocalDate[] dateRange = inputManager.getDateRange();
         if (dateRange == null) {
             return;
         }
 
-        // Show attendance based on view type
         if (viewType.equals("1")) {
             // Daily view
             outputManager.displayDailyAttendance(employee, dateRange[0], dateRange[1]);
@@ -131,88 +225,51 @@ public class Main {
     }
 
     /**
-     * Show all employee details
+     * Process payroll for a specific employee
      */
-    private static void showAllEmployeeDetails() {
-        // Get all employees
-        List<Employee> employees = employeeDataReader.getAllEmployees();
-
-        // Display employee summary
-        outputManager.displayAllEmployeesSummary(employees);
-        String choice = inputManager.getMenuChoice();
-
-        if (choice.equals("1")) {
-            Employee employee = inputManager.getEmployeeById();
-            if (employee != null) {
-                System.out.println("\n===== DETAILED EMPLOYEE INFO =====");
-                System.out.println(employee);
-                inputManager.waitForEnter();
-            }
-        }
-        // Any other choice returns to main menu
-    }
-
-    /**
-     * Process payroll for an employee
-     */
-    private static void processPayroll() {
-        System.out.println("\n===== PROCESS PAYROLL =====");
-
-        // Get pay period
-        LocalDate[] dateRange = inputManager.getDateRange();
-        if (dateRange == null) {
-            return;
-        }
-
-        LocalDate startDate = dateRange[0];
-        LocalDate endDate = dateRange[1];
-
-        // Get employee to process
-        System.out.print("\n");
-        Employee employee = inputManager.findEmployee();
-        if (employee == null) {
-            return;
-        }
-
-        // Display payroll summary and get totals
-        Map<String, Double> totals = outputManager.displayPayrollSummary(employee, startDate, endDate);
-        if (totals == null) {
-            return;
-        }
-
-        // Confirm accuracy
-        boolean confirmed = inputManager.getConfirmation("\nAre these records accurate? (Y/N): ");
-        if (!confirmed) {
+    private static void processEmployeePayroll(Employee employee, Map<String, Object> attendanceSummary,
+                                               int payrollType, LocalDate startDate, LocalDate endDate,
+                                               int year, int month) {
+        // Get confirmation
+        if (!inputManager.getConfirmation("\nAre these records accurate? (Y/N): ")) {
             System.out.println("Please double check the attendance file and try again.");
             return;
         }
 
-        // Determine pay period type
-        int payPeriodType = inputManager.determinePayPeriodType(endDate);
-
         System.out.println("\nCalculating salary...");
 
-        // Extract values from totals
-        double totalHours = totals.get("hours");
-        double totalOvertimeHours = totals.get("overtimeHours");
-        double totalLateMinutes = totals.get("lateMinutes");
-        double totalUndertimeMinutes = totals.get("undertimeMinutes");
-        boolean isLateAnyDay = totals.get("isLateAnyDay") > 0;
+        // Extract attendance data
+        double totalHours = (double) attendanceSummary.get("hours");
+        double overtimeHours = (double) attendanceSummary.get("overtimeHours");
+        double lateMinutes = (double) attendanceSummary.get("lateMinutes");
+        double undertimeMinutes = (double) attendanceSummary.get("undertimeMinutes");
+        boolean isLateAnyDay = (boolean) attendanceSummary.get("isLateAnyDay");
 
-        // Process payroll with the calculated totals and apply policies
-        payrollProcessor.processPayrollForPeriod(employee, totalHours, totalOvertimeHours,
-                totalLateMinutes, totalUndertimeMinutes, isLateAnyDay, payPeriodType, startDate, endDate);
+        // Process payroll
+        payrollProcessor.processPayrollForPeriod(
+                employee, totalHours, overtimeHours, lateMinutes, undertimeMinutes,
+                isLateAnyDay, payrollType, startDate, endDate, year, month);
 
         // Display salary details
         outputManager.displaySalaryDetails(employee);
 
         // Final confirmation
-        confirmed = inputManager.getConfirmation("\nConfirm payroll for processing (Y/N): ");
-        if (confirmed) {
+        if (inputManager.getConfirmation("\nConfirm payroll for processing (Y/N): ")) {
             System.out.println("\nPayroll confirmed and processed.");
             System.out.println("Payment will be issued according to the company schedule.");
         } else {
             System.out.println("\nPayroll processing canceled.");
         }
+    }
+
+    /**
+     * View payroll calendar
+     */
+    private static void viewPayrollCalendar() {
+        int year = inputManager.getYear();
+        int month = inputManager.getMonth();
+
+        outputManager.displayPayrollCalendar(year, month);
+        inputManager.waitForEnter();
     }
 }
