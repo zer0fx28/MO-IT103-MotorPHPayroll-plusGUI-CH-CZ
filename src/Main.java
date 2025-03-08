@@ -134,11 +134,12 @@ public class Main {
         double lateMinutes = (double) attendanceSummary.get("lateMinutes");
         double undertimeMinutes = (double) attendanceSummary.get("undertimeMinutes");
         boolean isLateAnyDay = (boolean) attendanceSummary.get("isLateAnyDay");
+        boolean hasUnpaidAbsences = (boolean) attendanceSummary.get("hasUnpaidAbsences");
 
-        // Process payroll
+        // Process payroll with the unpaid absences flag
         payrollProcessor.processPayrollForPeriod(
                 employee, totalHours, overtimeHours, lateMinutes, undertimeMinutes,
-                isLateAnyDay, payrollType, startDate, endDate, year, month);
+                isLateAnyDay, payrollType, startDate, endDate, year, month, hasUnpaidAbsences);
 
         // Display salary details
         outputManager.displaySalaryDetails(employee);
@@ -179,19 +180,19 @@ public class Main {
                 int month = inputManager.getMonth();
 
                 // Get payroll type
-                int payrollType = inputManager.getPayPeriodType();
+                int payPeriodType = inputManager.getPayPeriodType();
 
                 // Get cutoff dates
-                LocalDate[] cutoffDates = inputManager.getCutoffDateRange(year, month, payrollType);
+                LocalDate[] cutoffDates = inputManager.getCutoffDateRange(year, month, payPeriodType);
                 LocalDate startDate = cutoffDates[0];
                 LocalDate endDate = cutoffDates[1];
 
                 // Process this employee
                 Map<String, Object> attendanceSummary = outputManager.displayPayrollSummary(
-                        employee, startDate, endDate, payrollType);
+                        employee, startDate, endDate, payPeriodType);
 
                 if (attendanceSummary != null) {
-                    processEmployeePayroll(employee, attendanceSummary, payrollType, startDate, endDate, year, month);
+                    processEmployeePayroll(employee, attendanceSummary, payPeriodType, startDate, endDate, year, month);
                 }
                 break;
             case "3":
@@ -244,11 +245,12 @@ public class Main {
         double lateMinutes = (double) attendanceSummary.get("lateMinutes");
         double undertimeMinutes = (double) attendanceSummary.get("undertimeMinutes");
         boolean isLateAnyDay = (boolean) attendanceSummary.get("isLateAnyDay");
+        boolean hasUnpaidAbsences = (boolean) attendanceSummary.get("hasUnpaidAbsences");
 
-        // Process payroll
+        // Process payroll with the unpaid absences flag
         payrollProcessor.processPayrollForPeriod(
                 employee, totalHours, overtimeHours, lateMinutes, undertimeMinutes,
-                isLateAnyDay, payrollType, startDate, endDate, year, month);
+                isLateAnyDay, payrollType, startDate, endDate, year, month, hasUnpaidAbsences);
 
         // Display salary details
         outputManager.displaySalaryDetails(employee);

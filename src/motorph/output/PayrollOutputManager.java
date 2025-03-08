@@ -8,23 +8,24 @@ import motorph.process.PayrollProcessor;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
- * Handles all display and formatting of payroll information
+ * Handles display of payroll information
  */
 public class PayrollOutputManager {
-    private final DateTimeFormatter dateFormatter;
     private final Scanner scanner;
     private final AttendanceReader attendanceReader;
     private final PayrollProcessor payrollProcessor;
+    private final DateTimeFormatter dateFormatter;
 
     /**
-     * Constructor to initialize the output manager
+     * Create a new output manager
      */
-    public PayrollOutputManager(Scanner scanner, AttendanceReader attendanceReader,
-                                PayrollProcessor payrollProcessor) {
+    public PayrollOutputManager(Scanner scanner, AttendanceReader attendanceReader, PayrollProcessor payrollProcessor) {
         this.scanner = scanner;
         this.attendanceReader = attendanceReader;
         this.payrollProcessor = payrollProcessor;
@@ -32,7 +33,7 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display the main menu options
+     * Display main menu
      */
     public void displayMainMenu() {
         System.out.println("\nMAIN MENU:");
@@ -47,421 +48,361 @@ public class PayrollOutputManager {
      * Display employee details
      */
     public void displayEmployeeDetails(Employee employee) {
+        if (employee == null) {
+            return;
+        }
+
         System.out.println("\n===== EMPLOYEE DETAILS =====");
-        System.out.println(employee);
+        System.out.println("ID: " + employee.getEmployeeId());
+        System.out.println("Name: " + employee.getFullName());
+        System.out.println("Position: " + employee.getPosition());
+        System.out.println("Basic Salary: ₱" + String.format("%,.2f", employee.getBasicSalary()));
+        System.out.println("Rice Subsidy: ₱" + String.format("%,.2f", employee.getRiceSubsidy()));
+        System.out.println("Phone Allowance: ₱" + String.format("%,.2f", employee.getPhoneAllowance()));
+        System.out.println("Clothing Allowance: ₱" + String.format("%,.2f", employee.getClothingAllowance()));
+        System.out.println("Hourly Rate: ₱" + String.format("%.2f", employee.getHourlyRate()));
 
-        // Options after viewing employee
         System.out.println("\nOptions:");
-        System.out.println("1. Check Employee Attendance");
-        System.out.println("2. Process Payroll for This Employee");
-        System.out.println("3. Back to Main Menu");
-        System.out.print("Enter choice (1-3): ");
+        System.out.println("1. View Attendance");
+        System.out.println("2. Process Payroll");
+        System.out.println("3. Return to Main Menu");
+        System.out.print("Enter choice: ");
     }
 
     /**
-     * Display the attendance view options
-     */
-    public void displayAttendanceOptions(Employee employee) {
-        System.out.println("\n===== CHECK ATTENDANCE =====");
-        System.out.println("Employee: " + employee.getFullName());
-
-        // Choose view type
-        System.out.println("\nView attendance by:");
-        System.out.println("1. Daily");
-        System.out.println("2. Weekly");
-        System.out.print("Enter choice (1-2): ");
-    }
-
-    /**
-     * Display daily attendance for an employee
-     */
-    public void displayDailyAttendance(Employee employee, LocalDate startDate, LocalDate endDate) {
-        System.out.println("\n===== DAILY ATTENDANCE =====");
-        System.out.println("Employee: " + employee.getFullName() + " (ID: " + employee.getEmployeeId() + ")");
-        System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
-
-        // Get attendance records
-        Map<LocalDate, Map<String, Object>> dailyRecords = attendanceReader.getDailyAttendanceForEmployee(
-                employee.getEmployeeId(), startDate, endDate);
-
-        if (dailyRecords.isEmpty()) {
-            System.out.println("\nNo attendance records found for this period.");
-            return;
-        }
-
-        // Show headers
-        System.out.println("\nDate\t\tDay\t\tTime In\t\tTime Out\tHours\tLate(min)\tUT(min)\tOT(hrs)\tStatus");
-        System.out.println("------------------------------------------------------------------------------------------------");
-
-        // Show each day's attendance
-        double totalHours = 0;
-        double totalLateMinutes = 0;
-        double totalUndertimeMinutes = 0;
-        double totalOvertimeHours = 0;
-
-        for (Map.Entry<LocalDate, Map<String, Object>> entry : dailyRecords.entrySet()) {
-            LocalDate date = entry.getKey();
-            Map<String, Object> dailyData = entry.getValue();
-
-            String dayOfWeek = date.getDayOfWeek().toString();
-            dayOfWeek = dayOfWeek.charAt(0) + dayOfWeek.substring(1, 3).toLowerCase();
-
-            String timeIn = (String) dailyData.get("timeIn");
-            String timeOut = (String) dailyData.get("timeOut");
-            double hours = (double) dailyData.get("hours");
-            double lateMinutes = (double) dailyData.get("lateMinutes");
-            double undertimeMinutes = (double) dailyData.getOrDefault("undertimeMinutes", 0.0);
-            double overtimeHours = (double) dailyData.get("overtimeHours");
-            boolean isLate = (boolean) dailyData.get("isLate");
-            boolean isUndertime = (boolean) dailyData.getOrDefault("isUndertime", false);
-
-            String status = "ON TIME";
-            if (isLate && isUndertime) {
-                status = "LATE+UT";
-            } else if (isLate) {
-                status = "LATE";
-            } else if (isUndertime) {
-                status = "UNDERTIME";
-            }
-
-            totalHours += hours;
-            totalLateMinutes += lateMinutes;
-            totalUndertimeMinutes += undertimeMinutes;
-            totalOvertimeHours += overtimeHours;
-
-            System.out.printf("%s\t%s\t\t%s\t%s\t%.2f\t%.0f\t\t%.0f\t%.2f\t%s\n",
-                    date.format(dateFormatter), dayOfWeek, timeIn, timeOut,
-                    hours, lateMinutes, undertimeMinutes, overtimeHours, status);
-        }
-
-        // Show totals
-        System.out.println("------------------------------------------------------------------------------------------------");
-        System.out.printf("TOTALS:\t\t\t\t\t\t%.2f\t%.0f\t\t%.0f\t%.2f\n",
-                totalHours, totalLateMinutes, totalUndertimeMinutes, totalOvertimeHours);
-
-        // Wait for user
-        System.out.print("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
-
-    /**
-     * Display weekly attendance for an employee
-     */
-    public void displayWeeklyAttendance(Employee employee, LocalDate startDate, LocalDate endDate) {
-        System.out.println("\n===== WEEKLY ATTENDANCE =====");
-        System.out.println("Employee: " + employee.getFullName() + " (ID: " + employee.getEmployeeId() + ")");
-        System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
-
-        // Get weekly attendance data with daily logs
-        Map<String, Object> attendanceData = attendanceReader.getWeeklyAttendanceWithDailyLogs(
-                employee.getEmployeeId(), startDate, endDate);
-
-        @SuppressWarnings("unchecked")
-        Map<String, Map<String, Double>> weeklyRecords =
-                (Map<String, Map<String, Double>>) attendanceData.get("weeklyRecords");
-
-        @SuppressWarnings("unchecked")
-        Map<String, List<Map<String, Object>>> dailyLogsByWeek =
-                (Map<String, List<Map<String, Object>>>) attendanceData.get("dailyLogsByWeek");
-
-        if (weeklyRecords.isEmpty()) {
-            System.out.println("\nNo attendance records found for this period.");
-            return;
-        }
-
-        // Show weekly data with daily logs
-        double totalHours = 0;
-        double totalLateMinutes = 0;
-        double totalUndertimeMinutes = 0;
-        double totalOvertimeHours = 0;
-
-        for (Map.Entry<String, Map<String, Double>> entry : weeklyRecords.entrySet()) {
-            String weekLabel = entry.getKey();
-            Map<String, Double> weekData = entry.getValue();
-
-            double hours = weekData.getOrDefault("hours", 0.0);
-            double lateMinutes = weekData.getOrDefault("lateMinutes", 0.0);
-            double undertimeMinutes = weekData.getOrDefault("undertimeMinutes", 0.0);
-            double overtimeHours = weekData.getOrDefault("overtimeHours", 0.0);
-
-            totalHours += hours;
-            totalLateMinutes += lateMinutes;
-            totalUndertimeMinutes += undertimeMinutes;
-            totalOvertimeHours += overtimeHours;
-
-            // Show week summary
-            System.out.println("\n" + weekLabel);
-            System.out.println("Weekly Summary: " + String.format("%.2f", hours) + " hours, " +
-                    String.format("%.0f", lateMinutes) + " min late, " +
-                    String.format("%.0f", undertimeMinutes) + " min undertime, " +
-                    String.format("%.2f", overtimeHours) + " OT hours");
-
-            // Show daily logs header for this week
-            System.out.println("\nDate\t\tDay\t\tTime In\t\tTime Out\tHours\tLate\tUT\tOT\tStatus");
-            System.out.println("---------------------------------------------------------------------------------");
-
-            // Get daily logs for this week
-            List<Map<String, Object>> dailyLogs = dailyLogsByWeek.getOrDefault(weekLabel, new ArrayList<>());
-
-            // Sort logs by date
-            Collections.sort(dailyLogs, (a, b) -> {
-                LocalDate dateA = (LocalDate) a.get("date");
-                LocalDate dateB = (LocalDate) b.get("date");
-                return dateA.compareTo(dateB);
-            });
-
-            // Show each day's log
-            for (Map<String, Object> dayLog : dailyLogs) {
-                LocalDate date = (LocalDate) dayLog.get("date");
-                String dayOfWeek = date.getDayOfWeek().toString();
-                dayOfWeek = dayOfWeek.charAt(0) + dayOfWeek.substring(1, 3).toLowerCase();
-
-                String timeIn = (String) dayLog.get("timeIn");
-                String timeOut = (String) dayLog.get("timeOut");
-                double dayHours = (double) dayLog.get("hours");
-                double dayLate = (double) dayLog.get("lateMinutes");
-                double dayUT = (double) dayLog.getOrDefault("undertimeMinutes", 0.0);
-                double dayOT = (double) dayLog.get("overtimeHours");
-                boolean isLate = (boolean) dayLog.get("isLate");
-                boolean isUndertime = (boolean) dayLog.getOrDefault("isUndertime", false);
-
-                String status = "ON TIME";
-                if (isLate && isUndertime) {
-                    status = "LATE+UT";
-                } else if (isLate) {
-                    status = "LATE";
-                } else if (isUndertime) {
-                    status = "UNDERTIME";
-                }
-
-                System.out.printf("%s\t%s\t\t%s\t%s\t%.2f\t%.0f\t%.0f\t%.2f\t%s\n",
-                        date.format(dateFormatter), dayOfWeek, timeIn, timeOut,
-                        dayHours, dayLate, dayUT, dayOT, status);
-            }
-        }
-
-        // Show totals
-        System.out.println("\n=================================================================================");
-        System.out.printf("TOTALS:\t\t\t\t\t\t\t%.2f\t%.0f\t%.0f\t%.2f\n",
-                totalHours, totalLateMinutes, totalUndertimeMinutes, totalOvertimeHours);
-
-        // Wait for user
-        System.out.print("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
-
-    /**
-     * Display all employees in a tabular format
-     */
-    public void displayAllEmployeesSummary(List<Employee> employees) {
-        System.out.println("\n===== ALL EMPLOYEES =====");
-
-        if (employees.isEmpty()) {
-            System.out.println("No employees found.");
-            return;
-        }
-
-        // Show employee summary table
-        System.out.println("\nID\tName\t\t\tPosition\t\tStatus");
-        System.out.println("----------------------------------------------------------");
-
-        for (Employee employee : employees) {
-            String name = employee.getLastName() + ", " + employee.getFirstName();
-            String displayName = name.length() > 20 ? name.substring(0, 17) + "..." : name;
-
-            String position = employee.getPosition();
-            String displayPosition = position.length() > 15 ? position.substring(0, 12) + "..." : position;
-
-            System.out.printf("%-8s%-20s\t%-15s\t%s\n",
-                    employee.getEmployeeId(), displayName, displayPosition, employee.getStatus());
-        }
-
-        // Options after viewing all employees
-        System.out.println("\nOptions:");
-        System.out.println("1. View Detailed Info for an Employee");
-        System.out.println("2. Back to Main Menu");
-        System.out.print("Enter choice (1-2): ");
-    }
-
-    /**
-     * Display payroll information and return attendance summary
+     * Display payroll summary
      */
     public Map<String, Object> displayPayrollSummary(Employee employee, LocalDate startDate, LocalDate endDate, int payPeriodType) {
-        System.out.println("\n===== PAYROLL SUMMARY =====");
-        System.out.println("Employee: " + employee.getFullName() + " (ID: " + employee.getEmployeeId() + ")");
-
-        // Display payroll period type
-        String periodType = (payPeriodType == PayrollDateManager.MID_MONTH) ? "Mid-month" : "End-month";
-        System.out.println("Payroll Type: " + periodType);
-
-        // Display cutoff period
-        System.out.println("Cutoff Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
-
-        // Display payroll date
-        LocalDate payrollDate = PayrollDateManager.getPayrollDate(
-                startDate.getYear(), startDate.getMonthValue(), payPeriodType);
-        System.out.println("Payroll Date: " + payrollDate.format(dateFormatter));
-
-        // Display applicable deductions based on period type
-        System.out.println("Applicable Deductions:");
-        if (payPeriodType == PayrollDateManager.MID_MONTH) {
-            System.out.println("• SSS, PhilHealth, Pag-IBIG");
-        } else {
-            System.out.println("• Withholding Tax");
+        if (employee == null) {
+            return null;
         }
 
-        // Get weekly attendance data with daily logs
-        Map<String, Object> attendanceData = attendanceReader.getWeeklyAttendanceWithDailyLogs(
-                employee.getEmployeeId(), startDate, endDate);
+        System.out.println("\n===== PAYROLL SUMMARY =====");
+        System.out.println("Employee: " + employee.getFullName() + " (ID: " + employee.getEmployeeId() + ")");
+        System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
+        System.out.println("Payroll Type: " + (payPeriodType == PayrollDateManager.MID_MONTH ? "Mid-month" : "End-month"));
 
-        @SuppressWarnings("unchecked")
-        Map<String, Map<String, Double>> weeklyRecords =
-                (Map<String, Map<String, Double>>) attendanceData.get("weeklyRecords");
+        // Get daily attendance records
+        Map<LocalDate, Map<String, Object>> dailyAttendance =
+                attendanceReader.getDailyAttendanceForEmployee(employee.getEmployeeId(), startDate, endDate);
 
-        @SuppressWarnings("unchecked")
-        Map<String, List<Map<String, Object>>> dailyLogsByWeek =
-                (Map<String, List<Map<String, Object>>>) attendanceData.get("dailyLogsByWeek");
-
-        if (weeklyRecords.isEmpty()) {
+        if (dailyAttendance.isEmpty()) {
             System.out.println("\nNo attendance records found for this period.");
             return null;
         }
 
-        // Calculate totals and display weekly data
+        // Calculate totals
         double totalHours = 0;
+        double totalOvertimeHours = 0;
         double totalLateMinutes = 0;
         double totalUndertimeMinutes = 0;
-        double totalOvertimeHours = 0;
         boolean isLateAnyDay = false;
-        boolean isUndertimeAnyDay = false;
+        boolean hasUnpaidAbsences = false;
+        int unpaidAbsenceCount = 0;
 
-        for (Map.Entry<String, Map<String, Double>> entry : weeklyRecords.entrySet()) {
-            String weekLabel = entry.getKey();
-            Map<String, Double> weekData = entry.getValue();
+        // Display daily breakdown
+        System.out.println("\n--- ATTENDANCE DETAILS ---");
+        System.out.printf("%-12s %-10s %-10s %-10s %-10s %-10s %-15s\n",
+                "Date", "Time In", "Time Out", "Hours", "OT Hours", "Late", "Absence Type");
+        System.out.println("--------------------------------------------------------------------------------");
 
-            double hours = weekData.getOrDefault("hours", 0.0);
-            double lateMinutes = weekData.getOrDefault("lateMinutes", 0.0);
-            double undertimeMinutes = weekData.getOrDefault("undertimeMinutes", 0.0);
-            double overtimeHours = weekData.getOrDefault("overtimeHours", 0.0);
+        for (Map.Entry<LocalDate, Map<String, Object>> entry : dailyAttendance.entrySet()) {
+            LocalDate date = entry.getKey();
+            Map<String, Object> dayData = entry.getValue();
 
+            String timeIn = (String) dayData.get("timeIn");
+            String timeOut = (String) dayData.get("timeOut");
+            double hours = (double) dayData.get("hours");
+            double overtimeHours = (double) dayData.get("overtimeHours");
+            double lateMinutes = (double) dayData.get("lateMinutes");
+            double undertimeMinutes = (double) dayData.getOrDefault("undertimeMinutes", 0.0);
+            boolean isLate = (boolean) dayData.get("isLate");
+            String absenceType = (String) dayData.getOrDefault("absenceType", "");
+            boolean isUnpaidAbsence = false;
+
+            if (dayData.containsKey("isUnpaidAbsence")) {
+                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
+            } else if (absenceType != null && !absenceType.isEmpty()) {
+                // For backward compatibility when there's no isUnpaidAbsence field
+                String type = absenceType.toLowerCase();
+                isUnpaidAbsence = type.contains("unpaid") ||
+                        type.contains("unauthoriz") ||
+                        type.contains("unapproved");
+            }
+
+            // Update totals
             totalHours += hours;
+            totalOvertimeHours += overtimeHours;
             totalLateMinutes += lateMinutes;
             totalUndertimeMinutes += undertimeMinutes;
-            totalOvertimeHours += overtimeHours;
 
-            // Show week summary
-            System.out.println("\n" + weekLabel);
-            System.out.println("Weekly Summary: " + String.format("%.2f", hours) + " hours, " +
-                    String.format("%.0f", lateMinutes) + " min late, " +
-                    String.format("%.0f", undertimeMinutes) + " min undertime, " +
-                    String.format("%.2f", overtimeHours) + " OT hours");
-
-            // Show daily logs header
-            System.out.println("\nDate\t\tDay\t\tTime In\t\tTime Out\tHours\tLate\tUT\tOT\tStatus");
-            System.out.println("---------------------------------------------------------------------------------");
-
-            // Get daily logs for this week
-            List<Map<String, Object>> dailyLogs = dailyLogsByWeek.getOrDefault(weekLabel, new ArrayList<>());
-
-            // Sort logs by date
-            Collections.sort(dailyLogs, (a, b) -> {
-                LocalDate dateA = (LocalDate) a.get("date");
-                LocalDate dateB = (LocalDate) b.get("date");
-                return dateA.compareTo(dateB);
-            });
-
-            // Show each day's log
-            for (Map<String, Object> dayLog : dailyLogs) {
-                LocalDate date = (LocalDate) dayLog.get("date");
-                String dayOfWeek = date.getDayOfWeek().toString();
-                dayOfWeek = dayOfWeek.charAt(0) + dayOfWeek.substring(1, 3).toLowerCase();
-
-                String timeIn = (String) dayLog.get("timeIn");
-                String timeOut = (String) dayLog.get("timeOut");
-                double dayHours = (double) dayLog.get("hours");
-                double dayLate = (double) dayLog.get("lateMinutes");
-                double dayUT = (double) dayLog.getOrDefault("undertimeMinutes", 0.0);
-                double dayOT = (double) dayLog.get("overtimeHours");
-                boolean isDayLate = (boolean) dayLog.get("isLate");
-                boolean isDayUndertime = (boolean) dayLog.getOrDefault("isUndertime", false);
-
-                if (isDayLate) {
-                    isLateAnyDay = true;
-                }
-                if (isDayUndertime) {
-                    isUndertimeAnyDay = true;
-                }
-
-                String status = "ON TIME";
-                if (isDayLate && isDayUndertime) {
-                    status = "LATE+UT";
-                } else if (isDayLate) {
-                    status = "LATE";
-                } else if (isDayUndertime) {
-                    status = "UNDERTIME";
-                }
-
-                System.out.printf("%s\t%s\t\t%s\t%s\t%.2f\t%.0f\t%.0f\t%.2f\t%s\n",
-                        date.format(dateFormatter), dayOfWeek, timeIn, timeOut,
-                        dayHours, dayLate, dayUT, dayOT, status);
+            if (isLate) {
+                isLateAnyDay = true;
             }
+
+            if (isUnpaidAbsence) {
+                hasUnpaidAbsences = true;
+                unpaidAbsenceCount++;
+            }
+
+            // Format the line
+            System.out.printf("%-12s %-10s %-10s %-10.2f %-10.2f %-10s %-15s\n",
+                    date.format(dateFormatter),
+                    timeIn, timeOut, hours, overtimeHours,
+                    (lateMinutes > 0 ? lateMinutes + " min" : "-"),
+                    absenceType != null ? absenceType : "-");
         }
 
-        // Show totals
-        System.out.println("\n=================================================================================");
-        System.out.printf("TOTALS:\t\t\t\t\t\t\t%.2f\t%.0f\t%.0f\t%.2f\n",
-                totalHours, totalLateMinutes, totalUndertimeMinutes, totalOvertimeHours);
-        System.out.println("* Hours are calculated based on actual time logs.");
-        System.out.println("* Late employees (after 8:10 AM) cannot earn overtime pay.");
-        System.out.println("* Undertime deductions apply for employees who leave before 5:00 PM.");
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.printf("%-34s %-10.2f %-10.2f %-10.2f\n",
+                "TOTALS:", totalHours, totalOvertimeHours, totalLateMinutes);
 
-        // Return the attendance summary
+        // Create summary for return
         Map<String, Object> summary = new HashMap<>();
         summary.put("hours", totalHours);
+        summary.put("overtimeHours", totalOvertimeHours);
         summary.put("lateMinutes", totalLateMinutes);
         summary.put("undertimeMinutes", totalUndertimeMinutes);
-        summary.put("overtimeHours", totalOvertimeHours);
         summary.put("isLateAnyDay", isLateAnyDay);
-        summary.put("isUndertimeAnyDay", isUndertimeAnyDay);
+        summary.put("hasUnpaidAbsences", hasUnpaidAbsences);
+        summary.put("unpaidAbsenceCount", unpaidAbsenceCount);
 
         return summary;
     }
 
     /**
-     * Display salary calculation details
+     * Display salary details
      */
     public void displaySalaryDetails(Employee employee) {
-        System.out.println("\n===== SALARY DETAILS =====");
         payrollProcessor.displaySalaryDetails(employee);
     }
 
     /**
-     * Display payroll calendar for a year and month
+     * Display attendance options
+     */
+    public void displayAttendanceOptions(Employee employee) {
+        System.out.println("\n===== ATTENDANCE OPTIONS =====");
+        System.out.println("Employee: " + employee.getFullName());
+        System.out.println("\nSelect view type:");
+        System.out.println("1. Daily Attendance");
+        System.out.println("2. Weekly Summary");
+        System.out.print("Enter choice (1-2): ");
+    }
+
+    /**
+     * Display daily attendance
+     */
+    public void displayDailyAttendance(Employee employee, LocalDate startDate, LocalDate endDate) {
+        System.out.println("\n===== DAILY ATTENDANCE =====");
+        System.out.println("Employee: " + employee.getFullName());
+        System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
+
+        // Get daily attendance records
+        Map<LocalDate, Map<String, Object>> dailyAttendance =
+                attendanceReader.getDailyAttendanceForEmployee(employee.getEmployeeId(), startDate, endDate);
+
+        if (dailyAttendance.isEmpty()) {
+            System.out.println("\nNo attendance records found for this period.");
+            return;
+        }
+
+        // Display daily breakdown
+        System.out.println("\n--- ATTENDANCE DETAILS ---");
+        System.out.printf("%-12s %-10s %-10s %-10s %-10s %-10s %-10s %-15s\n",
+                "Date", "Time In", "Time Out", "Hours", "OT Hours", "Late", "Undertime", "Absence Type");
+        System.out.println("----------------------------------------------------------------------------------------");
+
+        double totalHours = 0;
+        double totalOvertimeHours = 0;
+        double totalLateMinutes = 0;
+        double totalUndertimeMinutes = 0;
+        int unpaidAbsenceCount = 0;
+
+        for (Map.Entry<LocalDate, Map<String, Object>> entry : dailyAttendance.entrySet()) {
+            LocalDate date = entry.getKey();
+            Map<String, Object> dayData = entry.getValue();
+
+            String timeIn = (String) dayData.get("timeIn");
+            String timeOut = (String) dayData.get("timeOut");
+            double hours = (double) dayData.get("hours");
+            double overtimeHours = (double) dayData.get("overtimeHours");
+            double lateMinutes = (double) dayData.get("lateMinutes");
+            double undertimeMinutes = (double) dayData.getOrDefault("undertimeMinutes", 0.0);
+            String absenceType = (String) dayData.getOrDefault("absenceType", "");
+            boolean isUnpaidAbsence = false;
+
+            if (dayData.containsKey("isUnpaidAbsence")) {
+                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
+            } else if (absenceType != null && !absenceType.isEmpty()) {
+                // For backward compatibility when there's no isUnpaidAbsence field
+                String type = absenceType.toLowerCase();
+                isUnpaidAbsence = type.contains("unpaid") ||
+                        type.contains("unauthoriz") ||
+                        type.contains("unapproved");
+            }
+
+            // Update totals
+            totalHours += hours;
+            totalOvertimeHours += overtimeHours;
+            totalLateMinutes += lateMinutes;
+            totalUndertimeMinutes += undertimeMinutes;
+
+            if (isUnpaidAbsence) {
+                unpaidAbsenceCount++;
+            }
+
+            // Format the line
+            System.out.printf("%-12s %-10s %-10s %-10.2f %-10.2f %-10s %-10s %-15s\n",
+                    date.format(dateFormatter),
+                    timeIn, timeOut, hours, overtimeHours,
+                    (lateMinutes > 0 ? lateMinutes + " min" : "-"),
+                    (undertimeMinutes > 0 ? undertimeMinutes + " min" : "-"),
+                    (absenceType != null && !absenceType.isEmpty() ? absenceType : "-"));
+        }
+
+        System.out.println("----------------------------------------------------------------------------------------");
+        System.out.printf("%-34s %-10.2f %-10.2f %-10.2f %-10.2f\n",
+                "TOTALS:", totalHours, totalOvertimeHours, totalLateMinutes, totalUndertimeMinutes);
+
+        if (unpaidAbsenceCount > 0) {
+            System.out.println("Unpaid Absences: " + unpaidAbsenceCount + " day(s)");
+        }
+
+        // Wait for user
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    /**
+     * Display weekly attendance
+     */
+    public void displayWeeklyAttendance(Employee employee, LocalDate startDate, LocalDate endDate) {
+        System.out.println("\n===== WEEKLY ATTENDANCE =====");
+        System.out.println("Employee: " + employee.getFullName());
+        System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
+
+        // Get weekly attendance records
+        Map<String, Object> weeklyAttendanceData =
+                attendanceReader.getWeeklyAttendanceWithDailyLogs(employee.getEmployeeId(), startDate, endDate);
+
+        if (weeklyAttendanceData.isEmpty()) {
+            System.out.println("\nNo attendance records found for this period.");
+            return;
+        }
+
+        // Get the weekly records and daily logs by week
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, Object>> weeklyRecords =
+                (Map<String, Map<String, Object>>) weeklyAttendanceData.get("weeklyRecords");
+
+        @SuppressWarnings("unchecked")
+        Map<String, List<Map<String, Object>>> dailyLogsByWeek =
+                (Map<String, List<Map<String, Object>>>) weeklyAttendanceData.get("dailyLogsByWeek");
+
+        if (weeklyRecords.isEmpty()) {
+            System.out.println("\nNo weekly records found.");
+            return;
+        }
+
+        // Display weekly summary
+        System.out.println("\n--- WEEKLY SUMMARY ---");
+        System.out.printf("%-30s %-10s %-12s %-12s %-10s\n",
+                "Week", "Hours", "Overtime", "Late (min)", "Unpaid Abs");
+        System.out.println("--------------------------------------------------------------------------------");
+
+        double totalHours = 0;
+        double totalOvertimeHours = 0;
+        double totalLateMinutes = 0;
+        int totalUnpaidAbsences = 0;
+
+        for (String weekLabel : weeklyRecords.keySet()) {
+            Map<String, Object> weekData = weeklyRecords.get(weekLabel);
+
+            double hours = 0;
+            double overtimeHours = 0;
+            double lateMinutes = 0;
+            int unpaidAbsences = 0;
+
+            // Extract values with type safety
+            if (weekData.containsKey("hours")) {
+                if (weekData.get("hours") instanceof Double) {
+                    hours = (Double) weekData.get("hours");
+                } else {
+                    hours = ((Number) weekData.get("hours")).doubleValue();
+                }
+            }
+
+            if (weekData.containsKey("overtimeHours")) {
+                if (weekData.get("overtimeHours") instanceof Double) {
+                    overtimeHours = (Double) weekData.get("overtimeHours");
+                } else {
+                    overtimeHours = ((Number) weekData.get("overtimeHours")).doubleValue();
+                }
+            }
+
+            if (weekData.containsKey("lateMinutes")) {
+                if (weekData.get("lateMinutes") instanceof Double) {
+                    lateMinutes = (Double) weekData.get("lateMinutes");
+                } else {
+                    lateMinutes = ((Number) weekData.get("lateMinutes")).doubleValue();
+                }
+            }
+
+            if (weekData.containsKey("unpaidAbsenceCount")) {
+                if (weekData.get("unpaidAbsenceCount") instanceof Integer) {
+                    unpaidAbsences = (Integer) weekData.get("unpaidAbsenceCount");
+                } else {
+                    unpaidAbsences = ((Number) weekData.get("unpaidAbsenceCount")).intValue();
+                }
+            }
+
+            // Add to totals
+            totalHours += hours;
+            totalOvertimeHours += overtimeHours;
+            totalLateMinutes += lateMinutes;
+            totalUnpaidAbsences += unpaidAbsences;
+
+            // Format the line
+            System.out.printf("%-30s %-10.2f %-12.2f %-12.2f %-10d\n",
+                    weekLabel, hours, overtimeHours, lateMinutes, unpaidAbsences);
+        }
+
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.printf("%-30s %-10.2f %-12.2f %-12.2f %-10d\n",
+                "TOTALS:", totalHours, totalOvertimeHours, totalLateMinutes, totalUnpaidAbsences);
+
+        // Wait for user
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    /**
+     * Display payroll calendar
      */
     public void displayPayrollCalendar(int year, int month) {
         System.out.println("\n===== PAYROLL CALENDAR =====");
-        System.out.println(PayrollDateManager.getMonthName(month) + " " + year);
+        System.out.println("Year: " + year);
+        System.out.println("Month: " + PayrollDateManager.getMonthName(month));
 
-        // Calculate the payroll dates
-        LocalDate midMonthPayDate = PayrollDateManager.getPayrollDate(year, month, PayrollDateManager.MID_MONTH);
-        LocalDate endMonthPayDate = PayrollDateManager.getPayrollDate(year, month, PayrollDateManager.END_MONTH);
+        // Calculate payroll dates
+        LocalDate midMonth = PayrollDateManager.getPayrollDate(year, month, PayrollDateManager.MID_MONTH);
+        LocalDate endMonth = PayrollDateManager.getPayrollDate(year, month, PayrollDateManager.END_MONTH);
 
-        // Get the cutoff periods
-        LocalDate[] midMonthCutoff = PayrollDateManager.getCutoffDateRange(midMonthPayDate, PayrollDateManager.MID_MONTH);
-        LocalDate[] endMonthCutoff = PayrollDateManager.getCutoffDateRange(endMonthPayDate, PayrollDateManager.END_MONTH);
+        // Get cutoff periods
+        LocalDate[] midCutoff = PayrollDateManager.getCutoffDateRange(midMonth, PayrollDateManager.MID_MONTH);
+        LocalDate[] endCutoff = PayrollDateManager.getCutoffDateRange(endMonth, PayrollDateManager.END_MONTH);
 
-        // Display mid-month payroll information
-        System.out.println("\nMid-month Payroll:");
-        System.out.println("  Date: " + midMonthPayDate.format(dateFormatter));
-        System.out.println("  Cutoff Period: " + midMonthCutoff[0].format(dateFormatter) +
-                " to " + midMonthCutoff[1].format(dateFormatter));
-        System.out.println("  Deductions: SSS, PhilHealth, Pag-IBIG");
+        // Display payroll information
+        System.out.println("\n--- MID-MONTH PAYROLL ---");
+        System.out.println("Payroll Date: " + midMonth.format(dateFormatter));
+        System.out.println("Cutoff Period: " + midCutoff[0].format(dateFormatter) +
+                " to " + midCutoff[1].format(dateFormatter));
+        System.out.println("Deductions: SSS, PhilHealth, Pag-IBIG");
 
-        // Display end-month payroll information
-        System.out.println("\nEnd-month Payroll:");
-        System.out.println("  Date: " + endMonthPayDate.format(dateFormatter));
-        System.out.println("  Cutoff Period: " + endMonthCutoff[0].format(dateFormatter) +
-                " to " + endMonthCutoff[1].format(dateFormatter));
-        System.out.println("  Deductions: Withholding Tax");
+        System.out.println("\n--- END-MONTH PAYROLL ---");
+        System.out.println("Payroll Date: " + endMonth.format(dateFormatter));
+        System.out.println("Cutoff Period: " + endCutoff[0].format(dateFormatter) +
+                " to " + endCutoff[1].format(dateFormatter));
+        System.out.println("Deductions: Withholding Tax");
     }
 }

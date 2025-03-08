@@ -16,6 +16,7 @@ public class AttendanceRecord {
     private LocalDate date;
     private LocalTime timeIn;
     private LocalTime timeOut;
+    private String absenceType; // New field to track absence type
 
     // Work schedule times
     public static final LocalTime STANDARD_START_TIME = LocalTime.of(8, 0); // 8:00 AM
@@ -37,6 +38,11 @@ public class AttendanceRecord {
             this.date = parseDate(data[3]);
             this.timeIn = parseTime(data[4]);
             this.timeOut = parseTime(data[5]);
+
+            // Check if absence type is included
+            if (data.length >= 7) {
+                this.absenceType = data[6];
+            }
         }
     }
 
@@ -50,6 +56,7 @@ public class AttendanceRecord {
         this.date = LocalDate.now();
         this.timeIn = LocalTime.of(0, 0);
         this.timeOut = LocalTime.of(0, 0);
+        this.absenceType = null;
     }
 
     /**
@@ -105,6 +112,9 @@ public class AttendanceRecord {
     public LocalTime getTimeOut() { return timeOut; }
     public void setTimeOut(LocalTime timeOut) { this.timeOut = timeOut; }
 
+    public String getAbsenceType() { return absenceType; }
+    public void setAbsenceType(String absenceType) { this.absenceType = absenceType; }
+
     /**
      * Check if employee arrived late
      */
@@ -117,6 +127,21 @@ public class AttendanceRecord {
      */
     public boolean isUndertime() {
         return timeOut != null && timeOut.isBefore(STANDARD_END_TIME);
+    }
+
+    /**
+     * Check if absence is unpaid
+     * Returns true if absence type is marked as unpaid, unauthorized, or unapproved
+     */
+    public boolean isUnpaidAbsence() {
+        if (absenceType == null || absenceType.trim().isEmpty()) {
+            return false;
+        }
+
+        String type = absenceType.toLowerCase().trim();
+        return type.contains("unpaid") ||
+                type.contains("unauthoriz") ||
+                type.contains("unapproved");
     }
 
     /**
@@ -148,6 +173,7 @@ public class AttendanceRecord {
         return "Date: " + date +
                 ", Employee: " + getFullName() +
                 ", Time In: " + timeIn +
-                ", Time Out: " + timeOut;
+                ", Time Out: " + timeOut +
+                (absenceType != null ? ", Absence Type: " + absenceType : "");
     }
 }

@@ -46,7 +46,7 @@ public class PayrollProcessor {
                                         double overtimeHours, double lateMinutes,
                                         double undertimeMinutes, boolean isLate,
                                         int payPeriodType, LocalDate startDate, LocalDate endDate,
-                                        int year, int month) {
+                                        int year, int month, boolean hasUnpaidAbsences) {
 
         String employeeId = employee.getEmployeeId();
         double monthlySalary = employee.getBasicSalary();
@@ -85,7 +85,12 @@ public class PayrollProcessor {
         // Calculate absences (if any)
         double absentHours = Math.max(0, expectedHours - hoursWorked - (lateMinutes / 60.0) - (undertimeMinutes / 60.0));
         double absentDays = absentHours / 8.0; // Convert hours to days
-        double absenceDeduction = absentDays * dailyRate;
+
+        // Only apply absence deduction if the absence is unpaid (based on CSV data)
+        double absenceDeduction = 0.0;
+        if (hasUnpaidAbsences) {
+            absenceDeduction = absentDays * dailyRate;
+        }
 
         // Calculate overtime pay
         double overtimePay = 0.0;
@@ -139,8 +144,23 @@ public class PayrollProcessor {
         payDetails.put("hourlyRate", hourlyRate);
         payDetails.put("year", year);
         payDetails.put("month", month);
+        payDetails.put("hasUnpaidAbsences", hasUnpaidAbsences);
 
         currentPayDetails.put(employeeId, payDetails);
+    }
+
+    /**
+     * Process payroll with the original signature (for backward compatibility)
+     */
+    public void processPayrollForPeriod(Employee employee, double hoursWorked,
+                                        double overtimeHours, double lateMinutes,
+                                        double undertimeMinutes, boolean isLate,
+                                        int payPeriodType, LocalDate startDate, LocalDate endDate,
+                                        int year, int month) {
+        // Default to not having unpaid absences when not specified
+        processPayrollForPeriod(employee, hoursWorked, overtimeHours, lateMinutes,
+                undertimeMinutes, isLate, payPeriodType, startDate,
+                endDate, year, month, false);
     }
 
     /**
@@ -193,6 +213,7 @@ public class PayrollProcessor {
         int payPeriod = (int) payDetails.get("payPeriod");
         int year = (int) payDetails.getOrDefault("year", LocalDate.now().getYear());
         int month = (int) payDetails.getOrDefault("month", LocalDate.now().getMonthValue());
+        boolean hasUnpaidAbsences = (boolean) payDetails.getOrDefault("hasUnpaidAbsences", false);
 
         // Display payroll details
         System.out.println("\n===== SALARY CALCULATION =====");
@@ -221,6 +242,9 @@ public class PayrollProcessor {
         System.out.println("Undertime: " + String.format("%.0f", undertimeMinutes) + " minutes");
         System.out.println("Absent Hours: " + String.format("%.2f", absentHours) +
                 " hours (" + String.format("%.2f", absentHours/8) + " days)");
+        if (absentHours > 0) {
+            System.out.println("Unpaid Absences: " + (hasUnpaidAbsences ? "Yes" : "No"));
+        }
 
         System.out.println("\n--- EARNINGS ---");
         System.out.println("Basic Pay: ₱" + String.format("%,.2f", regularPay));
@@ -247,7 +271,7 @@ public class PayrollProcessor {
                         " mins × ₱" + String.format("%.4f", hourlyRate/60) + ")" : ""));
 
         System.out.println("Absence Deduction: ₱" + String.format("%,.2f", absenceDeduction) +
-                (absentHours > 0 ? " (" + String.format("%.2f", absentHours/8) +
+                (absentHours > 0 && hasUnpaidAbsences ? " (" + String.format("%.2f", absentHours/8) +
                         " days × ₱" + String.format("%.2f", dailyRate) + ")" : ""));
 
         // Show statutory deductions based on period
@@ -283,6 +307,10 @@ public class PayrollProcessor {
 
         if (undertimeMinutes > 0) {
             System.out.println("- Early departure deductions apply for leaving before 5:00 PM.");
+        }
+
+        if (absentHours > 0) {
+            System.out.println("- Only unpaid, unauthorized, or unapproved absences are deducted from salary.");
         }
     }
 }
