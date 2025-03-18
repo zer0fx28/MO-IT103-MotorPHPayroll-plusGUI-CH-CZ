@@ -3,6 +3,9 @@ package motorph.employee;
 
 /**
  * Stores all employee information
+ *
+ * This class represents an employee in the MotorPH system and contains
+ * all relevant personal, employment, and salary information.
  */
 public class Employee {
     // Employee basic details
@@ -30,8 +33,15 @@ public class Employee {
 
     /**
      * Create employee from CSV data
+     *
+     * @param data Array of CSV data values (must contain at least basic employee information)
      */
     public Employee(String[] data) {
+        // Validate input
+        if (data == null) {
+            throw new IllegalArgumentException("Employee data array cannot be null");
+        }
+
         // Check if we have enough data
         if (data.length >= 19) {
             this.employeeId = data[0].trim();
@@ -65,7 +75,10 @@ public class Employee {
     }
 
     /**
-     * Convert string to number
+     * Convert string to number, handling currency symbols and formatting
+     *
+     * @param value String value to parse
+     * @return Parsed double value, or 0.0 if parsing fails
      */
     private double parseDouble(String value) {
         if (value == null || value.trim().isEmpty()) {
@@ -94,20 +107,25 @@ public class Employee {
         }
     }
 
-    // Getters
+    // Getters for employee information
     public String getEmployeeId() { return employeeId; }
     public String getLastName() { return lastName; }
     public String getFirstName() { return firstName; }
     public String getFullName() { return firstName + " " + lastName; }
-
+    public String getBirthday() { return birthday; }
+    public String getAddress() { return address; }
+    public String getPhoneNumber() { return phoneNumber; }
     public String getPosition() { return position; }
     public String getStatus() { return status; }
+    public String getImmediateSupervisor() { return immediateSupervisor; }
+
+    // Getters for government ID numbers
     public String getSssNo() { return sssNo; }
     public String getPhilhealthNo() { return philhealthNo; }
     public String getTinNo() { return tinNo; }
     public String getPagibigNo() { return pagibigNo; }
 
-    // Salary getters
+    // Getters for salary information
     public double getBasicSalary() { return basicSalary; }
     public double getHourlyRate() {
         // Calculate hourly rate if not provided
@@ -117,14 +135,26 @@ public class Employee {
         return hourlyRate;
     }
 
-    // Benefits getters
+    // Getters for benefits
     public double getRiceSubsidy() { return riceSubsidy; }
     public double getPhoneAllowance() { return phoneAllowance; }
     public double getClothingAllowance() { return clothingAllowance; }
+    public double getGrossSemiMonthlyRate() { return grossSemiMonthlyRate; }
+
+    /**
+     * Calculate total monthly benefits
+     *
+     * @return Sum of all monthly benefits
+     */
     public double getTotalBenefits() {
         return riceSubsidy + phoneAllowance + clothingAllowance;
     }
 
+    /**
+     * Convert employee to string for display
+     *
+     * @return Formatted string with employee details
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

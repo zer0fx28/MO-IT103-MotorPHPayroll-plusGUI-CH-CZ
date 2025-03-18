@@ -15,6 +15,9 @@ import java.util.Scanner;
 
 /**
  * Handles display of payroll information
+ *
+ * This class is responsible for presenting payroll data to the user,
+ * including menus, employee details, attendance records, and salary information.
  */
 public class PayrollOutputManager {
     private final Scanner scanner;
@@ -24,6 +27,10 @@ public class PayrollOutputManager {
 
     /**
      * Create a new output manager
+     *
+     * @param scanner Scanner for user input
+     * @param attendanceReader AttendanceReader for attendance data
+     * @param payrollProcessor PayrollProcessor for salary calculations
      */
     public PayrollOutputManager(Scanner scanner, AttendanceReader attendanceReader, PayrollProcessor payrollProcessor) {
         this.scanner = scanner;
@@ -46,9 +53,12 @@ public class PayrollOutputManager {
 
     /**
      * Display employee details
+     *
+     * @param employee Employee to display details for
      */
     public void displayEmployeeDetails(Employee employee) {
         if (employee == null) {
+            System.out.println("Error: Cannot display details for null employee");
             return;
         }
 
@@ -71,9 +81,16 @@ public class PayrollOutputManager {
 
     /**
      * Display payroll summary
+     *
+     * @param employee Employee to display summary for
+     * @param startDate Start date of pay period
+     * @param endDate End date of pay period
+     * @param payPeriodType Type of pay period (mid-month or end-month)
+     * @return Map with attendance summary data, or null if no records found
      */
     public Map<String, Object> displayPayrollSummary(Employee employee, LocalDate startDate, LocalDate endDate, int payPeriodType) {
         if (employee == null) {
+            System.out.println("Error: Cannot display payroll summary for null employee");
             return null;
         }
 
@@ -171,16 +188,25 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display salary details
+     * Display salary details for an employee
+     *
+     * @param employee Employee to display salary details for
      */
     public void displaySalaryDetails(Employee employee) {
         payrollProcessor.displaySalaryDetails(employee);
     }
 
     /**
-     * Display attendance options
+     * Display attendance options for an employee
+     *
+     * @param employee Employee to display options for
      */
     public void displayAttendanceOptions(Employee employee) {
+        if (employee == null) {
+            System.out.println("Error: Cannot display options for null employee");
+            return;
+        }
+
         System.out.println("\n===== ATTENDANCE OPTIONS =====");
         System.out.println("Employee: " + employee.getFullName());
         System.out.println("\nSelect view type:");
@@ -190,9 +216,18 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display daily attendance
+     * Display daily attendance for an employee
+     *
+     * @param employee Employee to display attendance for
+     * @param startDate Start date of the range
+     * @param endDate End date of the range
      */
     public void displayDailyAttendance(Employee employee, LocalDate startDate, LocalDate endDate) {
+        if (employee == null || startDate == null || endDate == null) {
+            System.out.println("Error: Invalid parameters for daily attendance");
+            return;
+        }
+
         System.out.println("\n===== DAILY ATTENDANCE =====");
         System.out.println("Employee: " + employee.getFullName());
         System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
@@ -274,9 +309,18 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display weekly attendance
+     * Display weekly attendance for an employee
+     *
+     * @param employee Employee to display attendance for
+     * @param startDate Start date of the range
+     * @param endDate End date of the range
      */
     public void displayWeeklyAttendance(Employee employee, LocalDate startDate, LocalDate endDate) {
+        if (employee == null || startDate == null || endDate == null) {
+            System.out.println("Error: Invalid parameters for weekly attendance");
+            return;
+        }
+
         System.out.println("\n===== WEEKLY ATTENDANCE =====");
         System.out.println("Employee: " + employee.getFullName());
         System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
@@ -377,7 +421,10 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display payroll calendar
+     * Display payroll calendar for a specific month
+     *
+     * @param year Year to display
+     * @param month Month to display (1-12)
      */
     public void displayPayrollCalendar(int year, int month) {
         System.out.println("\n===== PAYROLL CALENDAR =====");

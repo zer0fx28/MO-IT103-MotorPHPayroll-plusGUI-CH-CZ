@@ -1,7 +1,27 @@
 package motorph.deductions;
 
+/**
+ * Calculates Social Security System (SSS) contributions
+ *
+ * This class implements the SSS contribution calculation based on
+ * the Philippine SSS contribution table. The calculation returns the
+ * proper contribution amount based on the employee's monthly compensation.
+ */
 public class SSS {
+    /**
+     * Calculate SSS contribution based on monthly compensation
+     *
+     * @param compensation Monthly compensation amount (should be non-negative)
+     * @return The appropriate SSS contribution amount
+     */
     public static double calculateContribution(double compensation) {
+        // Input validation
+        if (compensation < 0) {
+            System.out.println("Error: Negative compensation provided for SSS calculation. Using 0.0");
+            compensation = 0.0;
+        }
+
+        // Contribution calculation based on SSS contribution table
         if (compensation < 3250) return 135.00;
         else if (compensation < 3750) return 157.50;
         else if (compensation < 4250) return 180.00;
@@ -46,6 +66,6 @@ public class SSS {
         else if (compensation < 23750) return 1057.50;
         else if (compensation < 24250) return 1080.00;
         else if (compensation < 24750) return 1102.50;
-        else return 1125.00;
+        else return 1125.00; // Maximum contribution amount
     }
 }

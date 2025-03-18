@@ -9,14 +9,17 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Manages payroll dates and cutoff periods
+ *
+ * This class handles all date-related operations for the payroll system,
+ * including determining payroll dates, cutoff periods, and formatting dates.
  */
 public class PayrollDateManager {
     // Date formatter for display
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
 
     // Payroll types
-    public static final int MID_MONTH = 1;
-    public static final int END_MONTH = 2;
+    public static final int MID_MONTH = 1;  // Mid-month payroll (15th)
+    public static final int END_MONTH = 2;  // End-month payroll (30th/31st)
 
     /**
      * Get the payroll date for a given month, year, and type
@@ -27,6 +30,15 @@ public class PayrollDateManager {
      * @return The payroll date
      */
     public static LocalDate getPayrollDate(int year, int month, int payrollType) {
+        // Validate inputs
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12");
+        }
+
+        if (payrollType != MID_MONTH && payrollType != END_MONTH) {
+            throw new IllegalArgumentException("Invalid payroll type. Must be MID_MONTH or END_MONTH");
+        }
+
         if (payrollType == MID_MONTH) {
             // Mid-month is the 15th
             LocalDate midMonth = LocalDate.of(year, month, 15);
@@ -58,6 +70,14 @@ public class PayrollDateManager {
      * @return Array with start and end dates of the cutoff period
      */
     public static LocalDate[] getCutoffDateRange(LocalDate payrollDate, int payrollType) {
+        if (payrollDate == null) {
+            throw new IllegalArgumentException("Payroll date cannot be null");
+        }
+
+        if (payrollType != MID_MONTH && payrollType != END_MONTH) {
+            throw new IllegalArgumentException("Invalid payroll type. Must be MID_MONTH or END_MONTH");
+        }
+
         LocalDate startDate, endDate;
 
         if (payrollType == MID_MONTH) {
@@ -90,6 +110,10 @@ public class PayrollDateManager {
      * @return Formatted date range string
      */
     public static String getFormattedDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Start date and end date cannot be null");
+        }
+
         return startDate.format(DATE_FORMATTER) + " to " + endDate.format(DATE_FORMATTER);
     }
 
@@ -117,13 +141,24 @@ public class PayrollDateManager {
      * @return Month name
      */
     public static String getMonthName(int month) {
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12");
+        }
+
         return Month.of(month).toString();
     }
 
     /**
      * Format a date for display
+     *
+     * @param date Date to format
+     * @return Formatted date string
      */
     public static String formatDate(LocalDate date) {
+        if (date == null) {
+            return "";
+        }
+
         return date.format(DATE_FORMATTER);
     }
 }

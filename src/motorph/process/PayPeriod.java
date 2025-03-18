@@ -9,6 +9,10 @@ import java.util.List;
 
 /**
  * Handles pay period calculations and date ranges
+ *
+ * This class represents a specific pay period with start and end dates,
+ * and provides methods to check dates within the period and generate
+ * weekly date ranges for reporting.
  */
 public class PayPeriod {
     // Date formatter for consistent parsing
@@ -25,12 +29,26 @@ public class PayPeriod {
 
     /**
      * Constructor for creating a pay period with specified date range
+     *
      * @param startDate Start date of the pay period
      * @param endDate End date of the pay period
      * @param payDate Date when payment is made
      * @param periodType Type of pay period (FIRST_HALF or SECOND_HALF)
      */
     public PayPeriod(LocalDate startDate, LocalDate endDate, LocalDate payDate, int periodType) {
+        // Validate inputs
+        if (startDate == null || endDate == null || payDate == null) {
+            throw new IllegalArgumentException("Pay period dates cannot be null");
+        }
+
+        if (endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("End date cannot be before start date");
+        }
+
+        if (periodType != FIRST_HALF && periodType != SECOND_HALF) {
+            throw new IllegalArgumentException("Invalid period type. Must be FIRST_HALF or SECOND_HALF");
+        }
+
         this.startDate = startDate;
         this.endDate = endDate;
         this.payDate = payDate;
@@ -39,10 +57,15 @@ public class PayPeriod {
 
     /**
      * Generate a pay period for a given pay date
+     *
      * @param payDate The pay date to calculate the period for
      * @return PayPeriod object with calculated date ranges
      */
     public static PayPeriod generateForPayDate(LocalDate payDate) {
+        if (payDate == null) {
+            throw new IllegalArgumentException("Pay date cannot be null");
+        }
+
         int day = payDate.getDayOfMonth();
         LocalDate startDate, endDate;
         int periodType;
@@ -72,6 +95,7 @@ public class PayPeriod {
 
     /**
      * Get all weekly date ranges within this pay period
+     *
      * @return List of date range pairs [startDate, endDate]
      */
     public List<LocalDate[]> getWeeklyDateRanges() {
@@ -107,24 +131,34 @@ public class PayPeriod {
 
     /**
      * Check if a date is within this pay period
+     *
      * @param date Date to check
      * @return true if date is within pay period
      */
     public boolean isDateInPeriod(LocalDate date) {
+        if (date == null) {
+            return false;
+        }
+
         return !date.isBefore(startDate) && !date.isAfter(endDate);
     }
 
     /**
      * Check if a date string is within this pay period
+     *
      * @param dateStr Date string in MM/dd/yyyy format
      * @return true if date is within pay period
      */
     public boolean isDateInPeriod(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            return false;
+        }
+
         try {
             LocalDate date = LocalDate.parse(dateStr, DATE_FORMAT);
             return isDateInPeriod(date);
         } catch (DateTimeParseException e) {
-            System.out.println("Error parsing date: " + dateStr);
+            System.out.println("Error parsing date: " + dateStr + " - " + e.getMessage());
             return false;
         }
     }
@@ -137,13 +171,23 @@ public class PayPeriod {
 
     /**
      * Format date to string using standard format
+     *
      * @param date Date to format
      * @return Formatted date string
      */
     public static String formatDate(LocalDate date) {
+        if (date == null) {
+            return "";
+        }
+
         return date.format(DATE_FORMAT);
     }
 
+    /**
+     * String representation of the pay period
+     *
+     * @return Formatted string with pay period details
+     */
     @Override
     public String toString() {
         return "Pay Period: " + formatDate(startDate) + " to " + formatDate(endDate) +

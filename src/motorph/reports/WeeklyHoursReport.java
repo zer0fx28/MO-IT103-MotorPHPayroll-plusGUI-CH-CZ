@@ -16,6 +16,9 @@ import java.util.Map;
 
 /**
  * Generates weekly hour reports for employees
+ *
+ * This class provides functionality to generate detailed reports on
+ * employee work hours, overtime, and lateness on a weekly basis.
  */
 public class WeeklyHoursReport {
     private final EmployeeDataReader employeeDataReader;
@@ -25,6 +28,9 @@ public class WeeklyHoursReport {
 
     /**
      * Create a new report generator
+     *
+     * @param employeeFilePath Path to employee data CSV
+     * @param attendanceFilePath Path to attendance data CSV
      */
     public WeeklyHoursReport(String employeeFilePath, String attendanceFilePath) {
         this.employeeDataReader = new EmployeeDataReader(employeeFilePath);
@@ -35,8 +41,28 @@ public class WeeklyHoursReport {
 
     /**
      * Generate report for a specific employee
+     *
+     * @param employeeId ID of the employee
+     * @param startDate Start date of the report period
+     * @param endDate End date of the report period
      */
     public void generateReportForEmployee(String employeeId, LocalDate startDate, LocalDate endDate) {
+        // Validate inputs
+        if (employeeId == null || employeeId.trim().isEmpty()) {
+            System.out.println("Error: Employee ID cannot be empty");
+            return;
+        }
+
+        if (startDate == null || endDate == null) {
+            System.out.println("Error: Invalid date range");
+            return;
+        }
+
+        if (endDate.isBefore(startDate)) {
+            System.out.println("Error: End date cannot be before start date");
+            return;
+        }
+
         // Get employee data
         Employee employee = employeeDataReader.findEmployee(employeeId);
         if (employee == null) {
@@ -72,14 +98,13 @@ public class WeeklyHoursReport {
         double totalLateMinutes = 0.0;
         double totalUndertimeMinutes = 0.0;
 
-        System.out.println("\n===== WEEKLY HOURS REPORT =====");
-        System.out.println("Employee: " + employee.getFullName() + " (ID: " + employeeId + ")");
-        System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
-        System.out.println("\nDAILY BREAKDOWN:");
-        System.out.printf("%-12s %-10s %-10s %-12s %-12s %-10s %-10s\n",
-                "Date", "Time In", "Time Out", "Regular Hrs", "Overtime", "Late", "Undertime");
-        System.out.println("----------------------------------------------------------------------------");
+        // Print report header
+        printReportHeader(employee, employeeId, startDate, endDate);
 
+        // Print column headers
+        printColumnHeaders();
+
+        // Process each day's records
         for (LocalDate date : recordsByDate.keySet()) {
             AttendanceRecord record = recordsByDate.get(date);
             LocalTime timeIn = record.getTimeIn();
@@ -99,33 +124,93 @@ public class WeeklyHoursReport {
             totalUndertimeMinutes += undertimeMinutes;
 
             // Display daily data
-            System.out.printf("%-12s %-10s %-10s %-12.2f %-12.2f %-10.0f %-10.0f\n",
-                    date.format(dateFormatter),
-                    formatTime(timeIn), formatTime(timeOut),
-                    regularHours, overtimeHours,
-                    lateMinutes, undertimeMinutes);
+            printDailyRecord(date, timeIn, timeOut, regularHours, overtimeHours, lateMinutes, undertimeMinutes);
         }
 
+        // Print totals
+        printTotals(totalRegularHours, totalOvertimeHours, totalLateMinutes, totalUndertimeMinutes);
+
+        // Calculate potential deductions
+        printFinancialSummary(employee, totalRegularHours, totalOvertimeHours, totalLateMinutes, totalUndertimeMinutes);
+    }
+
+    /**
+     * Print the report header
+     */
+    private void printReportHeader(Employee employee, String employeeId, LocalDate startDate, LocalDate endDate) {
+        System.out.println("\n===== WEEKLY HOURS REPORT =====");
+        System.out.println("Employee: " + employee.getFullName() + " (ID: " + employeeId + ")");
+        System.out.println("Position: " + employee.getPosition());
+        System.out.println("Hourly Rate: ₱" + String.format("%.2f", employee.getHourlyRate()));
+        System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
+    }
+
+    /**
+     * Print the column headers
+     */
+    private void printColumnHeaders() {
+        System.out.println("\nDAILY BREAKDOWN:");
+        System.out.printf("%-12s %-10s %-10s %-12s %-12s %-10s %-10s\n",
+                "Date", "Time In", "Time Out", "Regular Hrs", "Overtime", "Late", "Undertime");
+        System.out.println("----------------------------------------------------------------------------");
+    }
+
+    /**
+     * Print a daily record
+     */
+    private void printDailyRecord(LocalDate date, LocalTime timeIn, LocalTime timeOut,
+                                  double regularHours, double overtimeHours,
+                                  double lateMinutes, double undertimeMinutes) {
+        System.out.printf("%-12s %-10s %-10s %-12.2f %-12.2f %-10.0f %-10.0f\n",
+                date.format(dateFormatter),
+                formatTime(timeIn), formatTime(timeOut),
+                regularHours, overtimeHours,
+                lateMinutes, undertimeMinutes);
+    }
+
+    /**
+     * Print the totals row
+     */
+    private void printTotals(double totalRegularHours, double totalOvertimeHours,
+                             double totalLateMinutes, double totalUndertimeMinutes) {
         System.out.println("----------------------------------------------------------------------------");
         System.out.printf("%-34s %-12.2f %-12.2f %-10.0f %-10.0f\n",
                 "TOTALS:", totalRegularHours, totalOvertimeHours,
                 totalLateMinutes, totalUndertimeMinutes);
+    }
 
+    /**
+     * Print the financial summary
+     */
+    private void printFinancialSummary(Employee employee, double totalRegularHours,
+                                       double totalOvertimeHours, double totalLateMinutes,
+                                       double totalUndertimeMinutes) {
         // Calculate potential deductions
         double hourlyRate = employee.getHourlyRate();
         double lateDeduction = (hourlyRate / 60.0) * totalLateMinutes;
         double undertimeDeduction = (hourlyRate / 60.0) * totalUndertimeMinutes;
         double overtimePay = hourlyRate * 1.25 * totalOvertimeHours;
+        double regularPay = hourlyRate * totalRegularHours;
+        double totalPay = regularPay + overtimePay - lateDeduction - undertimeDeduction;
 
         System.out.println("\nSUMMARY FOR PAYROLL:");
-        System.out.printf("Total Regular Hours: %.2f hours\n", totalRegularHours);
-        System.out.printf("Total Overtime Hours: %.2f hours (₱%.2f)\n", totalOvertimeHours, overtimePay);
-        System.out.printf("Late Deduction: ₱%.2f (%.0f minutes)\n", lateDeduction, totalLateMinutes);
-        System.out.printf("Undertime Deduction: ₱%.2f (%.0f minutes)\n", undertimeDeduction, totalUndertimeMinutes);
+        System.out.printf("Regular Hours Pay: ₱%.2f (%.2f hours @ ₱%.2f/hr)\n",
+                regularPay, totalRegularHours, hourlyRate);
+        System.out.printf("Overtime Pay: ₱%.2f (%.2f hours @ ₱%.2f/hr)\n",
+                overtimePay, totalOvertimeHours, hourlyRate * 1.25);
+        System.out.printf("Late Deduction: ₱%.2f (%.0f minutes @ ₱%.4f/min)\n",
+                lateDeduction, totalLateMinutes, hourlyRate / 60.0);
+        System.out.printf("Undertime Deduction: ₱%.2f (%.0f minutes @ ₱%.4f/min)\n",
+                undertimeDeduction, totalUndertimeMinutes, hourlyRate / 60.0);
+        System.out.println("------------------------------------------------");
+        System.out.printf("Total Net Pay: ₱%.2f\n", totalPay);
     }
 
     /**
      * Format time for display
+     *
+     * @param time Time to format
+     * @return Formatted time string
      */
     private String formatTime(LocalTime time) {
         if (time == null) {
@@ -136,6 +221,8 @@ public class WeeklyHoursReport {
 
     /**
      * Main method for running standalone report
+     *
+     * @param args Command line arguments: employeeId, startDate, endDate
      */
     public static void main(String[] args) {
         if (args.length < 3) {
@@ -144,13 +231,25 @@ public class WeeklyHoursReport {
         }
 
         String employeeId = args[0];
-        LocalDate startDate = LocalDate.parse(args[1], DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-        LocalDate endDate = LocalDate.parse(args[2], DateTimeFormatter.ofPattern("MM/dd/yyyy"));
 
-        WeeklyHoursReport report = new WeeklyHoursReport(
-                "resources/MotorPH Employee Data - Employee Details.csv",
-                "resources/MotorPH Employee Data - Attendance Record.csv");
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            LocalDate startDate = LocalDate.parse(args[1], formatter);
+            LocalDate endDate = LocalDate.parse(args[2], formatter);
 
-        report.generateReportForEmployee(employeeId, startDate, endDate);
+            if (endDate.isBefore(startDate)) {
+                System.out.println("Error: End date cannot be before start date");
+                return;
+            }
+
+            WeeklyHoursReport report = new WeeklyHoursReport(
+                    "resources/MotorPH Employee Data - Employee Details.csv",
+                    "resources/MotorPH Employee Data - Attendance Record.csv");
+
+            report.generateReportForEmployee(employeeId, startDate, endDate);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("Usage: WeeklyHoursReport <employeeId> <startDate MM/dd/yyyy> <endDate MM/dd/yyyy>");
+        }
     }
 }

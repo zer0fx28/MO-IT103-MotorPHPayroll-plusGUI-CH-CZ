@@ -9,9 +9,17 @@ import java.util.regex.Pattern;
 
 /**
  * Handles time conversions between different formats
+ *
+ * This utility class provides methods to parse various time formats commonly found
+ * in employee attendance records and convert them to standardized formats.
+ * It handles multiple input formats including:
+ * - Four-digit format (e.g., "0800", "1700")
+ * - Three-digit format (e.g., "800", "130")
+ * - Standard time format with optional AM/PM (e.g., "8:00", "8:00 AM", "17:00")
  */
 public class TimeConverter {
 
+    // Time format constants
     private static final DateTimeFormatter MILITARY_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter STANDARD_FORMAT = DateTimeFormatter.ofPattern("h:mm a");
 
@@ -23,8 +31,12 @@ public class TimeConverter {
     /**
      * Convert time string to LocalTime
      * Handles common formats found in attendance data
+     *
+     * @param timeStr Time string to parse (can be in various formats)
+     * @return LocalTime object representing the parsed time, or null if parsing fails
      */
     public static LocalTime parseUserTime(String timeStr) {
+        // Handle null or empty inputs
         if (timeStr == null || timeStr.trim().isEmpty()) {
             return null;
         }
@@ -39,7 +51,14 @@ public class TimeConverter {
             if (fourDigitMatcher.matches()) {
                 int hour = Integer.parseInt(fourDigitMatcher.group(1));
                 int minute = Integer.parseInt(fourDigitMatcher.group(2));
-                return LocalTime.of(hour, minute);
+
+                // Validate hour and minute values
+                if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
+                    return LocalTime.of(hour, minute);
+                } else {
+                    System.out.println("Invalid time values in '" + timeStr + "': hour=" + hour + ", minute=" + minute);
+                    return null;
+                }
             }
 
             // Check for three-digit format (e.g., "800", "130")
@@ -47,7 +66,14 @@ public class TimeConverter {
             if (threeDigitMatcher.matches()) {
                 int hour = Integer.parseInt(threeDigitMatcher.group(1));
                 int minute = Integer.parseInt(threeDigitMatcher.group(2));
-                return LocalTime.of(hour, minute);
+
+                // Validate hour and minute values
+                if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
+                    return LocalTime.of(hour, minute);
+                } else {
+                    System.out.println("Invalid time values in '" + timeStr + "': hour=" + hour + ", minute=" + minute);
+                    return null;
+                }
             }
 
             // Check for standard time format with optional AM/PM (e.g., "8:00", "8:00 AM", "17:00")
@@ -72,7 +98,13 @@ public class TimeConverter {
                     }
                 }
 
-                return LocalTime.of(hour, minute);
+                // Validate hour and minute values
+                if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
+                    return LocalTime.of(hour, minute);
+                } else {
+                    System.out.println("Invalid time values in '" + timeStr + "': hour=" + hour + ", minute=" + minute);
+                    return null;
+                }
             }
 
             // Fallback to standard parsers if pattern matching fails
@@ -97,13 +129,16 @@ public class TimeConverter {
             return LocalTime.parse(cleanTime);
 
         } catch (Exception e) {
-            System.out.println("Error parsing time: " + timeStr);
+            System.out.println("Error parsing time: " + timeStr + " - " + e.getMessage());
             return null;
         }
     }
 
     /**
      * Format time to standard format (e.g., 5:00 PM)
+     *
+     * @param time LocalTime object to format
+     * @return Formatted time string in standard format, or empty string if time is null
      */
     public static String formatToStandardTime(LocalTime time) {
         if (time == null) {
@@ -114,6 +149,9 @@ public class TimeConverter {
 
     /**
      * Format time to military format (e.g., 17:00)
+     *
+     * @param time LocalTime object to format
+     * @return Formatted time string in military format, or empty string if time is null
      */
     public static String formatToMilitaryTime(LocalTime time) {
         if (time == null) {

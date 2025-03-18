@@ -4,7 +4,12 @@ package motorph.deductions;
 import motorph.process.PayrollDateManager;
 
 /**
- * Calculates government deductions (SSS, PhilHealth, Pag-IBIG, Tax)
+ * Calculates government statutory deductions (SSS, PhilHealth, Pag-IBIG, Tax)
+ *
+ * This class handles the calculation of all mandated government deductions based on
+ * the following schedule:
+ * - SSS, PhilHealth, Pag-IBIG: deducted on mid-month payroll
+ * - Tax: deducted on end-month payroll
  */
 public class StatutoryDeductions {
     // Constants for pay period types
@@ -12,16 +17,32 @@ public class StatutoryDeductions {
     public static final int END_MONTH = PayrollDateManager.END_MONTH;
 
     /**
-     * Calculate all deductions based on the new schedule:
+     * Calculate all deductions based on the schedule:
      * - SSS, PhilHealth, Pag-IBIG: deducted on mid-month payroll
      * - Tax: deducted on end-month payroll
      *
-     * @param grossSalary The gross salary for the period
+     * @param grossSalary The gross salary for the period (should be non-negative)
      * @param payPeriod Either MID_MONTH or END_MONTH
-     * @param fullMonthlyGross The total monthly gross (both periods)
-     * @return DeductionResult with all the calculated deductions
+     * @param fullMonthlyGross The total monthly gross (both periods combined)
+     * @return DeductionResult with all calculated deductions
      */
     public static DeductionResult calculateDeductions(double grossSalary, int payPeriod, double fullMonthlyGross) {
+        // Validate inputs
+        if (grossSalary < 0) {
+            System.out.println("Error: Negative gross salary provided. Using 0.0");
+            grossSalary = 0.0;
+        }
+
+        if (fullMonthlyGross < 0) {
+            System.out.println("Error: Negative monthly gross provided. Using 0.0");
+            fullMonthlyGross = 0.0;
+        }
+
+        if (payPeriod != MID_MONTH && payPeriod != END_MONTH) {
+            System.out.println("Error: Invalid pay period type. Defaulting to MID_MONTH");
+            payPeriod = MID_MONTH;
+        }
+
         // By default, set all deductions to zero
         double sssDeduction = 0;
         double philhealthDeduction = 0;
@@ -66,7 +87,7 @@ public class StatutoryDeductions {
     }
 
     /**
-     * Simple class to hold all deduction amounts
+     * Simple class to hold all deduction amounts for an employee
      */
     public static class DeductionResult {
         public final double sssDeduction;
@@ -75,6 +96,15 @@ public class StatutoryDeductions {
         public final double withholdingTax;
         public final double totalDeductions;
 
+        /**
+         * Create a new deduction result container
+         *
+         * @param sssDeduction SSS contribution amount
+         * @param philhealthDeduction PhilHealth contribution amount
+         * @param pagibigDeduction Pag-IBIG contribution amount
+         * @param withholdingTax Withholding tax amount
+         * @param totalDeductions Sum of all deductions
+         */
         public DeductionResult(
                 double sssDeduction,
                 double philhealthDeduction,
