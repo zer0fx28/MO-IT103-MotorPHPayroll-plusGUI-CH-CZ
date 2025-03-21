@@ -6,6 +6,7 @@ import motorph.hours.AttendanceReader;
 import motorph.input.PayrollInputManager;
 import motorph.output.PayrollOutputManager;
 import motorph.process.PayrollProcessor;
+import motorph.ui.MainMenu;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -24,7 +25,21 @@ public class Main {
     /**
      * Main method - application entry point
      */
-    public static void main(String... notUsed) {
+    public static void main(String... args) {
+        // Create MainMenu and display it
+        try {
+            MainMenu mainMenu = new MainMenu();
+            mainMenu.displayMainMenu();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unhandled exception in main application", e);
+        }
+    }
+
+    /**
+     * Run the main payroll system
+     * This method is called from the MainMenu
+     */
+    public static void runPayrollSystem() {
         // File paths
         String employeeFilePath = "resources/MotorPH Employee Data - Employee Details.csv";
         String attendanceFilePath = "resources/MotorPH Employee Data - Attendance Record.csv";
@@ -42,7 +57,7 @@ public class Main {
             // Run main application
             runApplication(inputManager, outputManager, payrollProcessor);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Unhandled exception in main application", e);
+            LOGGER.log(Level.SEVERE, "Unhandled exception in payroll system", e);
         }
     }
 
@@ -80,7 +95,7 @@ public class Main {
      * Display main menu options
      */
     private static void displayMainMenu() {
-        System.out.println("\nMAIN MENU:");
+        System.out.println("\nPAYROLL SYSTEM MENU:");
         System.out.println("1. Process Payroll");
         System.out.println("2. Find Employee");
         System.out.println("3. View Payroll Calendar");
