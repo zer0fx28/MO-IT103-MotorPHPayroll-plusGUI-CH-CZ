@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Manages payroll dates and cutoff periods
+ * Handles all date-related calculations for payroll processing
  */
 public class PayrollDateManager {
     // Date formatter for display
@@ -17,6 +18,13 @@ public class PayrollDateManager {
     // Payroll types
     public static final int MID_MONTH = 1;
     public static final int END_MONTH = 2;
+
+    // Cutoff days
+    private static final int MID_MONTH_PAY_DAY = 15;
+    private static final int MID_MONTH_CUTOFF_START_DAY = 27;  // of previous month
+    private static final int MID_MONTH_CUTOFF_END_DAY = 12;
+    private static final int END_MONTH_CUTOFF_START_DAY = 13;
+    private static final int END_MONTH_CUTOFF_END_DAY = 26;
 
     /**
      * Get the payroll date for a given month, year, and type
@@ -29,24 +37,16 @@ public class PayrollDateManager {
     public static LocalDate getPayrollDate(int year, int month, int payrollType) {
         if (payrollType == MID_MONTH) {
             // Mid-month is the 15th
-            LocalDate midMonth = LocalDate.of(year, month, 15);
+            LocalDate midMonth = LocalDate.of(year, month, MID_MONTH_PAY_DAY);
 
-            // If 15th falls on Sunday, move to Saturday (14th)
-            if (midMonth.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                return midMonth.minusDays(1);
-            }
-
-            return midMonth;
+            // If 15th falls on weekend, move to previous Friday
+            return adjustForWeekend(midMonth);
         } else {
             // End-month is the last day of the month
             LocalDate lastDayOfMonth = YearMonth.of(year, month).atEndOfMonth();
 
-            // If last day falls on Sunday, move to Saturday (day before)
-            if (lastDayOfMonth.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                return lastDayOfMonth.minusDays(1);
-            }
-
-            return lastDayOfMonth;
+            // If last day falls on weekend, move to previous Friday
+            return adjustForWeekend(lastDayOfMonth);
         }
     }
 
@@ -62,40 +62,70 @@ public class PayrollDateManager {
 
         if (payrollType == MID_MONTH) {
             // Mid-month cutoff: 27th of previous month to 12th of current month
-            LocalDate firstDayOfMonth = LocalDate.of(
-                    payrollDate.getYear(),
-                    payrollDate.getMonth(),
-                    1);
-
-            // Start date is the 27th of previous month
-            startDate = firstDayOfMonth.minusDays(4); // Go back to previous month
-            startDate = LocalDate.of(startDate.getYear(), startDate.getMonth(), 27); // Set to 27th
+            int year = payrollDate.getYear();
+            int month = payrollDate.getMonthValue();
 
             // End date is the 12th of current month
-            endDate = LocalDate.of(payrollDate.getYear(), payrollDate.getMonth(), 12);
+            endDate = LocalDate.of(year, month, MID_MONTH_CUTOFF_END_DAY);
+
+            // Start date is the 27th of previous month
+            LocalDate prevMonth = payrollDate.minusMonths(1);
+            startDate = LocalDate.of(prevMonth.getYear(), prevMonth.getMonth(), MID_MONTH_CUTOFF_START_DAY);
         } else {
             // End-month cutoff: 13th to 26th of current month
-            startDate = LocalDate.of(payrollDate.getYear(), payrollDate.getMonth(), 13);
-            endDate = LocalDate.of(payrollDate.getYear(), payrollDate.getMonth(), 26);
+            int year = payrollDate.getYear();
+            int month = payrollDate.getMonthValue();
+
+            startDate = LocalDate.of(year, month, END_MONTH_CUTOFF_START_DAY);
+            endDate = LocalDate.of(year, month, END_MONTH_CUTOFF_END_DAY);
         }
 
         return new LocalDate[] {startDate, endDate};
     }
 
     /**
-     * Get the formatted date range string for display
+     * Adjust a date if it falls on a weekend
+     * Moves to the previous Friday if it's a Saturday or Sunday
+     *
+     * @param date The date to adjust
+     * @return Adjusted date (same date if it's not a weekend)
+     */
+    private static LocalDate adjustForWeekend(LocalDate date) {
+        if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
+            return date.minusDays(1);  // Friday
+        } else if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            return date.minusDays(2);  // Friday
+        }
+        return date;
+    }
+
+    /**
+     * Calculate the number of working days in a date range
+     * Excludes weekends but not holidays (simplified version)
      *
      * @param startDate Start date
      * @param endDate End date
-     * @return Formatted date range string
+     * @return Number of working days
      */
-    public static String getFormattedDateRange(LocalDate startDate, LocalDate endDate) {
-        return startDate.format(DATE_FORMATTER) + " to " + endDate.format(DATE_FORMATTER);
+    public static int getWorkingDaysInPeriod(LocalDate startDate, LocalDate endDate) {
+        int workingDays = 0;
+        LocalDate currentDate = startDate;
+
+        while (!currentDate.isAfter(endDate)) {
+            // Skip weekends
+            if (currentDate.getDayOfWeek() != DayOfWeek.SATURDAY &&
+                    currentDate.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                workingDays++;
+            }
+            currentDate = currentDate.plusDays(1);
+        }
+
+        return workingDays;
     }
 
     /**
      * Calculate the number of working days in a year
-     * (Excluding weekends and holidays)
+     * (Excluding weekends and estimated holidays)
      *
      * @param year The year
      * @return Number of working days
@@ -122,8 +152,22 @@ public class PayrollDateManager {
 
     /**
      * Format a date for display
+     *
+     * @param date Date to format
+     * @return Formatted date string
      */
     public static String formatDate(LocalDate date) {
         return date.format(DATE_FORMATTER);
+    }
+
+    /**
+     * Get the formatted date range string for display
+     *
+     * @param startDate Start date
+     * @param endDate End date
+     * @return Formatted date range string
+     */
+    public static String getFormattedDateRange(LocalDate startDate, LocalDate endDate) {
+        return formatDate(startDate) + " to " + formatDate(endDate);
     }
 }

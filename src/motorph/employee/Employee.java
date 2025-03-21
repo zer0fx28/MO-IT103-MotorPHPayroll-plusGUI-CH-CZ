@@ -3,33 +3,36 @@ package motorph.employee;
 
 /**
  * Stores all employee information
+ * This class represents a single employee with all their data
  */
 public class Employee {
     // Employee basic details
-    private String employeeId;       // Column A
-    private String lastName;         // Column B
-    private String firstName;        // Column C
-    private String birthday;         // Column D
-    private String address;          // Column E
-    private String phoneNumber;      // Column F
-    private String sssNo;            // Column G
-    private String philhealthNo;     // Column H
-    private String tinNo;            // Column I
-    private String pagibigNo;        // Column J
-    private String status;           // Column K
-    private String position;         // Column L
-    private String immediateSupervisor; // Column M
+    private String employeeId;       // Employee ID
+    private String lastName;         // Last name
+    private String firstName;        // First name
+    private String birthday;         // Birthday
+    private String address;          // Home address
+    private String phoneNumber;      // Contact number
+    private String sssNo;            // SSS number
+    private String philhealthNo;     // PhilHealth number
+    private String tinNo;            // TIN number
+    private String pagibigNo;        // Pag-IBIG number
+    private String status;           // Employment status
+    private String position;         // Job position
+    private String immediateSupervisor; // Supervisor name
 
     // Salary information
-    private double basicSalary;      // Column N - monthly salary
-    private double riceSubsidy;      // Column O - monthly benefit
-    private double phoneAllowance;   // Column P - monthly benefit
-    private double clothingAllowance; // Column Q - monthly benefit
-    private double grossSemiMonthlyRate; // Column R - semi-monthly rate
-    private double hourlyRate;       // Column S - hourly rate
+    private double basicSalary;      // Monthly salary
+    private double riceSubsidy;      // Monthly rice subsidy benefit
+    private double phoneAllowance;   // Monthly phone allowance
+    private double clothingAllowance; // Monthly clothing allowance
+    private double grossSemiMonthlyRate; // Semi-monthly rate
+    private double hourlyRate;       // Hourly rate
 
     /**
-     * Create employee from CSV data
+     * Create employee from CSV data array
+     *
+     * @param data Array of strings containing employee data from CSV
      */
     public Employee(String[] data) {
         // Check if we have enough data
@@ -65,7 +68,10 @@ public class Employee {
     }
 
     /**
-     * Convert string to number
+     * Convert string to number with proper error handling
+     *
+     * @param value String value to convert
+     * @return Parsed double value, or 0 if parsing fails
      */
     private double parseDouble(String value) {
         if (value == null || value.trim().isEmpty()) {
@@ -94,21 +100,31 @@ public class Employee {
         }
     }
 
-    // Getters
+    // Getters for employee details
     public String getEmployeeId() { return employeeId; }
     public String getLastName() { return lastName; }
     public String getFirstName() { return firstName; }
     public String getFullName() { return firstName + " " + lastName; }
-
     public String getPosition() { return position; }
     public String getStatus() { return status; }
     public String getSssNo() { return sssNo; }
     public String getPhilhealthNo() { return philhealthNo; }
     public String getTinNo() { return tinNo; }
     public String getPagibigNo() { return pagibigNo; }
+    public String getBirthday() { return birthday; }
+    public String getAddress() { return address; }
+    public String getPhoneNumber() { return phoneNumber; }
+    public String getSupervisor() { return immediateSupervisor; }
 
     // Salary getters
     public double getBasicSalary() { return basicSalary; }
+
+    /**
+     * Get employee's hourly rate
+     * If hourly rate is not set, calculate it from monthly salary
+     *
+     * @return Hourly rate for the employee
+     */
     public double getHourlyRate() {
         // Calculate hourly rate if not provided
         if (hourlyRate == 0.0 && basicSalary > 0.0) {
@@ -117,10 +133,37 @@ public class Employee {
         return hourlyRate;
     }
 
+    /**
+     * Get daily rate based on monthly salary
+     *
+     * @return Daily rate for the employee
+     */
+    public double getDailyRate() {
+        return basicSalary / 22; // 22 working days per month
+    }
+
+    /**
+     * Get semi-monthly rate
+     *
+     * @return Semi-monthly rate for the employee
+     */
+    public double getSemiMonthlyRate() {
+        if (grossSemiMonthlyRate > 0) {
+            return grossSemiMonthlyRate;
+        }
+        return basicSalary / 2; // Half of monthly salary
+    }
+
     // Benefits getters
     public double getRiceSubsidy() { return riceSubsidy; }
     public double getPhoneAllowance() { return phoneAllowance; }
     public double getClothingAllowance() { return clothingAllowance; }
+
+    /**
+     * Get the total of all benefits
+     *
+     * @return Sum of all monthly benefits
+     */
     public double getTotalBenefits() {
         return riceSubsidy + phoneAllowance + clothingAllowance;
     }
