@@ -3,7 +3,6 @@ package motorph.deductions;
 
 /**
  * Calculates PhilHealth contributions based on monthly salary
- *
  * This class implements the computation of PhilHealth contributions according to
  * the government-mandated rate of 3% of monthly salary, with a maximum contribution cap.
  * The contribution is automatically divided by 2 to provide the semi-monthly rate.

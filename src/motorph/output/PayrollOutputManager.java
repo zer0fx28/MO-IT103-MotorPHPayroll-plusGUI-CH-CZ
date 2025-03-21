@@ -108,8 +108,12 @@ public class PayrollOutputManager {
             return null;
         }
 
-        // Calculate totals
+        // Use the improved formatter to display attendance
+        AttendanceDisplayFormatter.displayAttendanceReport(dailyAttendance);
+
+        // Calculate totals from the displayed data
         double totalHours = 0;
+        double totalActualHours = 0;
         double totalOvertimeHours = 0;
         double totalLateMinutes = 0;
         double totalUndertimeMinutes = 0;
@@ -117,38 +121,29 @@ public class PayrollOutputManager {
         boolean hasUnpaidAbsences = false;
         int unpaidAbsenceCount = 0;
 
-        // Display daily breakdown
-        System.out.println("\n--- ATTENDANCE DETAILS ---");
-        System.out.printf("%-12s %-10s %-10s %-10s %-10s %-10s %-15s\n",
-                "Date", "Time In", "Time Out", "Hours", "OT Hours", "Late", "Absence Type");
-        System.out.println("--------------------------------------------------------------------------------");
-
         for (Map.Entry<LocalDate, Map<String, Object>> entry : dailyAttendance.entrySet()) {
-            LocalDate date = entry.getKey();
             Map<String, Object> dayData = entry.getValue();
 
-            String timeIn = (String) dayData.get("timeIn");
-            String timeOut = (String) dayData.get("timeOut");
-            double hours = (double) dayData.get("hours");
-            double overtimeHours = (double) dayData.get("overtimeHours");
-            double lateMinutes = (double) dayData.get("lateMinutes");
+            double hours = (double) dayData.getOrDefault("hours", 0.0);
+            double overtimeHours = (double) dayData.getOrDefault("overtimeHours", 0.0);
+            double lateMinutes = (double) dayData.getOrDefault("lateMinutes", 0.0);
             double undertimeMinutes = (double) dayData.getOrDefault("undertimeMinutes", 0.0);
-            boolean isLate = (boolean) dayData.get("isLate");
+            boolean isLate = (boolean) dayData.getOrDefault("isLate", false);
             String absenceType = (String) dayData.getOrDefault("absenceType", "");
-            boolean isUnpaidAbsence = false;
 
-            if (dayData.containsKey("isUnpaidAbsence")) {
-                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
-            } else if (absenceType != null && !absenceType.isEmpty()) {
-                // For backward compatibility when there's no isUnpaidAbsence field
-                String type = absenceType.toLowerCase();
-                isUnpaidAbsence = type.contains("unpaid") ||
-                        type.contains("unauthoriz") ||
-                        type.contains("unapproved");
+            // Calculate actual hours after deducting late and undertime
+            double lateHoursDeduction = lateMinutes / 60.0;
+            double undertimeHoursDeduction = undertimeMinutes / 60.0;
+            double actualHours = Math.max(0, hours - lateHoursDeduction - undertimeHoursDeduction);
+
+            // For late employees, no overtime
+            if (isLate) {
+                overtimeHours = 0;
             }
 
             // Update totals
             totalHours += hours;
+            totalActualHours += actualHours;
             totalOvertimeHours += overtimeHours;
             totalLateMinutes += lateMinutes;
             totalUndertimeMinutes += undertimeMinutes;
@@ -157,26 +152,28 @@ public class PayrollOutputManager {
                 isLateAnyDay = true;
             }
 
+            // Check for unpaid absences
+            boolean isUnpaidAbsence = false;
+            if (dayData.containsKey("isUnpaidAbsence")) {
+                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
+            } else if (absenceType != null && !absenceType.isEmpty()) {
+                // For backward compatibility
+                String type = absenceType.toLowerCase();
+                isUnpaidAbsence = type.contains("unpaid") ||
+                        type.contains("unauthoriz") ||
+                        type.contains("unapproved");
+            }
+
             if (isUnpaidAbsence) {
                 hasUnpaidAbsences = true;
                 unpaidAbsenceCount++;
             }
-
-            // Format the line
-            System.out.printf("%-12s %-10s %-10s %-10.2f %-10.2f %-10s %-15s\n",
-                    date.format(dateFormatter),
-                    timeIn, timeOut, hours, overtimeHours,
-                    (lateMinutes > 0 ? lateMinutes + " min" : "-"),
-                    absenceType != null ? absenceType : "-");
         }
-
-        System.out.println("--------------------------------------------------------------------------------");
-        System.out.printf("%-34s %-10.2f %-10.2f %-10.2f\n",
-                "TOTALS:", totalHours, totalOvertimeHours, totalLateMinutes);
 
         // Create summary for return
         Map<String, Object> summary = new HashMap<>();
         summary.put("hours", totalHours);
+        summary.put("actualHours", totalActualHours);
         summary.put("overtimeHours", totalOvertimeHours);
         summary.put("lateMinutes", totalLateMinutes);
         summary.put("undertimeMinutes", totalUndertimeMinutes);
@@ -241,67 +238,8 @@ public class PayrollOutputManager {
             return;
         }
 
-        // Display daily breakdown
-        System.out.println("\n--- ATTENDANCE DETAILS ---");
-        System.out.printf("%-12s %-10s %-10s %-10s %-10s %-10s %-10s %-15s\n",
-                "Date", "Time In", "Time Out", "Hours", "OT Hours", "Late", "Undertime", "Absence Type");
-        System.out.println("----------------------------------------------------------------------------------------");
-
-        double totalHours = 0;
-        double totalOvertimeHours = 0;
-        double totalLateMinutes = 0;
-        double totalUndertimeMinutes = 0;
-        int unpaidAbsenceCount = 0;
-
-        for (Map.Entry<LocalDate, Map<String, Object>> entry : dailyAttendance.entrySet()) {
-            LocalDate date = entry.getKey();
-            Map<String, Object> dayData = entry.getValue();
-
-            String timeIn = (String) dayData.get("timeIn");
-            String timeOut = (String) dayData.get("timeOut");
-            double hours = (double) dayData.get("hours");
-            double overtimeHours = (double) dayData.get("overtimeHours");
-            double lateMinutes = (double) dayData.get("lateMinutes");
-            double undertimeMinutes = (double) dayData.getOrDefault("undertimeMinutes", 0.0);
-            String absenceType = (String) dayData.getOrDefault("absenceType", "");
-            boolean isUnpaidAbsence = false;
-
-            if (dayData.containsKey("isUnpaidAbsence")) {
-                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
-            } else if (absenceType != null && !absenceType.isEmpty()) {
-                // For backward compatibility when there's no isUnpaidAbsence field
-                String type = absenceType.toLowerCase();
-                isUnpaidAbsence = type.contains("unpaid") ||
-                        type.contains("unauthoriz") ||
-                        type.contains("unapproved");
-            }
-
-            // Update totals
-            totalHours += hours;
-            totalOvertimeHours += overtimeHours;
-            totalLateMinutes += lateMinutes;
-            totalUndertimeMinutes += undertimeMinutes;
-
-            if (isUnpaidAbsence) {
-                unpaidAbsenceCount++;
-            }
-
-            // Format the line
-            System.out.printf("%-12s %-10s %-10s %-10.2f %-10.2f %-10s %-10s %-15s\n",
-                    date.format(dateFormatter),
-                    timeIn, timeOut, hours, overtimeHours,
-                    (lateMinutes > 0 ? lateMinutes + " min" : "-"),
-                    (undertimeMinutes > 0 ? undertimeMinutes + " min" : "-"),
-                    (absenceType != null && !absenceType.isEmpty() ? absenceType : "-"));
-        }
-
-        System.out.println("----------------------------------------------------------------------------------------");
-        System.out.printf("%-34s %-10.2f %-10.2f %-10.2f %-10.2f\n",
-                "TOTALS:", totalHours, totalOvertimeHours, totalLateMinutes, totalUndertimeMinutes);
-
-        if (unpaidAbsenceCount > 0) {
-            System.out.println("Unpaid Absences: " + unpaidAbsenceCount + " day(s)");
-        }
+        // Use the improved formatter to display attendance
+        AttendanceDisplayFormatter.displayAttendanceReport(dailyAttendance);
 
         // Wait for user
         System.out.print("\nPress Enter to continue...");

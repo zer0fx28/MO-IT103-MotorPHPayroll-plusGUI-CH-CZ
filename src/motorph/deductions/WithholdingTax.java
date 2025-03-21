@@ -3,7 +3,6 @@ package motorph.deductions;
 
 /**
  * Calculates withholding tax based on the Philippine tax brackets
- *
  * This class implements withholding tax calculation based on the progressive
  * tax structure of the Philippines, taking into account the taxable income
  * after statutory deductions.

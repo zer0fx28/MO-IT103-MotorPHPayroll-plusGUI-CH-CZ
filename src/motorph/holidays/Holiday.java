@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Simple class to store holiday information
- *
  * This class represents a Philippine holiday with a name and date.
  */
 public class Holiday {

@@ -2,7 +2,6 @@ package motorph.deductions;
 
 /**
  * Calculates Pag-IBIG Fund contributions based on salary range
- *
  * This class handles the computation of monthly Pag-IBIG Fund contributions
  * based on the government-mandated rates:
  * - 1% for salaries between ₱1,000 to ₱1,500

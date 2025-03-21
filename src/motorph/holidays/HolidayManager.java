@@ -9,31 +9,19 @@ import java.util.Map;
 
 /**
  * Manages holidays and calculates holiday pay
- *
- * This class maintains a list of regular and special non-working holidays
- * for the Philippines, and provides methods to check if a date is a holiday
- * and calculate holiday pay for employees.
  */
 public class HolidayManager {
-    // Lists of holidays by type
     private List<Holiday> regularHolidays;
     private List<Holiday> specialNonWorkingHolidays;
 
-    /**
-     * Initialize the holiday manager with holiday data
-     */
     public HolidayManager() {
         regularHolidays = new ArrayList<>();
         specialNonWorkingHolidays = new ArrayList<>();
 
-        // Set up current and future holidays
         setup2024Holidays();
         setup2025Holidays();
     }
 
-    /**
-     * Set up 2024 holidays based on official proclamation
-     */
     private void setup2024Holidays() {
         // Regular Holidays 2024
         addRegularHoliday("New Year's Day", 2024, 1, 1);
@@ -61,9 +49,6 @@ public class HolidayManager {
         addSpecialNonWorkingHoliday("Last Day of the Year", 2024, 12, 31);
     }
 
-    /**
-     * Set up 2025 holidays based on official proclamation
-     */
     private void setup2025Holidays() {
         // Regular Holidays 2025
         addRegularHoliday("New Year's Day", 2025, 1, 1);
@@ -88,26 +73,14 @@ public class HolidayManager {
         addSpecialNonWorkingHoliday("Last Day of the Year", 2025, 12, 31);
     }
 
-    /**
-     * Helper method to add a regular holiday
-     */
     private void addRegularHoliday(String name, int year, int month, int day) {
         regularHolidays.add(new Holiday(name, LocalDate.of(year, month, day)));
     }
 
-    /**
-     * Helper method to add a special non-working holiday
-     */
     private void addSpecialNonWorkingHoliday(String name, int year, int month, int day) {
         specialNonWorkingHolidays.add(new Holiday(name, LocalDate.of(year, month, day)));
     }
 
-    /**
-     * Check if a date is a holiday (regular or special non-working)
-     *
-     * @param date Date to check
-     * @return true if the date is a holiday
-     */
     public boolean isHoliday(LocalDate date) {
         if (date == null) {
             return false;
@@ -115,12 +88,6 @@ public class HolidayManager {
         return isRegularHoliday(date) || isSpecialNonWorkingHoliday(date);
     }
 
-    /**
-     * Check if a date is a regular holiday
-     *
-     * @param date Date to check
-     * @return true if the date is a regular holiday
-     */
     public boolean isRegularHoliday(LocalDate date) {
         if (date == null) {
             return false;
@@ -134,12 +101,6 @@ public class HolidayManager {
         return false;
     }
 
-    /**
-     * Check if a date is a special non-working holiday
-     *
-     * @param date Date to check
-     * @return true if the date is a special non-working holiday
-     */
     public boolean isSpecialNonWorkingHoliday(LocalDate date) {
         if (date == null) {
             return false;
@@ -153,12 +114,6 @@ public class HolidayManager {
         return false;
     }
 
-    /**
-     * Get holiday name if it's a holiday
-     *
-     * @param date Date to check
-     * @return Holiday name with type, or null if not a holiday
-     */
     public String getHolidayName(LocalDate date) {
         if (date == null) {
             return null;
@@ -179,90 +134,65 @@ public class HolidayManager {
         return null;
     }
 
-    /**
-     * Calculate holiday pay for working on a holiday
-     *
-     * This method implements the complex holiday pay calculations based on Philippine labor laws:
-     * - Regular holidays: 200% of daily rate for first 8 hours, plus overtime premiums
-     * - Special non-working holidays: 130% of daily rate for first 8 hours, plus overtime premiums
-     * Additional premiums for rest days and non-late employees
-     *
-     * @param basePay The employee's base pay for that day
-     * @param hoursWorked Number of hours worked
-     * @param isRegularHoliday Whether it's a regular holiday
-     * @param isRestDay Whether it's the employee's rest day
-     * @param overtimeHours Number of overtime hours worked
-     * @param isLate Whether the employee was late
-     * @return The holiday pay amount
-     */
     public double calculateHolidayPay(double basePay, double hoursWorked,
                                       boolean isRegularHoliday, boolean isRestDay,
                                       double overtimeHours, boolean isLate) {
-        // Validate inputs
         if (basePay < 0) {
-            System.out.println("Warning: Negative base pay provided for holiday pay calculation. Using 0.0");
             basePay = 0.0;
         }
 
         if (hoursWorked < 0) {
-            System.out.println("Warning: Negative hours worked provided for holiday pay calculation. Using 0.0");
             hoursWorked = 0.0;
         }
 
         if (overtimeHours < 0) {
-            System.out.println("Warning: Negative overtime hours provided for holiday pay calculation. Using 0.0");
             overtimeHours = 0.0;
         }
 
         double holidayPay = 0.0;
 
         if (isRegularHoliday) {
-            // Regular holiday pay calculation
             if (hoursWorked == 0) {
-                // Non-working employees get 100% of base pay
                 holidayPay = basePay;
             } else {
-                // First 8 hours: 200% of basic wage
                 double regularHours = Math.min(hoursWorked, 8.0);
                 holidayPay = regularHours * (basePay / 8) * 2;
 
-                // Overtime hours: additional 30% + 25% for non-late employees
                 if (overtimeHours > 0 && !isLate) {
                     double hourlyRate = basePay / 8;
-                    double overtimeRate = hourlyRate * 1.3; // 30% additional
+                    double overtimeRate = hourlyRate * 2 * 1.3;
 
                     if (!isLate) {
-                        overtimeRate *= 1.25; // Additional 25% for non-late
+                        overtimeRate *= 1.25;
                     }
 
                     holidayPay += overtimeHours * overtimeRate;
                 }
 
-                // If holiday falls on rest day: additional 30%
                 if (isRestDay) {
-                    holidayPay *= 1.3; // Additional 30%
+                    holidayPay *= 1.3;
                 }
             }
         } else {
-            // Special non-working holiday pay calculation
             if (hoursWorked == 0) {
-                // No extra pay for non-working employees
                 holidayPay = 0;
             } else {
-                // First 8 hours: additional 30% of basic wage
                 double regularHours = Math.min(hoursWorked, 8.0);
                 holidayPay = regularHours * (basePay / 8) * 1.3;
 
-                // Overtime: 30% holiday + 25% overtime for non-late
                 if (overtimeHours > 0 && !isLate) {
                     double hourlyRate = basePay / 8;
-                    double overtimeRate = hourlyRate * 1.3; // 30% holiday premium
+                    double overtimeRate = hourlyRate * 1.3;
 
                     if (!isLate) {
-                        overtimeRate *= 1.25; // Additional 25% for non-late
+                        overtimeRate *= 1.25;
                     }
 
                     holidayPay += overtimeHours * overtimeRate;
+                }
+
+                if (isRestDay) {
+                    holidayPay *= 1.3;
                 }
             }
         }
@@ -270,13 +200,6 @@ public class HolidayManager {
         return holidayPay;
     }
 
-    /**
-     * Get a list of all holidays in a date range
-     *
-     * @param startDate Start date
-     * @param endDate End date
-     * @return Map of holiday dates to their names and types
-     */
     public Map<LocalDate, String> getHolidaysInRange(LocalDate startDate, LocalDate endDate) {
         Map<LocalDate, String> holidaysInRange = new HashMap<>();
 
@@ -284,7 +207,6 @@ public class HolidayManager {
             return holidaysInRange;
         }
 
-        // Check each date in the range
         LocalDate currentDate = startDate;
         while (!currentDate.isAfter(endDate)) {
             String holidayName = getHolidayName(currentDate);

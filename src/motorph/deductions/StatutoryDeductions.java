@@ -2,14 +2,16 @@
 package motorph.deductions;
 
 import motorph.process.PayrollDateManager;
+import motorph.util.ValidationUtils;
 
 /**
  * Calculates government statutory deductions (SSS, PhilHealth, Pag-IBIG, Tax)
- *
  * This class handles the calculation of all mandated government deductions based on
  * the following schedule:
  * - SSS, PhilHealth, Pag-IBIG: deducted on mid-month payroll
  * - Tax: deducted on end-month payroll
+ * The class manages the timing of deductions and ensures the correct application
+ * of each statutory requirement according to Philippine regulations.
  */
 public class StatutoryDeductions {
     // Constants for pay period types
@@ -20,6 +22,9 @@ public class StatutoryDeductions {
      * Calculate all deductions based on the schedule:
      * - SSS, PhilHealth, Pag-IBIG: deducted on mid-month payroll
      * - Tax: deducted on end-month payroll
+     * This method orchestrates the calculation of all required government deductions
+     * based on the pay period. It ensures that deductions are applied in the correct
+     * pay period according to company policy.
      *
      * @param grossSalary The gross salary for the period (should be non-negative)
      * @param payPeriod Either MID_MONTH or END_MONTH
@@ -27,21 +32,10 @@ public class StatutoryDeductions {
      * @return DeductionResult with all calculated deductions
      */
     public static DeductionResult calculateDeductions(double grossSalary, int payPeriod, double fullMonthlyGross) {
-        // Validate inputs
-        if (grossSalary < 0) {
-            System.out.println("Error: Negative gross salary provided. Using 0.0");
-            grossSalary = 0.0;
-        }
-
-        if (fullMonthlyGross < 0) {
-            System.out.println("Error: Negative monthly gross provided. Using 0.0");
-            fullMonthlyGross = 0.0;
-        }
-
-        if (payPeriod != MID_MONTH && payPeriod != END_MONTH) {
-            System.out.println("Error: Invalid pay period type. Defaulting to MID_MONTH");
-            payPeriod = MID_MONTH;
-        }
+        // Validate inputs using the ValidationUtils class
+        grossSalary = ValidationUtils.validateNonNegative(grossSalary, "gross salary", 0.0);
+        fullMonthlyGross = ValidationUtils.validateNonNegative(fullMonthlyGross, "monthly gross", 0.0);
+        payPeriod = ValidationUtils.validatePayPeriodType(payPeriod, MID_MONTH, END_MONTH, MID_MONTH);
 
         // By default, set all deductions to zero
         double sssDeduction = 0;
@@ -52,20 +46,20 @@ public class StatutoryDeductions {
         // For SSS, PhilHealth, and Pag-IBIG, deduct only on mid-month payroll
         if (payPeriod == MID_MONTH) {
             // Calculate based on full monthly salary
-            sssDeduction = SSS.calculateContribution(fullMonthlyGross);
-            philhealthDeduction = PhilHealth.calculateContribution(fullMonthlyGross);
-            pagibigDeduction = PagIBIG.calculateContribution(fullMonthlyGross);
+            sssDeduction = calculateSSSContribution(fullMonthlyGross);
+            philhealthDeduction = calculatePhilHealthContribution(fullMonthlyGross);
+            pagibigDeduction = calculatePagIBIGContribution(fullMonthlyGross);
         }
 
         // For tax, deduct only on end-month payroll
         if (payPeriod == END_MONTH) {
-            // Calculate statutory deductions for the month
-            double monthlySSS = SSS.calculateContribution(fullMonthlyGross);
-            double monthlyPhilHealth = PhilHealth.calculateContribution(fullMonthlyGross);
-            double monthlyPagIBIG = PagIBIG.calculateContribution(fullMonthlyGross);
+            // Calculate monthly deductions for tax computation
+            double monthlySSS = calculateSSSContribution(fullMonthlyGross);
+            double monthlyPhilHealth = calculatePhilHealthContribution(fullMonthlyGross);
+            double monthlyPagIBIG = calculatePagIBIGContribution(fullMonthlyGross);
 
             // Calculate tax based on full monthly income minus the deductions
-            withholdingTax = WithholdingTax.calculateTax(
+            withholdingTax = calculateWithholdingTax(
                     fullMonthlyGross,
                     monthlySSS,
                     monthlyPhilHealth,
@@ -87,7 +81,80 @@ public class StatutoryDeductions {
     }
 
     /**
+     * Calculate SSS contribution with proper error handling
+     *
+     * @param fullMonthlyGross Monthly gross salary
+     * @return SSS contribution amount
+     */
+    private static double calculateSSSContribution(double fullMonthlyGross) {
+        try {
+            return SSS.calculateContribution(fullMonthlyGross);
+        } catch (Exception e) {
+            System.out.println("Error calculating SSS contribution: " + e.getMessage());
+            return 0.0;
+        }
+    }
+
+    /**
+     * Calculate PhilHealth contribution with proper error handling
+     *
+     * @param fullMonthlyGross Monthly gross salary
+     * @return PhilHealth contribution amount
+     */
+    private static double calculatePhilHealthContribution(double fullMonthlyGross) {
+        try {
+            return PhilHealth.calculateContribution(fullMonthlyGross);
+        } catch (Exception e) {
+            System.out.println("Error calculating PhilHealth contribution: " + e.getMessage());
+            return 0.0;
+        }
+    }
+
+    /**
+     * Calculate Pag-IBIG contribution with proper error handling
+     *
+     * @param fullMonthlyGross Monthly gross salary
+     * @return Pag-IBIG contribution amount
+     */
+    private static double calculatePagIBIGContribution(double fullMonthlyGross) {
+        try {
+            return PagIBIG.calculateContribution(fullMonthlyGross);
+        } catch (Exception e) {
+            System.out.println("Error calculating Pag-IBIG contribution: " + e.getMessage());
+            return 0.0;
+        }
+    }
+
+    /**
+     * Calculate withholding tax with proper error handling
+     *
+     * @param fullMonthlyGross Monthly gross salary
+     * @param sssDeduction SSS contribution amount
+     * @param philhealthDeduction PhilHealth contribution amount
+     * @param pagibigDeduction Pag-IBIG contribution amount
+     * @return Withholding tax amount
+     */
+    private static double calculateWithholdingTax(double fullMonthlyGross,
+                                                  double sssDeduction,
+                                                  double philhealthDeduction,
+                                                  double pagibigDeduction) {
+        try {
+            return WithholdingTax.calculateTax(
+                    fullMonthlyGross,
+                    sssDeduction,
+                    philhealthDeduction,
+                    pagibigDeduction
+            );
+        } catch (Exception e) {
+            System.out.println("Error calculating withholding tax: " + e.getMessage());
+            return 0.0;
+        }
+    }
+
+    /**
      * Simple class to hold all deduction amounts for an employee
+     * This immutable data class stores the results of all deduction calculations
+     * for an employee, providing a structured way to return multiple values.
      */
     public static class DeductionResult {
         public final double sssDeduction;
@@ -117,6 +184,19 @@ public class StatutoryDeductions {
             this.pagibigDeduction = pagibigDeduction;
             this.withholdingTax = withholdingTax;
             this.totalDeductions = totalDeductions;
+        }
+
+        /**
+         * Get a string representation of deduction results
+         *
+         * @return Formatted string with all deduction amounts
+         */
+        @Override
+        public String toString() {
+            return String.format(
+                    "Deductions: [SSS: ₱%.2f, PhilHealth: ₱%.2f, Pag-IBIG: ₱%.2f, Tax: ₱%.2f, Total: ₱%.2f]",
+                    sssDeduction, philhealthDeduction, pagibigDeduction, withholdingTax, totalDeductions
+            );
         }
     }
 }

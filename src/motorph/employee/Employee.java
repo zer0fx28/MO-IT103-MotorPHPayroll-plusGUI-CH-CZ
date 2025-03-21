@@ -3,7 +3,6 @@ package motorph.employee;
 
 /**
  * Stores all employee information
- *
  * This class represents an employee in the MotorPH system and contains
  * all relevant personal, employment, and salary information.
  */
@@ -160,16 +159,24 @@ public class Employee {
         StringBuilder sb = new StringBuilder();
         sb.append("Employee ID: ").append(employeeId).append("\n");
         sb.append("Name: ").append(firstName).append(" ").append(lastName).append("\n");
+        sb.append("Birthday: ").append(birthday).append("\n");
+        sb.append("Address: ").append(address).append("\n");
+        sb.append("Phone: ").append(phoneNumber).append("\n");
         sb.append("Position: ").append(position).append("\n");
         sb.append("Status: ").append(status).append("\n");
+        sb.append("Supervisor: ").append(immediateSupervisor).append("\n");
+
         sb.append("\nSalary Information:\n");
-        sb.append("  Basic Salary: ₱").append(String.format("%,.2f", basicSalary)).append("\n");
-        sb.append("  Hourly Rate: ₱").append(String.format("%.2f", hourlyRate)).append("\n");
-        sb.append("\nID Numbers:\n");
+        sb.append("  Basic Salary: ₱").append(String.format("%,.2f", basicSalary)).append("/month\n");
+        sb.append("  Semi-Monthly Rate: ₱").append(String.format("%,.2f", grossSemiMonthlyRate)).append("\n");
+        sb.append("  Hourly Rate: ₱").append(String.format("%.2f", hourlyRate)).append("/hour\n");
+
+        sb.append("\nGovernment IDs:\n");
         sb.append("  SSS: ").append(sssNo).append("\n");
         sb.append("  PhilHealth: ").append(philhealthNo).append("\n");
         sb.append("  Pag-IBIG: ").append(pagibigNo).append("\n");
         sb.append("  TIN: ").append(tinNo).append("\n");
+
         sb.append("\nMonthly Benefits:\n");
         sb.append("  Rice Subsidy: ₱").append(String.format("%,.2f", riceSubsidy)).append("\n");
         sb.append("  Phone Allowance: ₱").append(String.format("%,.2f", phoneAllowance)).append("\n");
