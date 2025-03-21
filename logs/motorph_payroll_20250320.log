@@ -1,0 +1,768 @@
+2025-03-20 21:09:53.660 | INFO    | motorph.util.DebugLogger.configureLogger | Logging system initialized. Log file: logs\motorph_payroll_20250320.log
+2025-03-20 21:09:53.666 | INFO    | motorph.util.DebugLogger.log | Checking for employee file at: C:\Users\ferna\IdeaProjects\MotorphPayrollSystem\resources\MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:09:53.670 | INFO    | motorph.util.DebugLogger.log | File exists: true
+2025-03-20 21:09:53.671 | INFO    | motorph.util.DebugLogger.log | Checking for attendance file at: C:\Users\ferna\IdeaProjects\MotorphPayrollSystem\resources\MotorPH Employee Data - Attendance Record.csv
+2025-03-20 21:09:53.671 | INFO    | motorph.util.DebugLogger.log | File exists: true
+2025-03-20 21:10:03.966 | INFO    | motorph.util.DebugLogger.log | Initializing employee data reader...
+2025-03-20 21:10:03.979 | INFO    | motorph.util.DebugLogger.log | Loading employee data from: resources/MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:10:03.979 | INFO    | motorph.util.DebugLogger.log | File opened successfully. Reading data...
+2025-03-20 21:10:03.980 | INFO    | motorph.util.DebugLogger.log | Header row: Employee #,Last Name,First Name,Birthday,Address,Phone Number,SSS #,Philhealth #,TIN #,Pag-ibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate
+2025-03-20 21:10:03.982 | INFO    | motorph.util.DebugLogger.log | Line 2: Parsed 19 fields
+2025-03-20 21:10:03.986 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10001, Name: Manuel III Garcia
+2025-03-20 21:10:03.987 | INFO    | motorph.util.DebugLogger.log | Line 3: Parsed 19 fields
+2025-03-20 21:10:03.987 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10002, Name: Antonio Lim
+2025-03-20 21:10:03.987 | INFO    | motorph.util.DebugLogger.log | Line 4: Parsed 19 fields
+2025-03-20 21:10:03.987 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10003, Name: Bianca Sofia Aquino
+2025-03-20 21:10:03.988 | INFO    | motorph.util.DebugLogger.log | Line 5: Parsed 19 fields
+2025-03-20 21:10:03.988 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10004, Name: Isabella Reyes
+2025-03-20 21:10:03.988 | INFO    | motorph.util.DebugLogger.log | Line 6: Parsed 19 fields
+2025-03-20 21:10:03.988 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10005, Name: Eduard Hernandez
+2025-03-20 21:10:03.988 | INFO    | motorph.util.DebugLogger.log | Line 7: Parsed 19 fields
+2025-03-20 21:10:03.989 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10006, Name: Andrea Mae Villanueva
+2025-03-20 21:10:03.989 | INFO    | motorph.util.DebugLogger.log | Line 8: Parsed 19 fields
+2025-03-20 21:10:03.989 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10007, Name: Brad San Jose
+2025-03-20 21:10:03.989 | INFO    | motorph.util.DebugLogger.log | Line 9: Parsed 19 fields
+2025-03-20 21:10:03.990 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10008, Name: Alice Romualdez
+2025-03-20 21:10:03.990 | INFO    | motorph.util.DebugLogger.log | Line 10: Parsed 19 fields
+2025-03-20 21:10:03.990 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10009, Name: Rosie Atienza
+2025-03-20 21:10:03.990 | INFO    | motorph.util.DebugLogger.log | Line 11: Parsed 19 fields
+2025-03-20 21:10:03.990 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10010, Name: Roderick Alvaro
+2025-03-20 21:10:03.990 | INFO    | motorph.util.DebugLogger.log | Line 12: Parsed 19 fields
+2025-03-20 21:10:03.991 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10011, Name: Anthony Salcedo
+2025-03-20 21:10:03.991 | INFO    | motorph.util.DebugLogger.log | Line 13: Parsed 19 fields
+2025-03-20 21:10:03.991 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10012, Name: Josie Lopez
+2025-03-20 21:10:03.991 | INFO    | motorph.util.DebugLogger.log | Line 14: Parsed 19 fields
+2025-03-20 21:10:03.991 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10013, Name: Martha Farala
+2025-03-20 21:10:03.992 | INFO    | motorph.util.DebugLogger.log | Line 15: Parsed 19 fields
+2025-03-20 21:10:03.992 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10014, Name: Leila Martinez
+2025-03-20 21:10:03.992 | INFO    | motorph.util.DebugLogger.log | Line 16: Parsed 19 fields
+2025-03-20 21:10:03.992 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10015, Name: Fredrick Romualdez
+2025-03-20 21:10:03.992 | INFO    | motorph.util.DebugLogger.log | Line 17: Parsed 19 fields
+2025-03-20 21:10:03.992 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10016, Name: Christian Mata
+2025-03-20 21:10:03.993 | INFO    | motorph.util.DebugLogger.log | Line 18: Parsed 19 fields
+2025-03-20 21:10:03.993 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10017, Name: Selena De Leon
+2025-03-20 21:10:03.993 | INFO    | motorph.util.DebugLogger.log | Line 19: Parsed 19 fields
+2025-03-20 21:10:03.993 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10018, Name: Allison San Jose
+2025-03-20 21:10:03.993 | INFO    | motorph.util.DebugLogger.log | Line 20: Parsed 19 fields
+2025-03-20 21:10:03.994 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10019, Name: Cydney Rosario
+2025-03-20 21:10:03.994 | INFO    | motorph.util.DebugLogger.log | Line 21: Parsed 19 fields
+2025-03-20 21:10:03.994 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10020, Name: Mark Bautista
+2025-03-20 21:10:03.994 | INFO    | motorph.util.DebugLogger.log | Line 22: Parsed 19 fields
+2025-03-20 21:10:03.994 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10021, Name: Darlene Lazaro
+2025-03-20 21:10:03.994 | INFO    | motorph.util.DebugLogger.log | Line 23: Parsed 19 fields
+2025-03-20 21:10:03.995 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10022, Name: Kolby Delos Santos
+2025-03-20 21:10:03.995 | INFO    | motorph.util.DebugLogger.log | Line 24: Parsed 19 fields
+2025-03-20 21:10:03.995 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10023, Name: Vella Santos
+2025-03-20 21:10:03.995 | INFO    | motorph.util.DebugLogger.log | Line 25: Parsed 19 fields
+2025-03-20 21:10:03.995 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10024, Name: Tomas Del Rosario
+2025-03-20 21:10:03.995 | INFO    | motorph.util.DebugLogger.log | Line 26: Parsed 19 fields
+2025-03-20 21:10:03.995 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10025, Name: Jacklyn Tolentino
+2025-03-20 21:10:03.996 | INFO    | motorph.util.DebugLogger.log | Line 27: Parsed 19 fields
+2025-03-20 21:10:03.996 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10026, Name: Percival Gutierrez
+2025-03-20 21:10:03.996 | INFO    | motorph.util.DebugLogger.log | Line 28: Parsed 19 fields
+2025-03-20 21:10:03.996 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10027, Name: Garfield Manalaysay
+2025-03-20 21:10:03.996 | INFO    | motorph.util.DebugLogger.log | Line 29: Parsed 19 fields
+2025-03-20 21:10:03.997 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10028, Name: Lizeth Villegas
+2025-03-20 21:10:03.997 | INFO    | motorph.util.DebugLogger.log | Line 30: Parsed 19 fields
+2025-03-20 21:10:03.997 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10029, Name: Carol Ramos
+2025-03-20 21:10:03.997 | INFO    | motorph.util.DebugLogger.log | Line 31: Parsed 19 fields
+2025-03-20 21:10:03.997 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10030, Name: Emelia Maceda
+2025-03-20 21:10:03.997 | INFO    | motorph.util.DebugLogger.log | Line 32: Parsed 19 fields
+2025-03-20 21:10:03.997 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:10:03.998 | INFO    | motorph.util.DebugLogger.log | Line 33: Parsed 19 fields
+2025-03-20 21:10:03.998 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10032, Name: John Rafael Castro
+2025-03-20 21:10:03.998 | INFO    | motorph.util.DebugLogger.log | Line 34: Parsed 19 fields
+2025-03-20 21:10:03.998 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10033, Name: Carlos Ian Martinez
+2025-03-20 21:10:03.998 | INFO    | motorph.util.DebugLogger.log | Line 35: Parsed 19 fields
+2025-03-20 21:10:03.998 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10034, Name: Beatriz Santos
+2025-03-20 21:10:03.999 | INFO    | motorph.util.DebugLogger.log | Employee data loading complete:
+2025-03-20 21:10:03.999 | INFO    | motorph.util.DebugLogger.log | - Total records processed: 34
+2025-03-20 21:10:03.999 | INFO    | motorph.util.DebugLogger.log | - Successfully loaded: 34
+2025-03-20 21:10:03.999 | INFO    | motorph.util.DebugLogger.log | - Errors: 0
+2025-03-20 21:10:03.999 | INFO    | motorph.util.DebugLogger.log | - Total employees in map: 34
+2025-03-20 21:10:03.999 | INFO    | motorph.util.DebugLogger.log | Sample employee IDs: 
+2025-03-20 21:10:04.000 | INFO    | motorph.util.DebugLogger.log |   - 10031: Delia Aguilar
+2025-03-20 21:10:04.000 | INFO    | motorph.util.DebugLogger.log |   - 10030: Emelia Maceda
+2025-03-20 21:10:04.000 | INFO    | motorph.util.DebugLogger.log |   - 10019: Cydney Rosario
+2025-03-20 21:10:04.000 | INFO    | motorph.util.DebugLogger.log |   - 10018: Allison San Jose
+2025-03-20 21:10:04.000 | INFO    | motorph.util.DebugLogger.log |   - 10011: Anthony Salcedo
+2025-03-20 21:10:04.001 | INFO    | motorph.util.DebugLogger.log | Added test employee with ID: 10001, Name: John Doe
+2025-03-20 21:10:04.001 | INFO    | motorph.util.DebugLogger.log | Initializing attendance reader...
+2025-03-20 21:10:04.140 | INFO    | motorph.util.DebugLogger.log | Initializing payroll processor...
+2025-03-20 21:10:04.143 | INFO    | motorph.util.DebugLogger.log | Loading employee data from: resources/MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:10:04.143 | INFO    | motorph.util.DebugLogger.log | File opened successfully. Reading data...
+2025-03-20 21:10:04.145 | INFO    | motorph.util.DebugLogger.log | Header row: Employee #,Last Name,First Name,Birthday,Address,Phone Number,SSS #,Philhealth #,TIN #,Pag-ibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate
+2025-03-20 21:10:04.145 | INFO    | motorph.util.DebugLogger.log | Line 2: Parsed 19 fields
+2025-03-20 21:10:04.146 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10001, Name: Manuel III Garcia
+2025-03-20 21:10:04.146 | INFO    | motorph.util.DebugLogger.log | Line 3: Parsed 19 fields
+2025-03-20 21:10:04.146 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10002, Name: Antonio Lim
+2025-03-20 21:10:04.146 | INFO    | motorph.util.DebugLogger.log | Line 4: Parsed 19 fields
+2025-03-20 21:10:04.146 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10003, Name: Bianca Sofia Aquino
+2025-03-20 21:10:04.147 | INFO    | motorph.util.DebugLogger.log | Line 5: Parsed 19 fields
+2025-03-20 21:10:04.147 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10004, Name: Isabella Reyes
+2025-03-20 21:10:04.147 | INFO    | motorph.util.DebugLogger.log | Line 6: Parsed 19 fields
+2025-03-20 21:10:04.147 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10005, Name: Eduard Hernandez
+2025-03-20 21:10:04.147 | INFO    | motorph.util.DebugLogger.log | Line 7: Parsed 19 fields
+2025-03-20 21:10:04.147 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10006, Name: Andrea Mae Villanueva
+2025-03-20 21:10:04.148 | INFO    | motorph.util.DebugLogger.log | Line 8: Parsed 19 fields
+2025-03-20 21:10:04.148 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10007, Name: Brad San Jose
+2025-03-20 21:10:04.148 | INFO    | motorph.util.DebugLogger.log | Line 9: Parsed 19 fields
+2025-03-20 21:10:04.148 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10008, Name: Alice Romualdez
+2025-03-20 21:10:04.148 | INFO    | motorph.util.DebugLogger.log | Line 10: Parsed 19 fields
+2025-03-20 21:10:04.149 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10009, Name: Rosie Atienza
+2025-03-20 21:10:04.149 | INFO    | motorph.util.DebugLogger.log | Line 11: Parsed 19 fields
+2025-03-20 21:10:04.149 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10010, Name: Roderick Alvaro
+2025-03-20 21:10:04.149 | INFO    | motorph.util.DebugLogger.log | Line 12: Parsed 19 fields
+2025-03-20 21:10:04.149 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10011, Name: Anthony Salcedo
+2025-03-20 21:10:04.151 | INFO    | motorph.util.DebugLogger.log | Line 13: Parsed 19 fields
+2025-03-20 21:10:04.151 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10012, Name: Josie Lopez
+2025-03-20 21:10:04.151 | INFO    | motorph.util.DebugLogger.log | Line 14: Parsed 19 fields
+2025-03-20 21:10:04.151 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10013, Name: Martha Farala
+2025-03-20 21:10:04.152 | INFO    | motorph.util.DebugLogger.log | Line 15: Parsed 19 fields
+2025-03-20 21:10:04.152 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10014, Name: Leila Martinez
+2025-03-20 21:10:04.153 | INFO    | motorph.util.DebugLogger.log | Line 16: Parsed 19 fields
+2025-03-20 21:10:04.153 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10015, Name: Fredrick Romualdez
+2025-03-20 21:10:04.153 | INFO    | motorph.util.DebugLogger.log | Line 17: Parsed 19 fields
+2025-03-20 21:10:04.153 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10016, Name: Christian Mata
+2025-03-20 21:10:04.153 | INFO    | motorph.util.DebugLogger.log | Line 18: Parsed 19 fields
+2025-03-20 21:10:04.153 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10017, Name: Selena De Leon
+2025-03-20 21:10:04.154 | INFO    | motorph.util.DebugLogger.log | Line 19: Parsed 19 fields
+2025-03-20 21:10:04.154 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10018, Name: Allison San Jose
+2025-03-20 21:10:04.154 | INFO    | motorph.util.DebugLogger.log | Line 20: Parsed 19 fields
+2025-03-20 21:10:04.154 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10019, Name: Cydney Rosario
+2025-03-20 21:10:04.154 | INFO    | motorph.util.DebugLogger.log | Line 21: Parsed 19 fields
+2025-03-20 21:10:04.154 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10020, Name: Mark Bautista
+2025-03-20 21:10:04.154 | INFO    | motorph.util.DebugLogger.log | Line 22: Parsed 19 fields
+2025-03-20 21:10:04.155 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10021, Name: Darlene Lazaro
+2025-03-20 21:10:04.155 | INFO    | motorph.util.DebugLogger.log | Line 23: Parsed 19 fields
+2025-03-20 21:10:04.155 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10022, Name: Kolby Delos Santos
+2025-03-20 21:10:04.155 | INFO    | motorph.util.DebugLogger.log | Line 24: Parsed 19 fields
+2025-03-20 21:10:04.155 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10023, Name: Vella Santos
+2025-03-20 21:10:04.155 | INFO    | motorph.util.DebugLogger.log | Line 25: Parsed 19 fields
+2025-03-20 21:10:04.155 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10024, Name: Tomas Del Rosario
+2025-03-20 21:10:04.156 | INFO    | motorph.util.DebugLogger.log | Line 26: Parsed 19 fields
+2025-03-20 21:10:04.156 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10025, Name: Jacklyn Tolentino
+2025-03-20 21:10:04.156 | INFO    | motorph.util.DebugLogger.log | Line 27: Parsed 19 fields
+2025-03-20 21:10:04.156 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10026, Name: Percival Gutierrez
+2025-03-20 21:10:04.156 | INFO    | motorph.util.DebugLogger.log | Line 28: Parsed 19 fields
+2025-03-20 21:10:04.157 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10027, Name: Garfield Manalaysay
+2025-03-20 21:10:04.157 | INFO    | motorph.util.DebugLogger.log | Line 29: Parsed 19 fields
+2025-03-20 21:10:04.157 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10028, Name: Lizeth Villegas
+2025-03-20 21:10:04.157 | INFO    | motorph.util.DebugLogger.log | Line 30: Parsed 19 fields
+2025-03-20 21:10:04.157 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10029, Name: Carol Ramos
+2025-03-20 21:10:04.157 | INFO    | motorph.util.DebugLogger.log | Line 31: Parsed 19 fields
+2025-03-20 21:10:04.158 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10030, Name: Emelia Maceda
+2025-03-20 21:10:04.158 | INFO    | motorph.util.DebugLogger.log | Line 32: Parsed 19 fields
+2025-03-20 21:10:04.158 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:10:04.158 | INFO    | motorph.util.DebugLogger.log | Line 33: Parsed 19 fields
+2025-03-20 21:10:04.158 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10032, Name: John Rafael Castro
+2025-03-20 21:10:04.159 | INFO    | motorph.util.DebugLogger.log | Line 34: Parsed 19 fields
+2025-03-20 21:10:04.159 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10033, Name: Carlos Ian Martinez
+2025-03-20 21:10:04.159 | INFO    | motorph.util.DebugLogger.log | Line 35: Parsed 19 fields
+2025-03-20 21:10:04.160 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10034, Name: Beatriz Santos
+2025-03-20 21:10:04.160 | INFO    | motorph.util.DebugLogger.log | Employee data loading complete:
+2025-03-20 21:10:04.160 | INFO    | motorph.util.DebugLogger.log | - Total records processed: 34
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log | - Successfully loaded: 34
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log | - Errors: 0
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log | - Total employees in map: 34
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log | Sample employee IDs: 
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log |   - 10031: Delia Aguilar
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log |   - 10030: Emelia Maceda
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log |   - 10019: Cydney Rosario
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log |   - 10018: Allison San Jose
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log |   - 10011: Anthony Salcedo
+2025-03-20 21:10:04.162 | INFO    | motorph.util.DebugLogger.log | Added test employee with ID: 10001, Name: John Doe
+2025-03-20 21:10:04.233 | INFO    | motorph.util.DebugLogger.log | Initializing input manager...
+2025-03-20 21:10:04.234 | INFO    | motorph.util.DebugLogger.log | Initializing output manager...
+2025-03-20 21:10:04.237 | INFO    | motorph.util.DebugLogger.log | Initializing UI...
+2025-03-20 21:10:04.238 | INFO    | motorph.util.DebugLogger.log | System initialization complete!
+2025-03-20 21:15:54.611 | INFO    | motorph.util.DebugLogger.configureLogger | Logging system initialized. Log file: logs\motorph_payroll_20250320.log
+2025-03-20 21:15:54.611 | INFO    | motorph.util.DebugLogger.log | Loading employee data from: C:\Users\ferna\IdeaProjects\MotorphPayrollSystem\resources\MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:15:54.612 | INFO    | motorph.util.DebugLogger.log | File opened successfully. Reading data...
+2025-03-20 21:15:54.612 | INFO    | motorph.util.DebugLogger.log | Header row: Employee #,Last Name,First Name,Birthday,Address,Phone Number,SSS #,Philhealth #,TIN #,Pag-ibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate
+2025-03-20 21:15:54.615 | INFO    | motorph.util.DebugLogger.log | Line 2: Parsed 19 fields
+2025-03-20 21:15:54.619 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10001, Name: Manuel III Garcia
+2025-03-20 21:15:54.619 | INFO    | motorph.util.DebugLogger.log | Line 3: Parsed 19 fields
+2025-03-20 21:15:54.619 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10002, Name: Antonio Lim
+2025-03-20 21:15:54.620 | INFO    | motorph.util.DebugLogger.log | Line 4: Parsed 19 fields
+2025-03-20 21:15:54.620 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10003, Name: Bianca Sofia Aquino
+2025-03-20 21:15:54.620 | INFO    | motorph.util.DebugLogger.log | Line 5: Parsed 19 fields
+2025-03-20 21:15:54.620 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10004, Name: Isabella Reyes
+2025-03-20 21:15:54.621 | INFO    | motorph.util.DebugLogger.log | Line 6: Parsed 19 fields
+2025-03-20 21:15:54.621 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10005, Name: Eduard Hernandez
+2025-03-20 21:15:54.621 | INFO    | motorph.util.DebugLogger.log | Line 7: Parsed 19 fields
+2025-03-20 21:15:54.621 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10006, Name: Andrea Mae Villanueva
+2025-03-20 21:15:54.621 | INFO    | motorph.util.DebugLogger.log | Line 8: Parsed 19 fields
+2025-03-20 21:15:54.622 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10007, Name: Brad San Jose
+2025-03-20 21:15:54.622 | INFO    | motorph.util.DebugLogger.log | Line 9: Parsed 19 fields
+2025-03-20 21:15:54.622 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10008, Name: Alice Romualdez
+2025-03-20 21:15:54.622 | INFO    | motorph.util.DebugLogger.log | Line 10: Parsed 19 fields
+2025-03-20 21:15:54.622 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10009, Name: Rosie Atienza
+2025-03-20 21:15:54.622 | INFO    | motorph.util.DebugLogger.log | Line 11: Parsed 19 fields
+2025-03-20 21:15:54.623 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10010, Name: Roderick Alvaro
+2025-03-20 21:15:54.623 | INFO    | motorph.util.DebugLogger.log | Line 12: Parsed 19 fields
+2025-03-20 21:15:54.623 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10011, Name: Anthony Salcedo
+2025-03-20 21:15:54.623 | INFO    | motorph.util.DebugLogger.log | Line 13: Parsed 19 fields
+2025-03-20 21:15:54.623 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10012, Name: Josie Lopez
+2025-03-20 21:15:54.623 | INFO    | motorph.util.DebugLogger.log | Line 14: Parsed 19 fields
+2025-03-20 21:15:54.623 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10013, Name: Martha Farala
+2025-03-20 21:15:54.624 | INFO    | motorph.util.DebugLogger.log | Line 15: Parsed 19 fields
+2025-03-20 21:15:54.624 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10014, Name: Leila Martinez
+2025-03-20 21:15:54.624 | INFO    | motorph.util.DebugLogger.log | Line 16: Parsed 19 fields
+2025-03-20 21:15:54.624 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10015, Name: Fredrick Romualdez
+2025-03-20 21:15:54.624 | INFO    | motorph.util.DebugLogger.log | Line 17: Parsed 19 fields
+2025-03-20 21:15:54.624 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10016, Name: Christian Mata
+2025-03-20 21:15:54.625 | INFO    | motorph.util.DebugLogger.log | Line 18: Parsed 19 fields
+2025-03-20 21:15:54.625 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10017, Name: Selena De Leon
+2025-03-20 21:15:54.625 | INFO    | motorph.util.DebugLogger.log | Line 19: Parsed 19 fields
+2025-03-20 21:15:54.625 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10018, Name: Allison San Jose
+2025-03-20 21:15:54.625 | INFO    | motorph.util.DebugLogger.log | Line 20: Parsed 19 fields
+2025-03-20 21:15:54.625 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10019, Name: Cydney Rosario
+2025-03-20 21:15:54.625 | INFO    | motorph.util.DebugLogger.log | Line 21: Parsed 19 fields
+2025-03-20 21:15:54.626 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10020, Name: Mark Bautista
+2025-03-20 21:15:54.626 | INFO    | motorph.util.DebugLogger.log | Line 22: Parsed 19 fields
+2025-03-20 21:15:54.626 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10021, Name: Darlene Lazaro
+2025-03-20 21:15:54.626 | INFO    | motorph.util.DebugLogger.log | Line 23: Parsed 19 fields
+2025-03-20 21:15:54.626 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10022, Name: Kolby Delos Santos
+2025-03-20 21:15:54.627 | INFO    | motorph.util.DebugLogger.log | Line 24: Parsed 19 fields
+2025-03-20 21:15:54.627 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10023, Name: Vella Santos
+2025-03-20 21:15:54.627 | INFO    | motorph.util.DebugLogger.log | Line 25: Parsed 19 fields
+2025-03-20 21:15:54.627 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10024, Name: Tomas Del Rosario
+2025-03-20 21:15:54.627 | INFO    | motorph.util.DebugLogger.log | Line 26: Parsed 19 fields
+2025-03-20 21:15:54.628 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10025, Name: Jacklyn Tolentino
+2025-03-20 21:15:54.628 | INFO    | motorph.util.DebugLogger.log | Line 27: Parsed 19 fields
+2025-03-20 21:15:54.628 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10026, Name: Percival Gutierrez
+2025-03-20 21:15:54.629 | INFO    | motorph.util.DebugLogger.log | Line 28: Parsed 19 fields
+2025-03-20 21:15:54.629 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10027, Name: Garfield Manalaysay
+2025-03-20 21:15:54.629 | INFO    | motorph.util.DebugLogger.log | Line 29: Parsed 19 fields
+2025-03-20 21:15:54.629 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10028, Name: Lizeth Villegas
+2025-03-20 21:15:54.629 | INFO    | motorph.util.DebugLogger.log | Line 30: Parsed 19 fields
+2025-03-20 21:15:54.629 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10029, Name: Carol Ramos
+2025-03-20 21:15:54.629 | INFO    | motorph.util.DebugLogger.log | Line 31: Parsed 19 fields
+2025-03-20 21:15:54.630 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10030, Name: Emelia Maceda
+2025-03-20 21:15:54.630 | INFO    | motorph.util.DebugLogger.log | Line 32: Parsed 19 fields
+2025-03-20 21:15:54.630 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:15:54.630 | INFO    | motorph.util.DebugLogger.log | Line 33: Parsed 19 fields
+2025-03-20 21:15:54.630 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10032, Name: John Rafael Castro
+2025-03-20 21:15:54.630 | INFO    | motorph.util.DebugLogger.log | Line 34: Parsed 19 fields
+2025-03-20 21:15:54.631 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10033, Name: Carlos Ian Martinez
+2025-03-20 21:15:54.631 | INFO    | motorph.util.DebugLogger.log | Line 35: Parsed 19 fields
+2025-03-20 21:15:54.631 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10034, Name: Beatriz Santos
+2025-03-20 21:15:54.631 | INFO    | motorph.util.DebugLogger.log | Employee data loading complete:
+2025-03-20 21:15:54.631 | INFO    | motorph.util.DebugLogger.log | - Total records processed: 34
+2025-03-20 21:15:54.631 | INFO    | motorph.util.DebugLogger.log | - Successfully loaded: 34
+2025-03-20 21:15:54.631 | INFO    | motorph.util.DebugLogger.log | - Errors: 0
+2025-03-20 21:15:54.632 | INFO    | motorph.util.DebugLogger.log | - Total employees in map: 34
+2025-03-20 21:15:54.632 | INFO    | motorph.util.DebugLogger.log | Sample employee IDs: 
+2025-03-20 21:15:54.632 | INFO    | motorph.util.DebugLogger.log |   - 10031: Delia Aguilar
+2025-03-20 21:15:54.632 | INFO    | motorph.util.DebugLogger.log |   - 10030: Emelia Maceda
+2025-03-20 21:15:54.632 | INFO    | motorph.util.DebugLogger.log |   - 10019: Cydney Rosario
+2025-03-20 21:15:54.632 | INFO    | motorph.util.DebugLogger.log |   - 10018: Allison San Jose
+2025-03-20 21:15:54.633 | INFO    | motorph.util.DebugLogger.log |   - 10011: Anthony Salcedo
+2025-03-20 21:15:54.633 | INFO    | motorph.util.DebugLogger.log | Added test employee with ID: 10001, Name: John Doe
+2025-03-20 21:16:38.598 | INFO    | motorph.util.DebugLogger.log | Loading employee data from: resources/MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:16:38.599 | INFO    | motorph.util.DebugLogger.log | File opened successfully. Reading data...
+2025-03-20 21:16:38.599 | INFO    | motorph.util.DebugLogger.log | Header row: Employee #,Last Name,First Name,Birthday,Address,Phone Number,SSS #,Philhealth #,TIN #,Pag-ibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate
+2025-03-20 21:16:38.600 | INFO    | motorph.util.DebugLogger.log | Line 2: Parsed 19 fields
+2025-03-20 21:16:38.600 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10001, Name: Manuel III Garcia
+2025-03-20 21:16:38.600 | INFO    | motorph.util.DebugLogger.log | Line 3: Parsed 19 fields
+2025-03-20 21:16:38.600 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10002, Name: Antonio Lim
+2025-03-20 21:16:38.600 | INFO    | motorph.util.DebugLogger.log | Line 4: Parsed 19 fields
+2025-03-20 21:16:38.600 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10003, Name: Bianca Sofia Aquino
+2025-03-20 21:16:38.600 | INFO    | motorph.util.DebugLogger.log | Line 5: Parsed 19 fields
+2025-03-20 21:16:38.600 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10004, Name: Isabella Reyes
+2025-03-20 21:16:38.600 | INFO    | motorph.util.DebugLogger.log | Line 6: Parsed 19 fields
+2025-03-20 21:16:38.601 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10005, Name: Eduard Hernandez
+2025-03-20 21:16:38.601 | INFO    | motorph.util.DebugLogger.log | Line 7: Parsed 19 fields
+2025-03-20 21:16:38.601 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10006, Name: Andrea Mae Villanueva
+2025-03-20 21:16:38.602 | INFO    | motorph.util.DebugLogger.log | Line 8: Parsed 19 fields
+2025-03-20 21:16:38.602 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10007, Name: Brad San Jose
+2025-03-20 21:16:38.602 | INFO    | motorph.util.DebugLogger.log | Line 9: Parsed 19 fields
+2025-03-20 21:16:38.602 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10008, Name: Alice Romualdez
+2025-03-20 21:16:38.602 | INFO    | motorph.util.DebugLogger.log | Line 10: Parsed 19 fields
+2025-03-20 21:16:38.603 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10009, Name: Rosie Atienza
+2025-03-20 21:16:38.603 | INFO    | motorph.util.DebugLogger.log | Line 11: Parsed 19 fields
+2025-03-20 21:16:38.603 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10010, Name: Roderick Alvaro
+2025-03-20 21:16:38.603 | INFO    | motorph.util.DebugLogger.log | Line 12: Parsed 19 fields
+2025-03-20 21:16:38.603 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10011, Name: Anthony Salcedo
+2025-03-20 21:16:38.603 | INFO    | motorph.util.DebugLogger.log | Line 13: Parsed 19 fields
+2025-03-20 21:16:38.603 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10012, Name: Josie Lopez
+2025-03-20 21:16:38.603 | INFO    | motorph.util.DebugLogger.log | Line 14: Parsed 19 fields
+2025-03-20 21:16:38.604 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10013, Name: Martha Farala
+2025-03-20 21:16:38.604 | INFO    | motorph.util.DebugLogger.log | Line 15: Parsed 19 fields
+2025-03-20 21:16:38.604 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10014, Name: Leila Martinez
+2025-03-20 21:16:38.604 | INFO    | motorph.util.DebugLogger.log | Line 16: Parsed 19 fields
+2025-03-20 21:16:38.604 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10015, Name: Fredrick Romualdez
+2025-03-20 21:16:38.604 | INFO    | motorph.util.DebugLogger.log | Line 17: Parsed 19 fields
+2025-03-20 21:16:38.604 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10016, Name: Christian Mata
+2025-03-20 21:16:38.604 | INFO    | motorph.util.DebugLogger.log | Line 18: Parsed 19 fields
+2025-03-20 21:16:38.605 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10017, Name: Selena De Leon
+2025-03-20 21:16:38.605 | INFO    | motorph.util.DebugLogger.log | Line 19: Parsed 19 fields
+2025-03-20 21:16:38.605 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10018, Name: Allison San Jose
+2025-03-20 21:16:38.605 | INFO    | motorph.util.DebugLogger.log | Line 20: Parsed 19 fields
+2025-03-20 21:16:38.605 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10019, Name: Cydney Rosario
+2025-03-20 21:16:38.605 | INFO    | motorph.util.DebugLogger.log | Line 21: Parsed 19 fields
+2025-03-20 21:16:38.605 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10020, Name: Mark Bautista
+2025-03-20 21:16:38.606 | INFO    | motorph.util.DebugLogger.log | Line 22: Parsed 19 fields
+2025-03-20 21:16:38.606 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10021, Name: Darlene Lazaro
+2025-03-20 21:16:38.606 | INFO    | motorph.util.DebugLogger.log | Line 23: Parsed 19 fields
+2025-03-20 21:16:38.606 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10022, Name: Kolby Delos Santos
+2025-03-20 21:16:38.606 | INFO    | motorph.util.DebugLogger.log | Line 24: Parsed 19 fields
+2025-03-20 21:16:38.607 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10023, Name: Vella Santos
+2025-03-20 21:16:38.607 | INFO    | motorph.util.DebugLogger.log | Line 25: Parsed 19 fields
+2025-03-20 21:16:38.607 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10024, Name: Tomas Del Rosario
+2025-03-20 21:16:38.607 | INFO    | motorph.util.DebugLogger.log | Line 26: Parsed 19 fields
+2025-03-20 21:16:38.607 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10025, Name: Jacklyn Tolentino
+2025-03-20 21:16:38.607 | INFO    | motorph.util.DebugLogger.log | Line 27: Parsed 19 fields
+2025-03-20 21:16:38.607 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10026, Name: Percival Gutierrez
+2025-03-20 21:16:38.607 | INFO    | motorph.util.DebugLogger.log | Line 28: Parsed 19 fields
+2025-03-20 21:16:38.608 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10027, Name: Garfield Manalaysay
+2025-03-20 21:16:38.608 | INFO    | motorph.util.DebugLogger.log | Line 29: Parsed 19 fields
+2025-03-20 21:16:38.608 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10028, Name: Lizeth Villegas
+2025-03-20 21:16:38.608 | INFO    | motorph.util.DebugLogger.log | Line 30: Parsed 19 fields
+2025-03-20 21:16:38.608 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10029, Name: Carol Ramos
+2025-03-20 21:16:38.608 | INFO    | motorph.util.DebugLogger.log | Line 31: Parsed 19 fields
+2025-03-20 21:16:38.608 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10030, Name: Emelia Maceda
+2025-03-20 21:16:38.609 | INFO    | motorph.util.DebugLogger.log | Line 32: Parsed 19 fields
+2025-03-20 21:16:38.609 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:16:38.609 | INFO    | motorph.util.DebugLogger.log | Line 33: Parsed 19 fields
+2025-03-20 21:16:38.609 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10032, Name: John Rafael Castro
+2025-03-20 21:16:38.609 | INFO    | motorph.util.DebugLogger.log | Line 34: Parsed 19 fields
+2025-03-20 21:16:38.609 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10033, Name: Carlos Ian Martinez
+2025-03-20 21:16:38.609 | INFO    | motorph.util.DebugLogger.log | Line 35: Parsed 19 fields
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10034, Name: Beatriz Santos
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log | Employee data loading complete:
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log | - Total records processed: 34
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log | - Successfully loaded: 34
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log | - Errors: 0
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log | - Total employees in map: 34
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log | Sample employee IDs: 
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log |   - 10031: Delia Aguilar
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log |   - 10030: Emelia Maceda
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log |   - 10019: Cydney Rosario
+2025-03-20 21:16:38.610 | INFO    | motorph.util.DebugLogger.log |   - 10018: Allison San Jose
+2025-03-20 21:16:38.611 | INFO    | motorph.util.DebugLogger.log |   - 10011: Anthony Salcedo
+2025-03-20 21:16:38.611 | INFO    | motorph.util.DebugLogger.log | Added test employee with ID: 10001, Name: John Doe
+2025-03-20 21:16:38.633 | INFO    | motorph.util.DebugLogger.log | Loading employee data from: resources/MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:16:38.633 | INFO    | motorph.util.DebugLogger.log | File opened successfully. Reading data...
+2025-03-20 21:16:38.634 | INFO    | motorph.util.DebugLogger.log | Header row: Employee #,Last Name,First Name,Birthday,Address,Phone Number,SSS #,Philhealth #,TIN #,Pag-ibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate
+2025-03-20 21:16:38.634 | INFO    | motorph.util.DebugLogger.log | Line 2: Parsed 19 fields
+2025-03-20 21:16:38.635 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10001, Name: Manuel III Garcia
+2025-03-20 21:16:38.635 | INFO    | motorph.util.DebugLogger.log | Line 3: Parsed 19 fields
+2025-03-20 21:16:38.635 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10002, Name: Antonio Lim
+2025-03-20 21:16:38.636 | INFO    | motorph.util.DebugLogger.log | Line 4: Parsed 19 fields
+2025-03-20 21:16:38.636 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10003, Name: Bianca Sofia Aquino
+2025-03-20 21:16:38.636 | INFO    | motorph.util.DebugLogger.log | Line 5: Parsed 19 fields
+2025-03-20 21:16:38.637 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10004, Name: Isabella Reyes
+2025-03-20 21:16:38.637 | INFO    | motorph.util.DebugLogger.log | Line 6: Parsed 19 fields
+2025-03-20 21:16:38.638 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10005, Name: Eduard Hernandez
+2025-03-20 21:16:38.638 | INFO    | motorph.util.DebugLogger.log | Line 7: Parsed 19 fields
+2025-03-20 21:16:38.638 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10006, Name: Andrea Mae Villanueva
+2025-03-20 21:16:38.639 | INFO    | motorph.util.DebugLogger.log | Line 8: Parsed 19 fields
+2025-03-20 21:16:38.639 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10007, Name: Brad San Jose
+2025-03-20 21:16:38.639 | INFO    | motorph.util.DebugLogger.log | Line 9: Parsed 19 fields
+2025-03-20 21:16:38.639 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10008, Name: Alice Romualdez
+2025-03-20 21:16:38.640 | INFO    | motorph.util.DebugLogger.log | Line 10: Parsed 19 fields
+2025-03-20 21:16:38.640 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10009, Name: Rosie Atienza
+2025-03-20 21:16:38.640 | INFO    | motorph.util.DebugLogger.log | Line 11: Parsed 19 fields
+2025-03-20 21:16:38.640 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10010, Name: Roderick Alvaro
+2025-03-20 21:16:38.640 | INFO    | motorph.util.DebugLogger.log | Line 12: Parsed 19 fields
+2025-03-20 21:16:38.640 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10011, Name: Anthony Salcedo
+2025-03-20 21:16:38.640 | INFO    | motorph.util.DebugLogger.log | Line 13: Parsed 19 fields
+2025-03-20 21:16:38.641 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10012, Name: Josie Lopez
+2025-03-20 21:16:38.641 | INFO    | motorph.util.DebugLogger.log | Line 14: Parsed 19 fields
+2025-03-20 21:16:38.641 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10013, Name: Martha Farala
+2025-03-20 21:16:38.641 | INFO    | motorph.util.DebugLogger.log | Line 15: Parsed 19 fields
+2025-03-20 21:16:38.641 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10014, Name: Leila Martinez
+2025-03-20 21:16:38.642 | INFO    | motorph.util.DebugLogger.log | Line 16: Parsed 19 fields
+2025-03-20 21:16:38.642 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10015, Name: Fredrick Romualdez
+2025-03-20 21:16:38.642 | INFO    | motorph.util.DebugLogger.log | Line 17: Parsed 19 fields
+2025-03-20 21:16:38.643 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10016, Name: Christian Mata
+2025-03-20 21:16:38.643 | INFO    | motorph.util.DebugLogger.log | Line 18: Parsed 19 fields
+2025-03-20 21:16:38.644 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10017, Name: Selena De Leon
+2025-03-20 21:16:38.644 | INFO    | motorph.util.DebugLogger.log | Line 19: Parsed 19 fields
+2025-03-20 21:16:38.644 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10018, Name: Allison San Jose
+2025-03-20 21:16:38.645 | INFO    | motorph.util.DebugLogger.log | Line 20: Parsed 19 fields
+2025-03-20 21:16:38.645 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10019, Name: Cydney Rosario
+2025-03-20 21:16:38.645 | INFO    | motorph.util.DebugLogger.log | Line 21: Parsed 19 fields
+2025-03-20 21:16:38.645 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10020, Name: Mark Bautista
+2025-03-20 21:16:38.645 | INFO    | motorph.util.DebugLogger.log | Line 22: Parsed 19 fields
+2025-03-20 21:16:38.645 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10021, Name: Darlene Lazaro
+2025-03-20 21:16:38.647 | INFO    | motorph.util.DebugLogger.log | Line 23: Parsed 19 fields
+2025-03-20 21:16:38.647 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10022, Name: Kolby Delos Santos
+2025-03-20 21:16:38.647 | INFO    | motorph.util.DebugLogger.log | Line 24: Parsed 19 fields
+2025-03-20 21:16:38.647 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10023, Name: Vella Santos
+2025-03-20 21:16:38.648 | INFO    | motorph.util.DebugLogger.log | Line 25: Parsed 19 fields
+2025-03-20 21:16:38.648 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10024, Name: Tomas Del Rosario
+2025-03-20 21:16:38.648 | INFO    | motorph.util.DebugLogger.log | Line 26: Parsed 19 fields
+2025-03-20 21:16:38.649 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10025, Name: Jacklyn Tolentino
+2025-03-20 21:16:38.649 | INFO    | motorph.util.DebugLogger.log | Line 27: Parsed 19 fields
+2025-03-20 21:16:38.649 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10026, Name: Percival Gutierrez
+2025-03-20 21:16:38.649 | INFO    | motorph.util.DebugLogger.log | Line 28: Parsed 19 fields
+2025-03-20 21:16:38.649 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10027, Name: Garfield Manalaysay
+2025-03-20 21:16:38.649 | INFO    | motorph.util.DebugLogger.log | Line 29: Parsed 19 fields
+2025-03-20 21:16:38.649 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10028, Name: Lizeth Villegas
+2025-03-20 21:16:38.649 | INFO    | motorph.util.DebugLogger.log | Line 30: Parsed 19 fields
+2025-03-20 21:16:38.650 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10029, Name: Carol Ramos
+2025-03-20 21:16:38.650 | INFO    | motorph.util.DebugLogger.log | Line 31: Parsed 19 fields
+2025-03-20 21:16:38.650 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10030, Name: Emelia Maceda
+2025-03-20 21:16:38.650 | INFO    | motorph.util.DebugLogger.log | Line 32: Parsed 19 fields
+2025-03-20 21:16:38.651 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:16:38.651 | INFO    | motorph.util.DebugLogger.log | Line 33: Parsed 19 fields
+2025-03-20 21:16:38.652 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10032, Name: John Rafael Castro
+2025-03-20 21:16:38.652 | INFO    | motorph.util.DebugLogger.log | Line 34: Parsed 19 fields
+2025-03-20 21:16:38.652 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10033, Name: Carlos Ian Martinez
+2025-03-20 21:16:38.652 | INFO    | motorph.util.DebugLogger.log | Line 35: Parsed 19 fields
+2025-03-20 21:16:38.653 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10034, Name: Beatriz Santos
+2025-03-20 21:16:38.653 | INFO    | motorph.util.DebugLogger.log | Employee data loading complete:
+2025-03-20 21:16:38.653 | INFO    | motorph.util.DebugLogger.log | - Total records processed: 34
+2025-03-20 21:16:38.653 | INFO    | motorph.util.DebugLogger.log | - Successfully loaded: 34
+2025-03-20 21:16:38.654 | INFO    | motorph.util.DebugLogger.log | - Errors: 0
+2025-03-20 21:16:38.654 | INFO    | motorph.util.DebugLogger.log | - Total employees in map: 34
+2025-03-20 21:16:38.654 | INFO    | motorph.util.DebugLogger.log | Sample employee IDs: 
+2025-03-20 21:16:38.654 | INFO    | motorph.util.DebugLogger.log |   - 10031: Delia Aguilar
+2025-03-20 21:16:38.654 | INFO    | motorph.util.DebugLogger.log |   - 10030: Emelia Maceda
+2025-03-20 21:16:38.654 | INFO    | motorph.util.DebugLogger.log |   - 10019: Cydney Rosario
+2025-03-20 21:16:38.654 | INFO    | motorph.util.DebugLogger.log |   - 10018: Allison San Jose
+2025-03-20 21:16:38.654 | INFO    | motorph.util.DebugLogger.log |   - 10011: Anthony Salcedo
+2025-03-20 21:16:38.656 | INFO    | motorph.util.DebugLogger.log | Added test employee with ID: 10001, Name: John Doe
+2025-03-20 21:17:28.630 | INFO    | motorph.util.DebugLogger.log | findEmployee: Searching for: '10031'
+2025-03-20 21:17:28.631 | INFO    | motorph.util.DebugLogger.log | getEmployee: Found employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:34:36.001 | INFO    | motorph.util.DebugLogger.configureLogger | Logging system initialized. Log file: logs\motorph_payroll_20250320.log
+2025-03-20 21:34:36.003 | INFO    | motorph.util.DebugLogger.log | Loading employee data from: resources/MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:34:36.004 | INFO    | motorph.util.DebugLogger.log | File opened successfully. Reading data...
+2025-03-20 21:34:36.004 | INFO    | motorph.util.DebugLogger.log | Header row: Employee #,Last Name,First Name,Birthday,Address,Phone Number,SSS #,Philhealth #,TIN #,Pag-ibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate
+2025-03-20 21:34:36.007 | INFO    | motorph.util.DebugLogger.log | Line 2: Parsed 19 fields
+2025-03-20 21:34:36.010 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10001, Name: Manuel III Garcia
+2025-03-20 21:34:36.011 | INFO    | motorph.util.DebugLogger.log | Line 3: Parsed 19 fields
+2025-03-20 21:34:36.011 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10002, Name: Antonio Lim
+2025-03-20 21:34:36.012 | INFO    | motorph.util.DebugLogger.log | Line 4: Parsed 19 fields
+2025-03-20 21:34:36.012 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10003, Name: Bianca Sofia Aquino
+2025-03-20 21:34:36.012 | INFO    | motorph.util.DebugLogger.log | Line 5: Parsed 19 fields
+2025-03-20 21:34:36.013 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10004, Name: Isabella Reyes
+2025-03-20 21:34:36.013 | INFO    | motorph.util.DebugLogger.log | Line 6: Parsed 19 fields
+2025-03-20 21:34:36.013 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10005, Name: Eduard Hernandez
+2025-03-20 21:34:36.013 | INFO    | motorph.util.DebugLogger.log | Line 7: Parsed 19 fields
+2025-03-20 21:34:36.014 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10006, Name: Andrea Mae Villanueva
+2025-03-20 21:34:36.014 | INFO    | motorph.util.DebugLogger.log | Line 8: Parsed 19 fields
+2025-03-20 21:34:36.014 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10007, Name: Brad San Jose
+2025-03-20 21:34:36.014 | INFO    | motorph.util.DebugLogger.log | Line 9: Parsed 19 fields
+2025-03-20 21:34:36.014 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10008, Name: Alice Romualdez
+2025-03-20 21:34:36.014 | INFO    | motorph.util.DebugLogger.log | Line 10: Parsed 19 fields
+2025-03-20 21:34:36.015 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10009, Name: Rosie Atienza
+2025-03-20 21:34:36.015 | INFO    | motorph.util.DebugLogger.log | Line 11: Parsed 19 fields
+2025-03-20 21:34:36.015 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10010, Name: Roderick Alvaro
+2025-03-20 21:34:36.015 | INFO    | motorph.util.DebugLogger.log | Line 12: Parsed 19 fields
+2025-03-20 21:34:36.016 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10011, Name: Anthony Salcedo
+2025-03-20 21:34:36.016 | INFO    | motorph.util.DebugLogger.log | Line 13: Parsed 19 fields
+2025-03-20 21:34:36.016 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10012, Name: Josie Lopez
+2025-03-20 21:34:36.016 | INFO    | motorph.util.DebugLogger.log | Line 14: Parsed 19 fields
+2025-03-20 21:34:36.016 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10013, Name: Martha Farala
+2025-03-20 21:34:36.016 | INFO    | motorph.util.DebugLogger.log | Line 15: Parsed 19 fields
+2025-03-20 21:34:36.017 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10014, Name: Leila Martinez
+2025-03-20 21:34:36.017 | INFO    | motorph.util.DebugLogger.log | Line 16: Parsed 19 fields
+2025-03-20 21:34:36.017 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10015, Name: Fredrick Romualdez
+2025-03-20 21:34:36.017 | INFO    | motorph.util.DebugLogger.log | Line 17: Parsed 19 fields
+2025-03-20 21:34:36.017 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10016, Name: Christian Mata
+2025-03-20 21:34:36.017 | INFO    | motorph.util.DebugLogger.log | Line 18: Parsed 19 fields
+2025-03-20 21:34:36.018 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10017, Name: Selena De Leon
+2025-03-20 21:34:36.018 | INFO    | motorph.util.DebugLogger.log | Line 19: Parsed 19 fields
+2025-03-20 21:34:36.018 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10018, Name: Allison San Jose
+2025-03-20 21:34:36.018 | INFO    | motorph.util.DebugLogger.log | Line 20: Parsed 19 fields
+2025-03-20 21:34:36.018 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10019, Name: Cydney Rosario
+2025-03-20 21:34:36.018 | INFO    | motorph.util.DebugLogger.log | Line 21: Parsed 19 fields
+2025-03-20 21:34:36.018 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10020, Name: Mark Bautista
+2025-03-20 21:34:36.019 | INFO    | motorph.util.DebugLogger.log | Line 22: Parsed 19 fields
+2025-03-20 21:34:36.019 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10021, Name: Darlene Lazaro
+2025-03-20 21:34:36.019 | INFO    | motorph.util.DebugLogger.log | Line 23: Parsed 19 fields
+2025-03-20 21:34:36.019 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10022, Name: Kolby Delos Santos
+2025-03-20 21:34:36.019 | INFO    | motorph.util.DebugLogger.log | Line 24: Parsed 19 fields
+2025-03-20 21:34:36.019 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10023, Name: Vella Santos
+2025-03-20 21:34:36.020 | INFO    | motorph.util.DebugLogger.log | Line 25: Parsed 19 fields
+2025-03-20 21:34:36.020 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10024, Name: Tomas Del Rosario
+2025-03-20 21:34:36.020 | INFO    | motorph.util.DebugLogger.log | Line 26: Parsed 19 fields
+2025-03-20 21:34:36.021 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10025, Name: Jacklyn Tolentino
+2025-03-20 21:34:36.021 | INFO    | motorph.util.DebugLogger.log | Line 27: Parsed 19 fields
+2025-03-20 21:34:36.021 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10026, Name: Percival Gutierrez
+2025-03-20 21:34:36.021 | INFO    | motorph.util.DebugLogger.log | Line 28: Parsed 19 fields
+2025-03-20 21:34:36.021 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10027, Name: Garfield Manalaysay
+2025-03-20 21:34:36.021 | INFO    | motorph.util.DebugLogger.log | Line 29: Parsed 19 fields
+2025-03-20 21:34:36.021 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10028, Name: Lizeth Villegas
+2025-03-20 21:34:36.022 | INFO    | motorph.util.DebugLogger.log | Line 30: Parsed 19 fields
+2025-03-20 21:34:36.022 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10029, Name: Carol Ramos
+2025-03-20 21:34:36.022 | INFO    | motorph.util.DebugLogger.log | Line 31: Parsed 19 fields
+2025-03-20 21:34:36.022 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10030, Name: Emelia Maceda
+2025-03-20 21:34:36.022 | INFO    | motorph.util.DebugLogger.log | Line 32: Parsed 19 fields
+2025-03-20 21:34:36.022 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:34:36.023 | INFO    | motorph.util.DebugLogger.log | Line 33: Parsed 19 fields
+2025-03-20 21:34:36.023 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10032, Name: John Rafael Castro
+2025-03-20 21:34:36.023 | INFO    | motorph.util.DebugLogger.log | Line 34: Parsed 19 fields
+2025-03-20 21:34:36.023 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10033, Name: Carlos Ian Martinez
+2025-03-20 21:34:36.023 | INFO    | motorph.util.DebugLogger.log | Line 35: Parsed 19 fields
+2025-03-20 21:34:36.023 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10034, Name: Beatriz Santos
+2025-03-20 21:34:36.024 | INFO    | motorph.util.DebugLogger.log | Employee data loading complete:
+2025-03-20 21:34:36.024 | INFO    | motorph.util.DebugLogger.log | - Total records processed: 34
+2025-03-20 21:34:36.024 | INFO    | motorph.util.DebugLogger.log | - Successfully loaded: 34
+2025-03-20 21:34:36.024 | INFO    | motorph.util.DebugLogger.log | - Errors: 0
+2025-03-20 21:34:36.024 | INFO    | motorph.util.DebugLogger.log | - Total employees in map: 34
+2025-03-20 21:34:36.024 | INFO    | motorph.util.DebugLogger.log | Sample employee IDs: 
+2025-03-20 21:34:36.025 | INFO    | motorph.util.DebugLogger.log |   - 10031: Delia Aguilar
+2025-03-20 21:34:36.025 | INFO    | motorph.util.DebugLogger.log |   - 10030: Emelia Maceda
+2025-03-20 21:34:36.025 | INFO    | motorph.util.DebugLogger.log |   - 10019: Cydney Rosario
+2025-03-20 21:34:36.025 | INFO    | motorph.util.DebugLogger.log |   - 10018: Allison San Jose
+2025-03-20 21:34:36.025 | INFO    | motorph.util.DebugLogger.log |   - 10011: Anthony Salcedo
+2025-03-20 21:34:36.026 | INFO    | motorph.util.DebugLogger.log | Added test employee with ID: 10001, Name: John Doe
+2025-03-20 21:34:36.099 | INFO    | motorph.util.DebugLogger.log | Loading employee data from: resources/MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:34:36.100 | INFO    | motorph.util.DebugLogger.log | File opened successfully. Reading data...
+2025-03-20 21:34:36.101 | INFO    | motorph.util.DebugLogger.log | Header row: Employee #,Last Name,First Name,Birthday,Address,Phone Number,SSS #,Philhealth #,TIN #,Pag-ibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate
+2025-03-20 21:34:36.102 | INFO    | motorph.util.DebugLogger.log | Line 2: Parsed 19 fields
+2025-03-20 21:34:36.102 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10001, Name: Manuel III Garcia
+2025-03-20 21:34:36.102 | INFO    | motorph.util.DebugLogger.log | Line 3: Parsed 19 fields
+2025-03-20 21:34:36.103 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10002, Name: Antonio Lim
+2025-03-20 21:34:36.103 | INFO    | motorph.util.DebugLogger.log | Line 4: Parsed 19 fields
+2025-03-20 21:34:36.103 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10003, Name: Bianca Sofia Aquino
+2025-03-20 21:34:36.104 | INFO    | motorph.util.DebugLogger.log | Line 5: Parsed 19 fields
+2025-03-20 21:34:36.104 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10004, Name: Isabella Reyes
+2025-03-20 21:34:36.105 | INFO    | motorph.util.DebugLogger.log | Line 6: Parsed 19 fields
+2025-03-20 21:34:36.105 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10005, Name: Eduard Hernandez
+2025-03-20 21:34:36.105 | INFO    | motorph.util.DebugLogger.log | Line 7: Parsed 19 fields
+2025-03-20 21:34:36.107 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10006, Name: Andrea Mae Villanueva
+2025-03-20 21:34:36.107 | INFO    | motorph.util.DebugLogger.log | Line 8: Parsed 19 fields
+2025-03-20 21:34:36.107 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10007, Name: Brad San Jose
+2025-03-20 21:34:36.107 | INFO    | motorph.util.DebugLogger.log | Line 9: Parsed 19 fields
+2025-03-20 21:34:36.107 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10008, Name: Alice Romualdez
+2025-03-20 21:34:36.107 | INFO    | motorph.util.DebugLogger.log | Line 10: Parsed 19 fields
+2025-03-20 21:34:36.108 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10009, Name: Rosie Atienza
+2025-03-20 21:34:36.108 | INFO    | motorph.util.DebugLogger.log | Line 11: Parsed 19 fields
+2025-03-20 21:34:36.108 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10010, Name: Roderick Alvaro
+2025-03-20 21:34:36.108 | INFO    | motorph.util.DebugLogger.log | Line 12: Parsed 19 fields
+2025-03-20 21:34:36.109 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10011, Name: Anthony Salcedo
+2025-03-20 21:34:36.109 | INFO    | motorph.util.DebugLogger.log | Line 13: Parsed 19 fields
+2025-03-20 21:34:36.110 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10012, Name: Josie Lopez
+2025-03-20 21:34:36.110 | INFO    | motorph.util.DebugLogger.log | Line 14: Parsed 19 fields
+2025-03-20 21:34:36.110 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10013, Name: Martha Farala
+2025-03-20 21:34:36.110 | INFO    | motorph.util.DebugLogger.log | Line 15: Parsed 19 fields
+2025-03-20 21:34:36.111 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10014, Name: Leila Martinez
+2025-03-20 21:34:36.111 | INFO    | motorph.util.DebugLogger.log | Line 16: Parsed 19 fields
+2025-03-20 21:34:36.111 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10015, Name: Fredrick Romualdez
+2025-03-20 21:34:36.111 | INFO    | motorph.util.DebugLogger.log | Line 17: Parsed 19 fields
+2025-03-20 21:34:36.111 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10016, Name: Christian Mata
+2025-03-20 21:34:36.111 | INFO    | motorph.util.DebugLogger.log | Line 18: Parsed 19 fields
+2025-03-20 21:34:36.111 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10017, Name: Selena De Leon
+2025-03-20 21:34:36.112 | INFO    | motorph.util.DebugLogger.log | Line 19: Parsed 19 fields
+2025-03-20 21:34:36.112 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10018, Name: Allison San Jose
+2025-03-20 21:34:36.113 | INFO    | motorph.util.DebugLogger.log | Line 20: Parsed 19 fields
+2025-03-20 21:34:36.113 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10019, Name: Cydney Rosario
+2025-03-20 21:34:36.113 | INFO    | motorph.util.DebugLogger.log | Line 21: Parsed 19 fields
+2025-03-20 21:34:36.114 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10020, Name: Mark Bautista
+2025-03-20 21:34:36.114 | INFO    | motorph.util.DebugLogger.log | Line 22: Parsed 19 fields
+2025-03-20 21:34:36.115 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10021, Name: Darlene Lazaro
+2025-03-20 21:34:36.115 | INFO    | motorph.util.DebugLogger.log | Line 23: Parsed 19 fields
+2025-03-20 21:34:36.115 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10022, Name: Kolby Delos Santos
+2025-03-20 21:34:36.115 | INFO    | motorph.util.DebugLogger.log | Line 24: Parsed 19 fields
+2025-03-20 21:34:36.115 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10023, Name: Vella Santos
+2025-03-20 21:34:36.117 | INFO    | motorph.util.DebugLogger.log | Line 25: Parsed 19 fields
+2025-03-20 21:34:36.117 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10024, Name: Tomas Del Rosario
+2025-03-20 21:34:36.117 | INFO    | motorph.util.DebugLogger.log | Line 26: Parsed 19 fields
+2025-03-20 21:34:36.117 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10025, Name: Jacklyn Tolentino
+2025-03-20 21:34:36.117 | INFO    | motorph.util.DebugLogger.log | Line 27: Parsed 19 fields
+2025-03-20 21:34:36.117 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10026, Name: Percival Gutierrez
+2025-03-20 21:34:36.118 | INFO    | motorph.util.DebugLogger.log | Line 28: Parsed 19 fields
+2025-03-20 21:34:36.118 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10027, Name: Garfield Manalaysay
+2025-03-20 21:34:36.118 | INFO    | motorph.util.DebugLogger.log | Line 29: Parsed 19 fields
+2025-03-20 21:34:36.118 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10028, Name: Lizeth Villegas
+2025-03-20 21:34:36.118 | INFO    | motorph.util.DebugLogger.log | Line 30: Parsed 19 fields
+2025-03-20 21:34:36.118 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10029, Name: Carol Ramos
+2025-03-20 21:34:36.118 | INFO    | motorph.util.DebugLogger.log | Line 31: Parsed 19 fields
+2025-03-20 21:34:36.118 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10030, Name: Emelia Maceda
+2025-03-20 21:34:36.119 | INFO    | motorph.util.DebugLogger.log | Line 32: Parsed 19 fields
+2025-03-20 21:34:36.119 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:34:36.119 | INFO    | motorph.util.DebugLogger.log | Line 33: Parsed 19 fields
+2025-03-20 21:34:36.119 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10032, Name: John Rafael Castro
+2025-03-20 21:34:36.119 | INFO    | motorph.util.DebugLogger.log | Line 34: Parsed 19 fields
+2025-03-20 21:34:36.119 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10033, Name: Carlos Ian Martinez
+2025-03-20 21:34:36.120 | INFO    | motorph.util.DebugLogger.log | Line 35: Parsed 19 fields
+2025-03-20 21:34:36.120 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10034, Name: Beatriz Santos
+2025-03-20 21:34:36.120 | INFO    | motorph.util.DebugLogger.log | Employee data loading complete:
+2025-03-20 21:34:36.120 | INFO    | motorph.util.DebugLogger.log | - Total records processed: 34
+2025-03-20 21:34:36.120 | INFO    | motorph.util.DebugLogger.log | - Successfully loaded: 34
+2025-03-20 21:34:36.121 | INFO    | motorph.util.DebugLogger.log | - Errors: 0
+2025-03-20 21:34:36.121 | INFO    | motorph.util.DebugLogger.log | - Total employees in map: 34
+2025-03-20 21:34:36.121 | INFO    | motorph.util.DebugLogger.log | Sample employee IDs: 
+2025-03-20 21:34:36.121 | INFO    | motorph.util.DebugLogger.log |   - 10031: Delia Aguilar
+2025-03-20 21:34:36.122 | INFO    | motorph.util.DebugLogger.log |   - 10030: Emelia Maceda
+2025-03-20 21:34:36.122 | INFO    | motorph.util.DebugLogger.log |   - 10019: Cydney Rosario
+2025-03-20 21:34:36.123 | INFO    | motorph.util.DebugLogger.log |   - 10018: Allison San Jose
+2025-03-20 21:34:36.123 | INFO    | motorph.util.DebugLogger.log |   - 10011: Anthony Salcedo
+2025-03-20 21:34:36.123 | INFO    | motorph.util.DebugLogger.log | Added test employee with ID: 10001, Name: John Doe
+2025-03-20 21:34:53.601 | INFO    | motorph.util.DebugLogger.log | findEmployee: Searching for: '10031'
+2025-03-20 21:34:53.601 | INFO    | motorph.util.DebugLogger.log | getEmployee: Found employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:44:40.635 | INFO    | motorph.util.DebugLogger.configureLogger | Logging system initialized. Log file: logs\motorph_payroll_20250320.log
+2025-03-20 21:44:40.638 | INFO    | motorph.util.DebugLogger.log | Loading employee data from: resources/MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:44:40.638 | INFO    | motorph.util.DebugLogger.log | File opened successfully. Reading data...
+2025-03-20 21:44:40.639 | INFO    | motorph.util.DebugLogger.log | Header row: Employee #,Last Name,First Name,Birthday,Address,Phone Number,SSS #,Philhealth #,TIN #,Pag-ibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate
+2025-03-20 21:44:40.642 | INFO    | motorph.util.DebugLogger.log | Line 2: Parsed 19 fields
+2025-03-20 21:44:40.646 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10001, Name: Manuel III Garcia
+2025-03-20 21:44:40.646 | INFO    | motorph.util.DebugLogger.log | Line 3: Parsed 19 fields
+2025-03-20 21:44:40.647 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10002, Name: Antonio Lim
+2025-03-20 21:44:40.647 | INFO    | motorph.util.DebugLogger.log | Line 4: Parsed 19 fields
+2025-03-20 21:44:40.647 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10003, Name: Bianca Sofia Aquino
+2025-03-20 21:44:40.647 | INFO    | motorph.util.DebugLogger.log | Line 5: Parsed 19 fields
+2025-03-20 21:44:40.648 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10004, Name: Isabella Reyes
+2025-03-20 21:44:40.648 | INFO    | motorph.util.DebugLogger.log | Line 6: Parsed 19 fields
+2025-03-20 21:44:40.648 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10005, Name: Eduard Hernandez
+2025-03-20 21:44:40.648 | INFO    | motorph.util.DebugLogger.log | Line 7: Parsed 19 fields
+2025-03-20 21:44:40.648 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10006, Name: Andrea Mae Villanueva
+2025-03-20 21:44:40.648 | INFO    | motorph.util.DebugLogger.log | Line 8: Parsed 19 fields
+2025-03-20 21:44:40.649 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10007, Name: Brad San Jose
+2025-03-20 21:44:40.649 | INFO    | motorph.util.DebugLogger.log | Line 9: Parsed 19 fields
+2025-03-20 21:44:40.649 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10008, Name: Alice Romualdez
+2025-03-20 21:44:40.649 | INFO    | motorph.util.DebugLogger.log | Line 10: Parsed 19 fields
+2025-03-20 21:44:40.649 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10009, Name: Rosie Atienza
+2025-03-20 21:44:40.650 | INFO    | motorph.util.DebugLogger.log | Line 11: Parsed 19 fields
+2025-03-20 21:44:40.650 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10010, Name: Roderick Alvaro
+2025-03-20 21:44:40.650 | INFO    | motorph.util.DebugLogger.log | Line 12: Parsed 19 fields
+2025-03-20 21:44:40.650 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10011, Name: Anthony Salcedo
+2025-03-20 21:44:40.650 | INFO    | motorph.util.DebugLogger.log | Line 13: Parsed 19 fields
+2025-03-20 21:44:40.651 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10012, Name: Josie Lopez
+2025-03-20 21:44:40.651 | INFO    | motorph.util.DebugLogger.log | Line 14: Parsed 19 fields
+2025-03-20 21:44:40.651 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10013, Name: Martha Farala
+2025-03-20 21:44:40.651 | INFO    | motorph.util.DebugLogger.log | Line 15: Parsed 19 fields
+2025-03-20 21:44:40.651 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10014, Name: Leila Martinez
+2025-03-20 21:44:40.651 | INFO    | motorph.util.DebugLogger.log | Line 16: Parsed 19 fields
+2025-03-20 21:44:40.651 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10015, Name: Fredrick Romualdez
+2025-03-20 21:44:40.652 | INFO    | motorph.util.DebugLogger.log | Line 17: Parsed 19 fields
+2025-03-20 21:44:40.652 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10016, Name: Christian Mata
+2025-03-20 21:44:40.652 | INFO    | motorph.util.DebugLogger.log | Line 18: Parsed 19 fields
+2025-03-20 21:44:40.652 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10017, Name: Selena De Leon
+2025-03-20 21:44:40.652 | INFO    | motorph.util.DebugLogger.log | Line 19: Parsed 19 fields
+2025-03-20 21:44:40.652 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10018, Name: Allison San Jose
+2025-03-20 21:44:40.652 | INFO    | motorph.util.DebugLogger.log | Line 20: Parsed 19 fields
+2025-03-20 21:44:40.653 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10019, Name: Cydney Rosario
+2025-03-20 21:44:40.653 | INFO    | motorph.util.DebugLogger.log | Line 21: Parsed 19 fields
+2025-03-20 21:44:40.653 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10020, Name: Mark Bautista
+2025-03-20 21:44:40.653 | INFO    | motorph.util.DebugLogger.log | Line 22: Parsed 19 fields
+2025-03-20 21:44:40.653 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10021, Name: Darlene Lazaro
+2025-03-20 21:44:40.653 | INFO    | motorph.util.DebugLogger.log | Line 23: Parsed 19 fields
+2025-03-20 21:44:40.654 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10022, Name: Kolby Delos Santos
+2025-03-20 21:44:40.654 | INFO    | motorph.util.DebugLogger.log | Line 24: Parsed 19 fields
+2025-03-20 21:44:40.654 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10023, Name: Vella Santos
+2025-03-20 21:44:40.654 | INFO    | motorph.util.DebugLogger.log | Line 25: Parsed 19 fields
+2025-03-20 21:44:40.654 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10024, Name: Tomas Del Rosario
+2025-03-20 21:44:40.654 | INFO    | motorph.util.DebugLogger.log | Line 26: Parsed 19 fields
+2025-03-20 21:44:40.654 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10025, Name: Jacklyn Tolentino
+2025-03-20 21:44:40.654 | INFO    | motorph.util.DebugLogger.log | Line 27: Parsed 19 fields
+2025-03-20 21:44:40.654 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10026, Name: Percival Gutierrez
+2025-03-20 21:44:40.656 | INFO    | motorph.util.DebugLogger.log | Line 28: Parsed 19 fields
+2025-03-20 21:44:40.656 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10027, Name: Garfield Manalaysay
+2025-03-20 21:44:40.656 | INFO    | motorph.util.DebugLogger.log | Line 29: Parsed 19 fields
+2025-03-20 21:44:40.656 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10028, Name: Lizeth Villegas
+2025-03-20 21:44:40.656 | INFO    | motorph.util.DebugLogger.log | Line 30: Parsed 19 fields
+2025-03-20 21:44:40.656 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10029, Name: Carol Ramos
+2025-03-20 21:44:40.656 | INFO    | motorph.util.DebugLogger.log | Line 31: Parsed 19 fields
+2025-03-20 21:44:40.656 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10030, Name: Emelia Maceda
+2025-03-20 21:44:40.657 | INFO    | motorph.util.DebugLogger.log | Line 32: Parsed 19 fields
+2025-03-20 21:44:40.657 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:44:40.657 | INFO    | motorph.util.DebugLogger.log | Line 33: Parsed 19 fields
+2025-03-20 21:44:40.657 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10032, Name: John Rafael Castro
+2025-03-20 21:44:40.657 | INFO    | motorph.util.DebugLogger.log | Line 34: Parsed 19 fields
+2025-03-20 21:44:40.658 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10033, Name: Carlos Ian Martinez
+2025-03-20 21:44:40.658 | INFO    | motorph.util.DebugLogger.log | Line 35: Parsed 19 fields
+2025-03-20 21:44:40.658 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10034, Name: Beatriz Santos
+2025-03-20 21:44:40.658 | INFO    | motorph.util.DebugLogger.log | Employee data loading complete:
+2025-03-20 21:44:40.658 | INFO    | motorph.util.DebugLogger.log | - Total records processed: 34
+2025-03-20 21:44:40.658 | INFO    | motorph.util.DebugLogger.log | - Successfully loaded: 34
+2025-03-20 21:44:40.659 | INFO    | motorph.util.DebugLogger.log | - Errors: 0
+2025-03-20 21:44:40.659 | INFO    | motorph.util.DebugLogger.log | - Total employees in map: 34
+2025-03-20 21:44:40.659 | INFO    | motorph.util.DebugLogger.log | Sample employee IDs: 
+2025-03-20 21:44:40.659 | INFO    | motorph.util.DebugLogger.log |   - 10031: Delia Aguilar
+2025-03-20 21:44:40.660 | INFO    | motorph.util.DebugLogger.log |   - 10030: Emelia Maceda
+2025-03-20 21:44:40.660 | INFO    | motorph.util.DebugLogger.log |   - 10019: Cydney Rosario
+2025-03-20 21:44:40.660 | INFO    | motorph.util.DebugLogger.log |   - 10018: Allison San Jose
+2025-03-20 21:44:40.660 | INFO    | motorph.util.DebugLogger.log |   - 10011: Anthony Salcedo
+2025-03-20 21:44:40.660 | INFO    | motorph.util.DebugLogger.log | Added test employee with ID: 10001, Name: John Doe
+2025-03-20 21:44:40.732 | INFO    | motorph.util.DebugLogger.log | Loading employee data from: resources/MotorPH Employee Data - Employee Details.csv
+2025-03-20 21:44:40.732 | INFO    | motorph.util.DebugLogger.log | File opened successfully. Reading data...
+2025-03-20 21:44:40.733 | INFO    | motorph.util.DebugLogger.log | Header row: Employee #,Last Name,First Name,Birthday,Address,Phone Number,SSS #,Philhealth #,TIN #,Pag-ibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate
+2025-03-20 21:44:40.734 | INFO    | motorph.util.DebugLogger.log | Line 2: Parsed 19 fields
+2025-03-20 21:44:40.734 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10001, Name: Manuel III Garcia
+2025-03-20 21:44:40.734 | INFO    | motorph.util.DebugLogger.log | Line 3: Parsed 19 fields
+2025-03-20 21:44:40.735 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10002, Name: Antonio Lim
+2025-03-20 21:44:40.735 | INFO    | motorph.util.DebugLogger.log | Line 4: Parsed 19 fields
+2025-03-20 21:44:40.735 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10003, Name: Bianca Sofia Aquino
+2025-03-20 21:44:40.735 | INFO    | motorph.util.DebugLogger.log | Line 5: Parsed 19 fields
+2025-03-20 21:44:40.735 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10004, Name: Isabella Reyes
+2025-03-20 21:44:40.736 | INFO    | motorph.util.DebugLogger.log | Line 6: Parsed 19 fields
+2025-03-20 21:44:40.736 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10005, Name: Eduard Hernandez
+2025-03-20 21:44:40.736 | INFO    | motorph.util.DebugLogger.log | Line 7: Parsed 19 fields
+2025-03-20 21:44:40.737 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10006, Name: Andrea Mae Villanueva
+2025-03-20 21:44:40.737 | INFO    | motorph.util.DebugLogger.log | Line 8: Parsed 19 fields
+2025-03-20 21:44:40.737 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10007, Name: Brad San Jose
+2025-03-20 21:44:40.737 | INFO    | motorph.util.DebugLogger.log | Line 9: Parsed 19 fields
+2025-03-20 21:44:40.737 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10008, Name: Alice Romualdez
+2025-03-20 21:44:40.737 | INFO    | motorph.util.DebugLogger.log | Line 10: Parsed 19 fields
+2025-03-20 21:44:40.737 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10009, Name: Rosie Atienza
+2025-03-20 21:44:40.738 | INFO    | motorph.util.DebugLogger.log | Line 11: Parsed 19 fields
+2025-03-20 21:44:40.738 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10010, Name: Roderick Alvaro
+2025-03-20 21:44:40.738 | INFO    | motorph.util.DebugLogger.log | Line 12: Parsed 19 fields
+2025-03-20 21:44:40.738 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10011, Name: Anthony Salcedo
+2025-03-20 21:44:40.738 | INFO    | motorph.util.DebugLogger.log | Line 13: Parsed 19 fields
+2025-03-20 21:44:40.738 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10012, Name: Josie Lopez
+2025-03-20 21:44:40.738 | INFO    | motorph.util.DebugLogger.log | Line 14: Parsed 19 fields
+2025-03-20 21:44:40.740 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10013, Name: Martha Farala
+2025-03-20 21:44:40.740 | INFO    | motorph.util.DebugLogger.log | Line 15: Parsed 19 fields
+2025-03-20 21:44:40.740 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10014, Name: Leila Martinez
+2025-03-20 21:44:40.740 | INFO    | motorph.util.DebugLogger.log | Line 16: Parsed 19 fields
+2025-03-20 21:44:40.741 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10015, Name: Fredrick Romualdez
+2025-03-20 21:44:40.741 | INFO    | motorph.util.DebugLogger.log | Line 17: Parsed 19 fields
+2025-03-20 21:44:40.741 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10016, Name: Christian Mata
+2025-03-20 21:44:40.742 | INFO    | motorph.util.DebugLogger.log | Line 18: Parsed 19 fields
+2025-03-20 21:44:40.742 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10017, Name: Selena De Leon
+2025-03-20 21:44:40.742 | INFO    | motorph.util.DebugLogger.log | Line 19: Parsed 19 fields
+2025-03-20 21:44:40.742 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10018, Name: Allison San Jose
+2025-03-20 21:44:40.743 | INFO    | motorph.util.DebugLogger.log | Line 20: Parsed 19 fields
+2025-03-20 21:44:40.743 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10019, Name: Cydney Rosario
+2025-03-20 21:44:40.743 | INFO    | motorph.util.DebugLogger.log | Line 21: Parsed 19 fields
+2025-03-20 21:44:40.743 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10020, Name: Mark Bautista
+2025-03-20 21:44:40.744 | INFO    | motorph.util.DebugLogger.log | Line 22: Parsed 19 fields
+2025-03-20 21:44:40.744 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10021, Name: Darlene Lazaro
+2025-03-20 21:44:40.745 | INFO    | motorph.util.DebugLogger.log | Line 23: Parsed 19 fields
+2025-03-20 21:44:40.745 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10022, Name: Kolby Delos Santos
+2025-03-20 21:44:40.745 | INFO    | motorph.util.DebugLogger.log | Line 24: Parsed 19 fields
+2025-03-20 21:44:40.745 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10023, Name: Vella Santos
+2025-03-20 21:44:40.745 | INFO    | motorph.util.DebugLogger.log | Line 25: Parsed 19 fields
+2025-03-20 21:44:40.746 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10024, Name: Tomas Del Rosario
+2025-03-20 21:44:40.746 | INFO    | motorph.util.DebugLogger.log | Line 26: Parsed 19 fields
+2025-03-20 21:44:40.746 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10025, Name: Jacklyn Tolentino
+2025-03-20 21:44:40.747 | INFO    | motorph.util.DebugLogger.log | Line 27: Parsed 19 fields
+2025-03-20 21:44:40.747 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10026, Name: Percival Gutierrez
+2025-03-20 21:44:40.747 | INFO    | motorph.util.DebugLogger.log | Line 28: Parsed 19 fields
+2025-03-20 21:44:40.749 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10027, Name: Garfield Manalaysay
+2025-03-20 21:44:40.749 | INFO    | motorph.util.DebugLogger.log | Line 29: Parsed 19 fields
+2025-03-20 21:44:40.749 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10028, Name: Lizeth Villegas
+2025-03-20 21:44:40.750 | INFO    | motorph.util.DebugLogger.log | Line 30: Parsed 19 fields
+2025-03-20 21:44:40.750 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10029, Name: Carol Ramos
+2025-03-20 21:44:40.750 | INFO    | motorph.util.DebugLogger.log | Line 31: Parsed 19 fields
+2025-03-20 21:44:40.751 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10030, Name: Emelia Maceda
+2025-03-20 21:44:40.751 | INFO    | motorph.util.DebugLogger.log | Line 32: Parsed 19 fields
+2025-03-20 21:44:40.752 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10031, Name: Delia Aguilar
+2025-03-20 21:44:40.752 | INFO    | motorph.util.DebugLogger.log | Line 33: Parsed 19 fields
+2025-03-20 21:44:40.752 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10032, Name: John Rafael Castro
+2025-03-20 21:44:40.753 | INFO    | motorph.util.DebugLogger.log | Line 34: Parsed 19 fields
+2025-03-20 21:44:40.753 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10033, Name: Carlos Ian Martinez
+2025-03-20 21:44:40.753 | INFO    | motorph.util.DebugLogger.log | Line 35: Parsed 19 fields
+2025-03-20 21:44:40.754 | INFO    | motorph.util.DebugLogger.log | Created employee with ID: 10034, Name: Beatriz Santos
+2025-03-20 21:44:40.754 | INFO    | motorph.util.DebugLogger.log | Employee data loading complete:
+2025-03-20 21:44:40.755 | INFO    | motorph.util.DebugLogger.log | - Total records processed: 34
+2025-03-20 21:44:40.755 | INFO    | motorph.util.DebugLogger.log | - Successfully loaded: 34
+2025-03-20 21:44:40.755 | INFO    | motorph.util.DebugLogger.log | - Errors: 0
+2025-03-20 21:44:40.755 | INFO    | motorph.util.DebugLogger.log | - Total employees in map: 34
+2025-03-20 21:44:40.755 | INFO    | motorph.util.DebugLogger.log | Sample employee IDs: 
+2025-03-20 21:44:40.756 | INFO    | motorph.util.DebugLogger.log |   - 10031: Delia Aguilar
+2025-03-20 21:44:40.756 | INFO    | motorph.util.DebugLogger.log |   - 10030: Emelia Maceda
+2025-03-20 21:44:40.756 | INFO    | motorph.util.DebugLogger.log |   - 10019: Cydney Rosario
+2025-03-20 21:44:40.756 | INFO    | motorph.util.DebugLogger.log |   - 10018: Allison San Jose
+2025-03-20 21:44:40.757 | INFO    | motorph.util.DebugLogger.log |   - 10011: Anthony Salcedo
+2025-03-20 21:44:40.757 | INFO    | motorph.util.DebugLogger.log | Added test employee with ID: 10001, Name: John Doe
+2025-03-20 21:45:01.301 | INFO    | motorph.util.DebugLogger.log | findEmployee: Searching for: '10031'
+2025-03-20 21:45:01.301 | INFO    | motorph.util.DebugLogger.log | getEmployee: Found employee with ID: 10031, Name: Delia Aguilar

@@ -1,11 +1,12 @@
-// File: motorph/output/Main.java
-package motorph.output;
+// File: motorph/Main.java
+package motorph;
 
 import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
 import motorph.holidays.HolidayManager;
 import motorph.hours.AttendanceReader;
 import motorph.input.PayrollInputManager;
+import motorph.output.PayrollOutputManager;
 import motorph.process.PayrollDateManager;
 import motorph.process.PayrollProcessor;
 
@@ -15,6 +16,7 @@ import java.util.Scanner;
 
 /**
  * Main class for the MotorPH Payroll System
+ * Entry point for the application
  */
 public class Main {
     // For user input
@@ -28,36 +30,53 @@ public class Main {
     private static PayrollInputManager inputManager;
     private static HolidayManager holidayManager;
 
+    /**
+     * Main method - application entry point
+     *
+     * @param args Command-line arguments (not used)
+     */
     public static void main(String[] args) {
         System.out.println("===== MOTORPH PAYROLL SYSTEM =====");
 
-        // File paths
+        // File paths - can be moved to configuration file later
         String employeeFilePath = "resources/MotorPH Employee Data - Employee Details.csv";
         String attendanceFilePath = "resources/MotorPH Employee Data - Attendance Record.csv";
 
         try {
-            // Initialize scanner
+            // Initialize scanner for user input
             scanner = new Scanner(System.in);
 
             // Load data and initialize components
             System.out.println("Loading data...");
+
+            // Initialize readers
             employeeDataReader = new EmployeeDataReader(employeeFilePath);
             attendanceReader = new AttendanceReader(attendanceFilePath);
             holidayManager = new HolidayManager();
+
+            // Initialize processor
             payrollProcessor = new PayrollProcessor(employeeFilePath, attendanceFilePath);
 
-            // Initialize managers
+            // Initialize UI managers
             outputManager = new PayrollOutputManager(scanner, attendanceReader, payrollProcessor);
             inputManager = new PayrollInputManager(scanner, employeeDataReader);
 
             System.out.println("Data loaded successfully!");
 
-            // Main menu
+            // Main menu loop
             boolean exit = false;
             while (!exit) {
-                outputManager.displayMainMenu();
-                String choice = inputManager.getMenuChoice();
+                // Display menu
+                System.out.println("\nMAIN MENU:");
+                System.out.println("1. Process Payroll");
+                System.out.println("2. Find Employee");
+                System.out.println("3. View Payroll Calendar");
+                System.out.println("4. Exit");
+                System.out.print("Enter choice (1-4): ");
 
+                String choice = scanner.nextLine().trim();
+
+                // Process choice
                 switch (choice) {
                     case "1":
                         processPayroll();
@@ -136,8 +155,8 @@ public class Main {
         boolean isLateAnyDay = (boolean) attendanceSummary.get("isLateAnyDay");
         boolean hasUnpaidAbsences = (boolean) attendanceSummary.get("hasUnpaidAbsences");
 
-        // Process payroll with the unpaid absences flag
-        payrollProcessor.processPayrollForPeriod(
+        // Process payroll
+        payrollProcessor.processPayroll(
                 employee, totalHours, overtimeHours, lateMinutes, undertimeMinutes,
                 isLateAnyDay, payrollType, startDate, endDate, year, month, hasUnpaidAbsences);
 
@@ -247,8 +266,8 @@ public class Main {
         boolean isLateAnyDay = (boolean) attendanceSummary.get("isLateAnyDay");
         boolean hasUnpaidAbsences = (boolean) attendanceSummary.get("hasUnpaidAbsences");
 
-        // Process payroll with the unpaid absences flag
-        payrollProcessor.processPayrollForPeriod(
+        // Process payroll
+        payrollProcessor.processPayroll(
                 employee, totalHours, overtimeHours, lateMinutes, undertimeMinutes,
                 isLateAnyDay, payrollType, startDate, endDate, year, month, hasUnpaidAbsences);
 

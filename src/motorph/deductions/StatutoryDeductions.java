@@ -1,15 +1,34 @@
 // File: motorph/deductions/StatutoryDeductions.java
 package motorph.deductions;
 
-import motorph.process.PayrollDateManager;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Calculates government deductions (SSS, PhilHealth, Pag-IBIG, Tax)
+ * Uses the DeductionProvider interface to handle deductions uniformly
  */
 public class StatutoryDeductions {
     // Constants for pay period types
-    public static final int MID_MONTH = PayrollDateManager.MID_MONTH;
-    public static final int END_MONTH = PayrollDateManager.END_MONTH;
+    public static final int MID_MONTH = DeductionProvider.MID_MONTH;
+    public static final int END_MONTH = DeductionProvider.END_MONTH;
+
+    // Deduction instances
+    private static final SSS sssDeduction = new SSS();
+    private static final PhilHealth philHealthDeduction = new PhilHealth();
+    private static final PagIBIG pagIbigDeduction = new PagIBIG();
+    private static final WithholdingTax taxDeduction = new WithholdingTax();
+
+    // List of all deductions for easy iteration
+    private static final List<DeductionProvider> allDeductions = new ArrayList<>();
+
+    // Static initializer to populate the deductions list
+    static {
+        allDeductions.add(sssDeduction);
+        allDeductions.add(philHealthDeduction);
+        allDeductions.add(pagIbigDeduction);
+        allDeductions.add(taxDeduction);
+    }
 
     /**
      * Calculate all deductions based on the new schedule:
@@ -31,20 +50,20 @@ public class StatutoryDeductions {
         // For SSS, PhilHealth, and Pag-IBIG, deduct only on mid-month payroll
         if (payPeriod == MID_MONTH) {
             // Calculate based on full monthly salary
-            sssDeduction = SSS.calculateContribution(fullMonthlyGross);
-            philhealthDeduction = PhilHealth.calculateContribution(fullMonthlyGross);
-            pagibigDeduction = PagIBIG.calculateContribution(fullMonthlyGross);
+            sssDeduction = StatutoryDeductions.sssDeduction.calculateContribution(fullMonthlyGross);
+            philhealthDeduction = StatutoryDeductions.philHealthDeduction.calculateContribution(fullMonthlyGross) / 2; // Get semi-monthly
+            pagibigDeduction = StatutoryDeductions.pagIbigDeduction.calculateContribution(fullMonthlyGross);
         }
 
         // For tax, deduct only on end-month payroll
         if (payPeriod == END_MONTH) {
             // Calculate statutory deductions for the month
-            double monthlySSS = SSS.calculateContribution(fullMonthlyGross);
-            double monthlyPhilHealth = PhilHealth.calculateContribution(fullMonthlyGross);
-            double monthlyPagIBIG = PagIBIG.calculateContribution(fullMonthlyGross);
+            double monthlySSS = StatutoryDeductions.sssDeduction.calculateContribution(fullMonthlyGross);
+            double monthlyPhilHealth = StatutoryDeductions.philHealthDeduction.calculateContribution(fullMonthlyGross);
+            double monthlyPagIBIG = StatutoryDeductions.pagIbigDeduction.calculateContribution(fullMonthlyGross);
 
             // Calculate tax based on full monthly income minus the deductions
-            withholdingTax = WithholdingTax.calculateTax(
+            withholdingTax = StatutoryDeductions.taxDeduction.calculateTax(
                     fullMonthlyGross,
                     monthlySSS,
                     monthlyPhilHealth,

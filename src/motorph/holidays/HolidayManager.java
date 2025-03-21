@@ -9,25 +9,33 @@ import java.util.Map;
 
 /**
  * Manages holidays and calculates holiday pay
+ * Tracks both regular and special non-working holidays
  */
 public class HolidayManager {
-    // List of all holidays
+    // Holiday lists by type
     private List<Holiday> regularHolidays;
     private List<Holiday> specialNonWorkingHolidays;
 
-    // Constructor
+    // Holiday premium rates
+    private static final double REGULAR_HOLIDAY_RATE = 1.0; // 100% of daily rate
+    private static final double SPECIAL_HOLIDAY_RATE = 0.3; // 30% of daily rate
+    private static final double OVERTIME_PREMIUM = 0.25; // 25% overtime premium
+
+    /**
+     * Create a new holiday manager with predefined holidays
+     */
     public HolidayManager() {
         regularHolidays = new ArrayList<>();
         specialNonWorkingHolidays = new ArrayList<>();
 
-        // Set up 2024 holidays
+        // Set up holidays
         setup2024Holidays();
-
-        // Set up 2025 holidays
         setup2025Holidays();
     }
 
-    // Set up 2024 holidays
+    /**
+     * Set up 2024 holidays
+     */
     private void setup2024Holidays() {
         // Regular Holidays 2024
         regularHolidays.add(new Holiday("New Year's Day", LocalDate.of(2024, 1, 1)));
@@ -55,7 +63,9 @@ public class HolidayManager {
         specialNonWorkingHolidays.add(new Holiday("Last Day of the Year", LocalDate.of(2024, 12, 31)));
     }
 
-    // Set up 2025 holidays
+    /**
+     * Set up 2025 holidays
+     */
     private void setup2025Holidays() {
         // Regular Holidays 2025
         regularHolidays.add(new Holiday("New Year's Day", LocalDate.of(2025, 1, 1)));
@@ -82,6 +92,9 @@ public class HolidayManager {
 
     /**
      * Check if a date is a holiday
+     *
+     * @param date Date to check
+     * @return true if the date is a holiday (regular or special)
      */
     public boolean isHoliday(LocalDate date) {
         return isRegularHoliday(date) || isSpecialNonWorkingHoliday(date);
@@ -89,6 +102,9 @@ public class HolidayManager {
 
     /**
      * Check if a date is a regular holiday
+     *
+     * @param date Date to check
+     * @return true if the date is a regular holiday
      */
     public boolean isRegularHoliday(LocalDate date) {
         for (Holiday holiday : regularHolidays) {
@@ -101,6 +117,9 @@ public class HolidayManager {
 
     /**
      * Check if a date is a special non-working holiday
+     *
+     * @param date Date to check
+     * @return true if the date is a special non-working holiday
      */
     public boolean isSpecialNonWorkingHoliday(LocalDate date) {
         for (Holiday holiday : specialNonWorkingHolidays) {
@@ -113,6 +132,9 @@ public class HolidayManager {
 
     /**
      * Get holiday name if it's a holiday
+     *
+     * @param date Date to check
+     * @return Holiday name with type, or null if not a holiday
      */
     public String getHolidayName(LocalDate date) {
         for (Holiday holiday : regularHolidays) {
@@ -199,6 +221,48 @@ public class HolidayManager {
 
         return holidayPay;
     }
+
+    /**
+     * Get all holidays for a given year
+     *
+     * @param year Year to get holidays for
+     * @return Map of dates to holiday names
+     */
+    public Map<LocalDate, String> getHolidaysForYear(int year) {
+        Map<LocalDate, String> yearHolidays = new HashMap<>();
+
+        // Add regular holidays
+        for (Holiday holiday : regularHolidays) {
+            if (holiday.getDate().getYear() == year) {
+                yearHolidays.put(holiday.getDate(), holiday.getName() + " (Regular)");
+            }
+        }
+
+        // Add special holidays
+        for (Holiday holiday : specialNonWorkingHolidays) {
+            if (holiday.getDate().getYear() == year) {
+                yearHolidays.put(holiday.getDate(), holiday.getName() + " (Special)");
+            }
+        }
+
+        return yearHolidays;
+    }
+
+    /**
+     * Add a custom holiday
+     *
+     * @param name Holiday name
+     * @param date Holiday date
+     * @param isRegular Whether it's a regular holiday
+     */
+    public void addHoliday(String name, LocalDate date, boolean isRegular) {
+        Holiday holiday = new Holiday(name, date);
+        if (isRegular) {
+            regularHolidays.add(holiday);
+        } else {
+            specialNonWorkingHolidays.add(holiday);
+        }
+    }
 }
 
 /**
@@ -208,6 +272,12 @@ class Holiday {
     private String name;
     private LocalDate date;
 
+    /**
+     * Create a new holiday
+     *
+     * @param name Holiday name
+     * @param date Holiday date
+     */
     public Holiday(String name, LocalDate date) {
         this.name = name;
         this.date = date;

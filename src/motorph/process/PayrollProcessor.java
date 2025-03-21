@@ -6,8 +6,7 @@ import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
 import motorph.holidays.HolidayManager;
 import motorph.hours.AttendanceReader;
-import motorph.hours.WorkHoursCalculator;
-import motorph.util.TimeConverter;
+import motorph.util.DateTimeUtil;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,49 +15,73 @@ import java.util.Map;
 
 /**
  * Handles all payroll calculations
+ * Core class for processing employee payroll
  */
 public class PayrollProcessor {
+    // Data readers
     private final EmployeeDataReader employeeDataReader;
     private final AttendanceReader attendanceReader;
-    private final WorkHoursCalculator hoursCalculator;
     private final HolidayManager holidayManager;
 
     // Storage for calculated values
-    private final Map<String, Double> currentGrossPay = new HashMap<>();
-    private final Map<String, Double> currentNetPay = new HashMap<>();
-    private final Map<String, StatutoryDeductions.DeductionResult> currentDeductions = new HashMap<>();
-    private final Map<String, Map<String, Object>> currentPayDetails = new HashMap<>();
+    private final Map<String, PayrollResult> payrollResults = new HashMap<>();
 
     /**
-     * Set up processor with data files
+     * Create a new PayrollProcessor
+     *
+     * @param employeeFilePath Path to employee data CSV
+     * @param attendanceFilePath Path to attendance data CSV
      */
     public PayrollProcessor(String employeeFilePath, String attendanceFilePath) {
         this.employeeDataReader = new EmployeeDataReader(employeeFilePath);
         this.attendanceReader = new AttendanceReader(attendanceFilePath);
-        this.hoursCalculator = new WorkHoursCalculator();
         this.holidayManager = new HolidayManager();
     }
 
     /**
-     * Process payroll for a period
+     * Process payroll for an employee
+     *
+     * @param employee The employee to process
+     * @param hoursWorked Total hours worked
+     * @param overtimeHours Overtime hours
+     * @param lateMinutes Minutes late
+     * @param undertimeMinutes Minutes undertime
+     * @param isLate Whether employee was late
+     * @param payPeriodType Pay period type (MID_MONTH or END_MONTH)
+     * @param startDate Start date of pay period
+     * @param endDate End date of pay period
+     * @param year Year of payroll
+     * @param month Month of payroll
+     * @param hasUnpaidAbsences Whether employee has unpaid absences
+     * @return PayrollResult containing calculation results
      */
-    public void processPayrollForPeriod(Employee employee, double hoursWorked,
+    public PayrollResult processPayroll(Employee employee, double hoursWorked,
                                         double overtimeHours, double lateMinutes,
                                         double undertimeMinutes, boolean isLate,
                                         int payPeriodType, LocalDate startDate, LocalDate endDate,
                                         int year, int month, boolean hasUnpaidAbsences) {
 
+        // Validate input
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee cannot be null");
+        }
+
+        // Ensure non-negative values
+        hoursWorked = Math.max(0, hoursWorked);
+        overtimeHours = Math.max(0, overtimeHours);
+        lateMinutes = Math.max(0, lateMinutes);
+        undertimeMinutes = Math.max(0, undertimeMinutes);
+
         String employeeId = employee.getEmployeeId();
         double monthlySalary = employee.getBasicSalary();
-        double semiMonthlySalary = monthlySalary / 2;  // Half of the monthly salary
+        double semiMonthlySalary = employee.getSemiMonthlyRate();
         double hourlyRate = employee.getHourlyRate();
-        double dailyRate = monthlySalary / PayrollDateManager.getWorkingDaysInYear(year);
+        double dailyRate = employee.getDailyRate();
 
-        // Base computation is half the monthly salary
+        // Base computation is the semi-monthly rate
         double basePay = semiMonthlySalary;
 
         // Calculate deductions for late, undertime, and absences
-
         // Late deduction: per minute rate × late minutes
         double lateDeduction = 0.0;
         if (lateMinutes > 0) {
@@ -73,22 +96,18 @@ public class PayrollProcessor {
             undertimeDeduction = perMinuteRate * undertimeMinutes;
         }
 
-        // Calculate number of working days in the cutoff period
-        LocalDate[] cutoffRange = PayrollDateManager.getCutoffDateRange(
-                PayrollDateManager.getPayrollDate(year, month, payPeriodType),
-                payPeriodType);
-
-        // Calculate the expected working hours for the period
-        int workingDaysInPeriod = 10; // Simplified: Assume 10 working days in a period
+        // Calculate expected working hours for the period
+        int workingDaysInPeriod = DateTimeUtil.daysBetween(startDate, endDate);
+        workingDaysInPeriod = Math.min(workingDaysInPeriod, 12); // Maximum 12 working days per period
         double expectedHours = workingDaysInPeriod * 8.0; // 8 hours per day
 
         // Calculate absences (if any)
         double absentHours = Math.max(0, expectedHours - hoursWorked - (lateMinutes / 60.0) - (undertimeMinutes / 60.0));
         double absentDays = absentHours / 8.0; // Convert hours to days
 
-        // Only apply absence deduction if the absence is unpaid (based on CSV data)
+        // Only apply absence deduction if the absence is unpaid
         double absenceDeduction = 0.0;
-        if (hasUnpaidAbsences) {
+        if (hasUnpaidAbsences && absentDays > 0) {
             absenceDeduction = absentDays * dailyRate;
         }
 
@@ -98,9 +117,10 @@ public class PayrollProcessor {
             overtimePay = hourlyRate * overtimeHours * 1.25; // 25% overtime premium
         }
 
-        // Calculate holiday pay (simplified - would need to check each day in real implementation)
+        // Calculate holiday pay
         double holidayPay = 0.0;
-        // Not implementing full holiday check here to keep it simple
+        // This would check if any of the days worked were holidays
+        // Simplified implementation - would need to check each day in real system
 
         // Calculate gross pay: base pay + overtime - deductions
         double grossPay = basePay + overtimePay + holidayPay - lateDeduction - undertimeDeduction - absenceDeduction;
@@ -109,7 +129,7 @@ public class PayrollProcessor {
         grossPay = Math.max(0, grossPay);
 
         // Full monthly gross (for tax calculation)
-        double fullMonthlyGross = grossPay * 2; // Simplified approximation
+        double fullMonthlyGross = monthlySalary; // Use actual monthly salary
 
         // Calculate statutory deductions
         StatutoryDeductions.DeductionResult deductions =
@@ -118,164 +138,112 @@ public class PayrollProcessor {
         // Calculate net pay
         double netPay = Math.max(0, grossPay - deductions.totalDeductions);
 
-        // Save calculations
-        currentGrossPay.put(employeeId, grossPay);
-        currentNetPay.put(employeeId, netPay);
-        currentDeductions.put(employeeId, deductions);
+        // Create result object
+        PayrollResult result = new PayrollResult(
+                employee, grossPay, netPay, deductions,
+                basePay, overtimePay, holidayPay, lateDeduction,
+                undertimeDeduction, absenceDeduction, hoursWorked,
+                overtimeHours, lateMinutes, undertimeMinutes,
+                expectedHours, absentHours, dailyRate, startDate,
+                endDate, payPeriodType, hourlyRate, year, month,
+                hasUnpaidAbsences
+        );
 
-        // Save additional details for reports
-        Map<String, Object> payDetails = new HashMap<>();
-        payDetails.put("regularPay", basePay);
-        payDetails.put("overtimePay", overtimePay);
-        payDetails.put("holidayPay", holidayPay);
-        payDetails.put("lateDeduction", lateDeduction);
-        payDetails.put("undertimeDeduction", undertimeDeduction);
-        payDetails.put("absenceDeduction", absenceDeduction);
-        payDetails.put("hoursWorked", hoursWorked);
-        payDetails.put("overtimeHours", overtimeHours);
-        payDetails.put("lateMinutes", lateMinutes);
-        payDetails.put("undertimeMinutes", undertimeMinutes);
-        payDetails.put("expectedHours", expectedHours);
-        payDetails.put("absentHours", absentHours);
-        payDetails.put("dailyRate", dailyRate);
-        payDetails.put("startDate", startDate);
-        payDetails.put("endDate", endDate);
-        payDetails.put("payPeriod", payPeriodType);
-        payDetails.put("hourlyRate", hourlyRate);
-        payDetails.put("year", year);
-        payDetails.put("month", month);
-        payDetails.put("hasUnpaidAbsences", hasUnpaidAbsences);
+        // Save result
+        payrollResults.put(employeeId, result);
 
-        currentPayDetails.put(employeeId, payDetails);
+        return result;
     }
 
     /**
-     * Process payroll with the original signature (for backward compatibility)
+     * Get the most recent payroll result for an employee
+     *
+     * @param employeeId The employee ID
+     * @return PayrollResult or null if not found
      */
-    public void processPayrollForPeriod(Employee employee, double hoursWorked,
-                                        double overtimeHours, double lateMinutes,
-                                        double undertimeMinutes, boolean isLate,
-                                        int payPeriodType, LocalDate startDate, LocalDate endDate,
-                                        int year, int month) {
-        // Default to not having unpaid absences when not specified
-        processPayrollForPeriod(employee, hoursWorked, overtimeHours, lateMinutes,
-                undertimeMinutes, isLate, payPeriodType, startDate,
-                endDate, year, month, false);
+    public PayrollResult getPayrollResult(String employeeId) {
+        return payrollResults.get(employeeId);
     }
 
     /**
-     * Show salary breakdown for an employee
+     * Display salary details for an employee
+     *
+     * @param employee The employee to display details for
      */
     public void displaySalaryDetails(Employee employee) {
+        if (employee == null) {
+            System.out.println("No employee provided");
+            return;
+        }
+
         String employeeId = employee.getEmployeeId();
+        PayrollResult result = payrollResults.get(employeeId);
 
-        // Get saved calculations
-        double grossPay = currentGrossPay.getOrDefault(employeeId, 0.0);
-        double netPay = currentNetPay.getOrDefault(employeeId, 0.0);
-        StatutoryDeductions.DeductionResult deductions = currentDeductions.get(employeeId);
-        Map<String, Object> payDetails = currentPayDetails.get(employeeId);
-
-        if (deductions == null || payDetails == null) {
+        if (result == null) {
             System.out.println("No payroll data for this employee.");
             return;
         }
 
-        // Get current date for the pay slip
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
-        String formattedDate = today.format(dateFormatter);
-
-        // Get period dates if available
-        LocalDate startDate = (LocalDate) payDetails.get("startDate");
-        LocalDate endDate = (LocalDate) payDetails.get("endDate");
-        String periodStr = "";
-
-        if (startDate != null && endDate != null) {
-            periodStr = "Period: " + startDate.format(dateFormatter) +
-                    " to " + endDate.format(dateFormatter);
-        }
-
-        // Get work details
-        double hoursWorked = (double) payDetails.get("hoursWorked");
-        double overtimeHours = (double) payDetails.get("overtimeHours");
-        double lateMinutes = (double) payDetails.get("lateMinutes");
-        double undertimeMinutes = (double) payDetails.getOrDefault("undertimeMinutes", 0.0);
-        double regularPay = (double) payDetails.get("regularPay");
-        double overtimePay = (double) payDetails.get("overtimePay");
-        double holidayPay = (double) payDetails.getOrDefault("holidayPay", 0.0);
-        double lateDeduction = (double) payDetails.get("lateDeduction");
-        double undertimeDeduction = (double) payDetails.getOrDefault("undertimeDeduction", 0.0);
-        double absenceDeduction = (double) payDetails.getOrDefault("absenceDeduction", 0.0);
-        double hourlyRate = (double) payDetails.get("hourlyRate");
-        double expectedHours = (double) payDetails.getOrDefault("expectedHours", 0.0);
-        double absentHours = (double) payDetails.getOrDefault("absentHours", 0.0);
-        double dailyRate = (double) payDetails.getOrDefault("dailyRate", 0.0);
-        int payPeriod = (int) payDetails.get("payPeriod");
-        int year = (int) payDetails.getOrDefault("year", LocalDate.now().getYear());
-        int month = (int) payDetails.getOrDefault("month", LocalDate.now().getMonthValue());
-        boolean hasUnpaidAbsences = (boolean) payDetails.getOrDefault("hasUnpaidAbsences", false);
-
         // Display payroll details
         System.out.println("\n===== SALARY CALCULATION =====");
-        System.out.println("Date: " + formattedDate);
+        System.out.println("Date: " + DateTimeUtil.formatDate(LocalDate.now()));
         System.out.println("Employee: " + employee.getFullName() + " (ID: " + employeeId + ")");
         System.out.println("Position: " + employee.getPosition());
         System.out.println("Basic Salary: ₱" + String.format("%,.2f", employee.getBasicSalary()) + "/month");
-        System.out.println("Hourly Rate: ₱" + String.format("%.2f", hourlyRate) + "/hour");
-        System.out.println("Daily Rate: ₱" + String.format("%.2f", dailyRate) + "/day");
+        System.out.println("Hourly Rate: ₱" + String.format("%.2f", result.hourlyRate) + "/hour");
+        System.out.println("Daily Rate: ₱" + String.format("%.2f", result.dailyRate) + "/day");
 
         // Show cutoff period and payroll date
-        if (startDate != null && endDate != null) {
-            System.out.println("Cutoff Period: " + startDate.format(dateFormatter) +
-                    " to " + endDate.format(dateFormatter));
+        System.out.println("Cutoff Period: " + DateTimeUtil.formatDate(result.startDate) +
+                " to " + DateTimeUtil.formatDate(result.endDate));
 
-            LocalDate payrollDate = PayrollDateManager.getPayrollDate(year, month, payPeriod);
-            System.out.println("Payroll Date: " + payrollDate.format(dateFormatter) +
-                    (payPeriod == PayrollDateManager.MID_MONTH ? " (Mid-month)" : " (End-month)"));
-        }
+        LocalDate payrollDate = PayrollDateManager.getPayrollDate(result.year, result.month, result.payPeriodType);
+        System.out.println("Payroll Date: " + DateTimeUtil.formatDate(payrollDate) +
+                (result.payPeriodType == PayrollDateManager.MID_MONTH ? " (Mid-month)" : " (End-month)"));
 
         System.out.println("\n--- WORK SUMMARY ---");
-        System.out.println("Expected Work Hours: " + String.format("%.2f", expectedHours) + " hours");
-        System.out.println("Actual Hours Worked: " + String.format("%.2f", hoursWorked) + " hours");
-        System.out.println("Overtime Hours: " + String.format("%.2f", overtimeHours) + " hours");
-        System.out.println("Late: " + String.format("%.0f", lateMinutes) + " minutes");
-        System.out.println("Undertime: " + String.format("%.0f", undertimeMinutes) + " minutes");
-        System.out.println("Absent Hours: " + String.format("%.2f", absentHours) +
-                " hours (" + String.format("%.2f", absentHours/8) + " days)");
-        if (absentHours > 0) {
-            System.out.println("Unpaid Absences: " + (hasUnpaidAbsences ? "Yes" : "No"));
+        System.out.println("Expected Work Hours: " + String.format("%.2f", result.expectedHours) + " hours");
+        System.out.println("Actual Hours Worked: " + String.format("%.2f", result.hoursWorked) + " hours");
+        System.out.println("Overtime Hours: " + String.format("%.2f", result.overtimeHours) + " hours");
+        System.out.println("Late: " + String.format("%.0f", result.lateMinutes) + " minutes");
+        System.out.println("Undertime: " + String.format("%.0f", result.undertimeMinutes) + " minutes");
+        System.out.println("Absent Hours: " + String.format("%.2f", result.absentHours) +
+                " hours (" + String.format("%.2f", result.absentHours/8) + " days)");
+        if (result.absentHours > 0) {
+            System.out.println("Unpaid Absences: " + (result.hasUnpaidAbsences ? "Yes" : "No"));
         }
 
         System.out.println("\n--- EARNINGS ---");
-        System.out.println("Basic Pay: ₱" + String.format("%,.2f", regularPay));
+        System.out.println("Basic Pay: ₱" + String.format("%,.2f", result.basePay));
 
-        if (overtimePay > 0) {
-            System.out.println("Overtime Pay: ₱" + String.format("%,.2f", overtimePay) +
-                    " (" + String.format("%.2f", overtimeHours) + " hrs × ₱" +
-                    String.format("%.2f", hourlyRate * 1.25) + ")");
+        if (result.overtimePay > 0) {
+            System.out.println("Overtime Pay: ₱" + String.format("%,.2f", result.overtimePay) +
+                    " (" + String.format("%.2f", result.overtimeHours) + " hrs × ₱" +
+                    String.format("%.2f", result.hourlyRate * 1.25) + ")");
         } else {
             System.out.println("Overtime Pay: ₱0.00");
         }
 
-        if (holidayPay > 0) {
-            System.out.println("Holiday Pay: ₱" + String.format("%,.2f", holidayPay));
+        if (result.holidayPay > 0) {
+            System.out.println("Holiday Pay: ₱" + String.format("%,.2f", result.holidayPay));
         }
 
         System.out.println("\n--- DEDUCTIONS ---");
-        System.out.println("Late Deduction: ₱" + String.format("%,.2f", lateDeduction) +
-                (lateMinutes > 0 ? " (" + String.format("%.0f", lateMinutes) +
-                        " mins × ₱" + String.format("%.4f", hourlyRate/60) + ")" : ""));
+        System.out.println("Late Deduction: ₱" + String.format("%,.2f", result.lateDeduction) +
+                (result.lateMinutes > 0 ? " (" + String.format("%.0f", result.lateMinutes) +
+                        " mins × ₱" + String.format("%.4f", result.hourlyRate/60) + ")" : ""));
 
-        System.out.println("Undertime Deduction: ₱" + String.format("%,.2f", undertimeDeduction) +
-                (undertimeMinutes > 0 ? " (" + String.format("%.0f", undertimeMinutes) +
-                        " mins × ₱" + String.format("%.4f", hourlyRate/60) + ")" : ""));
+        System.out.println("Undertime Deduction: ₱" + String.format("%,.2f", result.undertimeDeduction) +
+                (result.undertimeMinutes > 0 ? " (" + String.format("%.0f", result.undertimeMinutes) +
+                        " mins × ₱" + String.format("%.4f", result.hourlyRate/60) + ")" : ""));
 
-        System.out.println("Absence Deduction: ₱" + String.format("%,.2f", absenceDeduction) +
-                (absentHours > 0 && hasUnpaidAbsences ? " (" + String.format("%.2f", absentHours/8) +
-                        " days × ₱" + String.format("%.2f", dailyRate) + ")" : ""));
+        System.out.println("Absence Deduction: ₱" + String.format("%,.2f", result.absenceDeduction) +
+                (result.absentHours > 0 && result.hasUnpaidAbsences ? " (" + String.format("%.2f", result.absentHours/8) +
+                        " days × ₱" + String.format("%.2f", result.dailyRate) + ")" : ""));
 
         // Show statutory deductions based on period
-        if (payPeriod == PayrollDateManager.MID_MONTH) {
+        StatutoryDeductions.DeductionResult deductions = result.deductions;
+        if (result.payPeriodType == PayrollDateManager.MID_MONTH) {
             System.out.println("SSS: ₱" + String.format("%.2f", deductions.sssDeduction));
             System.out.println("PhilHealth: ₱" + String.format("%.2f", deductions.philhealthDeduction));
             System.out.println("Pag-IBIG: ₱" + String.format("%.2f", deductions.pagibigDeduction));
@@ -290,27 +258,108 @@ public class PayrollProcessor {
         System.out.println("Total Deductions: ₱" + String.format("%.2f", deductions.totalDeductions));
 
         System.out.println("\n--- NET PAY ---");
-        System.out.println("Gross Pay: ₱" + String.format("%,.2f", grossPay));
-        System.out.println("Net Pay: ₱" + String.format("%,.2f", netPay));
+        System.out.println("Gross Pay: ₱" + String.format("%,.2f", result.grossPay));
+        System.out.println("Net Pay: ₱" + String.format("%,.2f", result.netPay));
 
         // Show notes about policies
         System.out.println("\n--- POLICIES ---");
-        if (payPeriod == PayrollDateManager.MID_MONTH) {
+        if (result.payPeriodType == PayrollDateManager.MID_MONTH) {
             System.out.println("- SSS, PhilHealth, and Pag-IBIG are deducted on Mid-month payroll.");
         } else {
             System.out.println("- Withholding Tax is deducted on End-month payroll.");
         }
 
-        if (lateMinutes > 0) {
+        if (result.lateMinutes > 0) {
             System.out.println("- Late employees cannot earn overtime pay.");
         }
 
-        if (undertimeMinutes > 0) {
+        if (result.undertimeMinutes > 0) {
             System.out.println("- Early departure deductions apply for leaving before 5:00 PM.");
         }
 
-        if (absentHours > 0) {
+        if (result.absentHours > 0) {
             System.out.println("- Only unpaid, unauthorized, or unapproved absences are deducted from salary.");
+        }
+    }
+
+    /**
+     * Class to store payroll calculation results
+     */
+    public static class PayrollResult {
+        // Basic information
+        public final Employee employee;
+        public final double grossPay;
+        public final double netPay;
+        public final StatutoryDeductions.DeductionResult deductions;
+
+        // Earning components
+        public final double basePay;
+        public final double overtimePay;
+        public final double holidayPay;
+
+        // Deduction components
+        public final double lateDeduction;
+        public final double undertimeDeduction;
+        public final double absenceDeduction;
+
+        // Work details
+        public final double hoursWorked;
+        public final double overtimeHours;
+        public final double lateMinutes;
+        public final double undertimeMinutes;
+        public final double expectedHours;
+        public final double absentHours;
+
+        // Rates
+        public final double dailyRate;
+        public final double hourlyRate;
+
+        // Period information
+        public final LocalDate startDate;
+        public final LocalDate endDate;
+        public final int payPeriodType;
+        public final int year;
+        public final int month;
+
+        // Flags
+        public final boolean hasUnpaidAbsences;
+
+        /**
+         * Create a new PayrollResult
+         */
+        public PayrollResult(Employee employee, double grossPay, double netPay,
+                             StatutoryDeductions.DeductionResult deductions,
+                             double basePay, double overtimePay, double holidayPay,
+                             double lateDeduction, double undertimeDeduction, double absenceDeduction,
+                             double hoursWorked, double overtimeHours, double lateMinutes,
+                             double undertimeMinutes, double expectedHours, double absentHours,
+                             double dailyRate, LocalDate startDate, LocalDate endDate,
+                             int payPeriodType, double hourlyRate, int year, int month,
+                             boolean hasUnpaidAbsences) {
+            this.employee = employee;
+            this.grossPay = grossPay;
+            this.netPay = netPay;
+            this.deductions = deductions;
+            this.basePay = basePay;
+            this.overtimePay = overtimePay;
+            this.holidayPay = holidayPay;
+            this.lateDeduction = lateDeduction;
+            this.undertimeDeduction = undertimeDeduction;
+            this.absenceDeduction = absenceDeduction;
+            this.hoursWorked = hoursWorked;
+            this.overtimeHours = overtimeHours;
+            this.lateMinutes = lateMinutes;
+            this.undertimeMinutes = undertimeMinutes;
+            this.expectedHours = expectedHours;
+            this.absentHours = absentHours;
+            this.dailyRate = dailyRate;
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.payPeriodType = payPeriodType;
+            this.hourlyRate = hourlyRate;
+            this.year = year;
+            this.month = month;
+            this.hasUnpaidAbsences = hasUnpaidAbsences;
         }
     }
 }

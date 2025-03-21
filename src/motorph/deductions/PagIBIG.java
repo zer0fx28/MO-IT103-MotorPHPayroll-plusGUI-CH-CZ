@@ -1,9 +1,12 @@
+// File: motorph/deductions/PagIBIG.java
 package motorph.deductions;
 
 /**
  * Calculates Pag-IBIG Fund contributions based on salary range
+ * Implements the DeductionProvider interface for uniform handling
  */
-public class PagIBIG {
+public class PagIBIG implements DeductionProvider {
+
     // Contribution rates
     private static final double RATE_LOWER = 0.01; // 1% for salaries from 1,000 to 1,500
     private static final double RATE_HIGHER = 0.02; // 2% for salaries over 1,500
@@ -18,13 +21,10 @@ public class PagIBIG {
      * @param monthlySalary Monthly basic salary
      * @return Pag-IBIG contribution amount (monthly)
      */
-    public static double calculateContribution(double monthlySalary) {
-        // Debug: Print the input salary
-        System.out.println("Monthly Salary: " + monthlySalary);
-
+    @Override
+    public double calculateContribution(double monthlySalary) {
         // If salary is below minimum threshold, no contribution
         if (monthlySalary < MIN_SALARY) {
-            System.out.println("Salary below minimum threshold. Contribution: 0.0");
             return 0.0;
         }
 
@@ -33,21 +33,39 @@ public class PagIBIG {
         if (monthlySalary <= MID_SALARY) {
             // 1% for salaries from 1,000 to 1,500
             contribution = monthlySalary * RATE_LOWER;
-            System.out.println("Salary <= 1,500. Contribution: " + contribution);
         } else {
             // 2% for salaries over 1,500
             contribution = monthlySalary * RATE_HIGHER;
-            System.out.println("Salary > 1,500. Contribution: " + contribution);
         }
 
         // Ensure contribution is at least the minimum contribution amount
         contribution = Math.max(contribution, MIN_CONTRIBUTION);
-        System.out.println("After applying minimum contribution: " + contribution);
 
         // Cap at maximum contribution amount
         contribution = Math.min(contribution, MAX_CONTRIBUTION);
-        System.out.println("Final Contribution: " + contribution);
 
         return contribution;
+    }
+
+    /**
+     * Get the name of this deduction
+     *
+     * @return The name "Pag-IBIG"
+     */
+    @Override
+    public String getName() {
+        return "Pag-IBIG";
+    }
+
+    /**
+     * Check if Pag-IBIG applies to this pay period
+     * Pag-IBIG is only deducted on mid-month payroll
+     *
+     * @param payPeriodType The pay period type (MID_MONTH or END_MONTH)
+     * @return true if this is a mid-month pay period, false otherwise
+     */
+    @Override
+    public boolean appliesTo(int payPeriodType) {
+        return payPeriodType == DeductionProvider.MID_MONTH;
     }
 }
