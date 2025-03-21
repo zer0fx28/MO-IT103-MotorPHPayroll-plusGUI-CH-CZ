@@ -1,14 +1,14 @@
 package motorph.process;
 
-import motorph.process.PayrollDateManager;
 import motorph.deductions.StatutoryDeductions;
 import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
 import motorph.hours.AttendanceReader;
+import motorph.holidays.HolidayManager;
+import motorph.holidays.HolidayPayCalculator;
 import motorph.util.DateTimeUtil;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +20,10 @@ public class PayrollProcessor {
     // Data readers
     private final EmployeeDataReader employeeDataReader;
     private final AttendanceReader attendanceReader;
+
+    // Holiday handling
+    private final HolidayManager holidayManager;
+    private final HolidayPayCalculator holidayPayCalculator;
 
     // Storage for calculated values
     private final Map<String, PayrollResult> payrollResults = new HashMap<>();
@@ -33,6 +37,8 @@ public class PayrollProcessor {
     public PayrollProcessor(String employeeFilePath, String attendanceFilePath) {
         this.employeeDataReader = new EmployeeDataReader(employeeFilePath);
         this.attendanceReader = new AttendanceReader(attendanceFilePath);
+        this.holidayManager = new HolidayManager();
+        this.holidayPayCalculator = new HolidayPayCalculator(holidayManager);
     }
 
     /**
@@ -87,19 +93,8 @@ public class PayrollProcessor {
         double basePay = semiMonthlySalary;
 
         // Calculate deductions for late, undertime, and absences
-        // Late deduction: per minute rate × late minutes
-        double lateDeduction = 0.0;
-        if (lateMinutes > 0) {
-            double perMinuteRate = hourlyRate / 60.0;
-            lateDeduction = perMinuteRate * lateMinutes;
-        }
-
-        // Undertime deduction: per minute rate × undertime minutes
-        double undertimeDeduction = 0.0;
-        if (undertimeMinutes > 0) {
-            double perMinuteRate = hourlyRate / 60.0;
-            undertimeDeduction = perMinuteRate * undertimeMinutes;
-        }
+        double lateDeduction = lateMinutes > 0 ? (hourlyRate / 60.0) * lateMinutes : 0.0;
+        double undertimeDeduction = undertimeMinutes > 0 ? (hourlyRate / 60.0) * undertimeMinutes : 0.0;
 
         // Calculate expected working hours for the period
         int workingDaysInPeriod = DateTimeUtil.daysBetween(startDate, endDate);
@@ -109,32 +104,39 @@ public class PayrollProcessor {
         // Calculate absences (if any)
         double absentHours = Math.max(0, expectedHours - hoursWorked - (lateMinutes / 60.0) - (undertimeMinutes / 60.0));
         double absentDays = absentHours / 8.0; // Convert hours to days
-
-        // Only apply absence deduction if the absence is unpaid
-        double absenceDeduction = 0.0;
-        if (hasUnpaidAbsences && absentDays > 0) {
-            absenceDeduction = absentDays * dailyRate;
-        }
+        double absenceDeduction = hasUnpaidAbsences && absentDays > 0 ? absentDays * dailyRate : 0.0;
 
         // Calculate overtime pay
-        double overtimePay = 0.0;
-        if (overtimeHours > 0 && !isLateAnyDay) {
-            overtimePay = hourlyRate * overtimeHours * 1.25; // 25% overtime premium
+        double overtimePay = !isLateAnyDay && overtimeHours > 0 ? hourlyRate * overtimeHours * 1.25 : 0.0;
+
+        // Calculate holiday pay for each day in the period
+        double holidayPay = 0.0;
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            if (holidayManager.isHoliday(currentDate)) {
+                Map<LocalDate, Map<String, Object>> dailyAttendance =
+                        attendanceReader.getDailyAttendanceForEmployee(employee.getEmployeeId(), currentDate, currentDate);
+                Map<String, Object> dayData = dailyAttendance.isEmpty() ? null : dailyAttendance.get(currentDate);
+
+                double dayHoursWorked = dayData != null ? (double) dayData.getOrDefault("hours", 0.0) : 0.0;
+                double dayOvertimeHours = dayData != null ? (double) dayData.getOrDefault("overtimeHours", 0.0) : 0.0;
+                boolean dayIsLate = dayData != null ? (boolean) dayData.getOrDefault("isLate", false) : false;
+
+                boolean isRestDay = currentDate.getDayOfWeek().getValue() == 7;
+                double dayHolidayPay = holidayPayCalculator.calculateHolidayPay(
+                        currentDate, dailyRate, dayHoursWorked, isRestDay, dayIsLate, dayOvertimeHours);
+
+                holidayPay += dayHolidayPay;
+            }
+            currentDate = currentDate.plusDays(1);
         }
 
-        // Calculate holiday pay
-        double holidayPay = 0.0;
-        // This would check if any of the days worked were holidays
-        // Simplified implementation - would need to check each day in real system
-
-        // Calculate gross pay: base pay + overtime - deductions
+        // Calculate gross pay: base pay + overtime + holiday pay - deductions
         double grossPay = basePay + overtimePay + holidayPay - lateDeduction - undertimeDeduction - absenceDeduction;
-
-        // Ensure gross pay is not negative
         grossPay = Math.max(0, grossPay);
 
         // Full monthly gross (for tax calculation)
-        double fullMonthlyGross = monthlySalary; // Use actual monthly salary
+        double fullMonthlyGross = monthlySalary;
 
         // Calculate statutory deductions
         StatutoryDeductions.DeductionResult deductions =
@@ -206,7 +208,85 @@ public class PayrollProcessor {
         System.out.println("Payroll Date: " + DateTimeUtil.formatDate(payrollDate) +
                 (result.payPeriodType == PayrollDateManager.MID_MONTH ? " (Mid-month)" : " (End-month)"));
 
-        // ... (rest of the existing display logic remains the same)
+        // Display earnings and deductions
+        System.out.println("\n=== EARNINGS ===");
+        System.out.println("Base Pay: ₱" + String.format("%,.2f", result.basePay));
+
+        if (result.holidayPay > 0) {
+            System.out.println("Holiday Pay: ₱" + String.format("%,.2f", result.holidayPay));
+
+            // Display holiday details if available
+            LocalDate currentDate = result.startDate;
+            while (!currentDate.isAfter(result.endDate)) {
+                if (holidayManager.isHoliday(currentDate)) {
+                    String holidayName = holidayManager.getHolidayName(currentDate);
+                    System.out.println("  - " + DateTimeUtil.formatDate(currentDate) + ": " + holidayName);
+                }
+                currentDate = currentDate.plusDays(1);
+            }
+        }
+
+        if (result.overtimePay > 0) {
+            System.out.println("Overtime Pay: ₱" + String.format("%,.2f", result.overtimePay) +
+                    " (" + String.format("%.2f", result.overtimeHours) + " hours)");
+        }
+
+        System.out.println("Gross Pay: ₱" + String.format("%,.2f", result.grossPay));
+
+        // Display deductions
+        System.out.println("\n=== DEDUCTIONS ===");
+
+        if (result.lateDeduction > 0) {
+            System.out.println("Late Deduction: ₱" + String.format("%,.2f", result.lateDeduction) +
+                    " (" + String.format("%.0f", result.lateMinutes) + " minutes)");
+        }
+
+        if (result.undertimeDeduction > 0) {
+            System.out.println("Undertime Deduction: ₱" + String.format("%,.2f", result.undertimeDeduction) +
+                    " (" + String.format("%.0f", result.undertimeMinutes) + " minutes)");
+        }
+
+        if (result.absenceDeduction > 0) {
+            System.out.println("Absence Deduction: ₱" + String.format("%,.2f", result.absenceDeduction));
+        }
+
+        // Display statutory deductions
+        if (result.deductions.sssDeduction > 0) {
+            System.out.println("SSS Contribution: ₱" + String.format("%,.2f", result.deductions.sssDeduction));
+        }
+
+        if (result.deductions.philhealthDeduction > 0) {
+            System.out.println("PhilHealth Contribution: ₱" + String.format("%,.2f", result.deductions.philhealthDeduction));
+        }
+
+        if (result.deductions.pagibigDeduction > 0) {
+            System.out.println("Pag-IBIG Contribution: ₱" + String.format("%,.2f", result.deductions.pagibigDeduction));
+        }
+
+        if (result.deductions.withholdingTax > 0) {
+            System.out.println("Withholding Tax: ₱" + String.format("%,.2f", result.deductions.withholdingTax));
+        }
+
+        System.out.println("Total Deductions: ₱" + String.format("%,.2f", result.deductions.totalDeductions));
+
+        // Display final pay
+        System.out.println("\n=== NET PAY ===");
+        System.out.println("Net Pay: ₱" + String.format("%,.2f", result.netPay));
+
+        // Add holiday pay calculation explanation
+        if (result.holidayPay > 0) {
+            System.out.println("\n=== HOLIDAY PAY CALCULATION ===");
+            System.out.println("Regular Holiday Pay Rules:");
+            System.out.println("- Non-working employees: 100% of daily rate");
+            System.out.println("- Working employees: 200% of daily rate for first 8 hours");
+            System.out.println("- Overtime: Additional 30% + 25% (if not late)");
+            System.out.println("- Rest day premium: Additional 30%");
+
+            System.out.println("\nSpecial Non-Working Holiday Pay Rules:");
+            System.out.println("- Non-working employees: No additional pay");
+            System.out.println("- Working employees: Additional 30% of daily rate");
+            System.out.println("- Overtime: 30% holiday premium + 25% (if not late)");
+        }
     }
 
     /**

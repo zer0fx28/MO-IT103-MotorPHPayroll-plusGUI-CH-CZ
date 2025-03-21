@@ -1,4 +1,3 @@
-// File: motorph/holidays/HolidayManager.java
 package motorph.holidays;
 
 import java.time.LocalDate;
@@ -233,15 +232,17 @@ public class HolidayManager {
 
         // Add regular holidays
         for (Holiday holiday : regularHolidays) {
-            if (holiday.getDate().getYear() == year) {
-                yearHolidays.put(holiday.getDate(), holiday.getName() + " (Regular)");
+            LocalDate holidayDate = holiday.getDate();
+            if (holidayDate.getYear() == year) {
+                yearHolidays.put(holidayDate, holiday.getName() + " (Regular)");
             }
         }
 
         // Add special holidays
         for (Holiday holiday : specialNonWorkingHolidays) {
-            if (holiday.getDate().getYear() == year) {
-                yearHolidays.put(holiday.getDate(), holiday.getName() + " (Special)");
+            LocalDate holidayDate = holiday.getDate();
+            if (holidayDate.getYear() == year) {
+                yearHolidays.put(holidayDate, holiday.getName() + " (Special)");
             }
         }
 
