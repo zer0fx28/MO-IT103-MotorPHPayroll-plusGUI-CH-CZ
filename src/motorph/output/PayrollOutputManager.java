@@ -7,8 +7,11 @@ import motorph.process.PayrollDateManager;
 import motorph.process.PayrollProcessor;
 import motorph.util.DateTimeUtil;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +28,9 @@ public class PayrollOutputManager {
     // Data sources
     private final AttendanceReader attendanceReader;
     private final PayrollProcessor payrollProcessor;
+
+    // Lunch break in minutes
+    private static final int LUNCH_BREAK_MINUTES = 60; // 1-hour lunch break
 
     /**
      * Create a new output manager
@@ -132,7 +138,54 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display payroll summary before processing
+     * Calculate actual hours worked considering lunch break
+     *
+     * @param timeIn Time employee clocked in
+     * @param timeOut Time employee clocked out
+     * @param isLate Whether employee was late
+     * @return Actual hours worked with lunch break deducted
+     */
+    private double calculateActualHours(LocalTime timeIn, LocalTime timeOut, boolean isLate) {
+        if (timeIn == null || timeOut == null) {
+            return 0.0;
+        }
+
+        // Standard end time is 5:00 PM
+        LocalTime standardEndTime = LocalTime.of(17, 0);
+
+        // For late employees, cap time out at 5:00 PM
+        LocalTime effectiveTimeOut = timeOut;
+        if (isLate && timeOut.isAfter(standardEndTime)) {
+            effectiveTimeOut = standardEndTime;
+        }
+
+        Duration workDuration = Duration.between(timeIn, effectiveTimeOut);
+        double totalMinutes = workDuration.toMinutes();
+
+        // Deduct 1 hour (60 minutes) for lunch break if working more than 5 hours
+        if (totalMinutes >= 300) { // Only deduct lunch if worked at least 5 hours
+            totalMinutes -= LUNCH_BREAK_MINUTES;
+        }
+
+        double hours = totalMinutes / 60.0;
+
+        // Round to 2 decimal places
+        return Math.round(hours * 100) / 100.0;
+    }
+
+    /**
+     * Helper method to check if an employee is late
+     *
+     * @param timeIn The time the employee clocked in
+     * @return true if the employee is late (after 8:10 AM)
+     */
+    private boolean isLate(LocalTime timeIn) {
+        return timeIn != null && timeIn.isAfter(LocalTime.of(8, 10));
+    }
+
+    /**
+     * Display payroll summary before processing with enhanced format
+     * Accounts for 1-hour lunch break
      *
      * @param employee Employee to display summary for
      * @param startDate Start date of payroll period
@@ -162,52 +215,150 @@ public class PayrollOutputManager {
             return null;
         }
 
-        // Get attendance summary
-        Map<String, Object> attendanceSummary = attendanceReader.getAttendanceSummary(
-                employee.getEmployeeId(), startDate, endDate);
+        // Track totals
+        double totalBaseHours = 0;
+        double totalActualHours = 0;
+        double totalOvertimeHours = 0;
+        double totalLateMinutes = 0;
+        double totalUndertimeMinutes = 0;
+        boolean isLateAnyDay = false;
+        boolean hasUnpaidAbsences = false;
+        int recordCount = dailyAttendance.size();
 
-        // Display daily breakdown
+        // Display header for the enhanced format
         System.out.println("\n--- ATTENDANCE DETAILS ---");
-        System.out.printf("%-12s %-10s %-10s %-10s %-10s %-10s %-15s\n",
-                "Date", "Time In", "Time Out", "Hours", "OT Hours", "Late", "Absence Type");
-        System.out.println("--------------------------------------------------------------------------------");
+        System.out.printf("%-10s %-5s %-8s %-8s %-5s %-5s %-5s %-5s %-5s %-6s\n",
+                "Date", "Base", "Time In", "Time Out", "Late", "UT", "OT", "UA", "LV", "Actual");
+        System.out.println("----------------------------------------------------------------------");
 
-        // Display daily records sorted by date
-        dailyAttendance.keySet().stream().sorted().forEach(date -> {
+        // Process each day
+        List<LocalDate> sortedDates = new ArrayList<>(dailyAttendance.keySet());
+        java.util.Collections.sort(sortedDates);
+
+        for (LocalDate date : sortedDates) {
             Map<String, Object> dayData = dailyAttendance.get(date);
 
-            String timeIn = (String) dayData.get("timeIn");
-            String timeOut = (String) dayData.get("timeOut");
-            double hours = (double) dayData.get("hours");
-            double overtimeHours = (double) dayData.get("overtimeHours");
-            double lateMinutes = (double) dayData.get("lateMinutes");
-            String absenceType = (String) dayData.getOrDefault("absenceType", "");
+            // Base hours is always 8.0
+            double baseHours = 8.0;
+            totalBaseHours += baseHours;
 
-            // Format the line
-            System.out.printf("%-12s %-10s %-10s %-10.2f %-10.2f %-10s %-15s\n",
-                    DateTimeUtil.formatDateStandard(date),
-                    timeIn, timeOut, hours, overtimeHours,
-                    (lateMinutes > 0 ? lateMinutes + " min" : "-"),
-                    absenceType != null ? absenceType : "-");
-        });
+            String timeInStr = (String) dayData.get("timeIn");
+            String timeOutStr = (String) dayData.get("timeOut");
 
-        System.out.println("--------------------------------------------------------------------------------");
+            LocalTime timeIn = DateTimeUtil.parseTime(timeInStr);
+            LocalTime timeOut = DateTimeUtil.parseTime(timeOutStr);
 
-        // Extract totals from summary
-        double totalHours = (double) attendanceSummary.get("hours");
-        double totalOvertimeHours = (double) attendanceSummary.get("overtimeHours");
-        double totalLateMinutes = (double) attendanceSummary.get("lateMinutes");
+            // Standard times
+            LocalTime graceEndTime = LocalTime.of(8, 10);
+            LocalTime standardEndTime = LocalTime.of(17, 0);
 
-        System.out.printf("%-34s %-10.2f %-10.2f %-10.2f\n",
-                "TOTALS:", totalHours, totalOvertimeHours, totalLateMinutes);
+            // Calculate late minutes (after 8:10 AM)
+            double lateMinutes = 0;
+            if (timeIn != null && timeIn.isAfter(graceEndTime)) {
+                Duration lateBy = Duration.between(graceEndTime, timeIn);
+                lateMinutes = lateBy.toMinutes();
+                isLateAnyDay = true;
+            }
 
-        return attendanceSummary;
+            // Calculate undertime minutes (before 5:00 PM)
+            double undertimeMinutes = 0;
+            if (timeOut != null && timeOut.isBefore(standardEndTime)) {
+                Duration undertimeBy = Duration.between(timeOut, standardEndTime);
+                undertimeMinutes = undertimeBy.toMinutes();
+            }
+
+            // Calculate overtime hours (only for non-late employees after 5:00 PM)
+            double overtimeHours = 0;
+            if (timeIn != null && timeOut != null && !isLate(timeIn) && timeOut.isAfter(standardEndTime)) {
+                Duration overtimeDuration = Duration.between(standardEndTime, timeOut);
+                overtimeHours = overtimeDuration.toMinutes() / 60.0;
+                // Round to 2 decimal places
+                overtimeHours = Math.round(overtimeHours * 100) / 100.0;
+            }
+
+            // Calculate actual hours worked with proper capping for late employees
+            double actualHours = calculateActualHours(timeIn, timeOut, lateMinutes > 0);
+
+            // Check for unpaid absence
+            boolean isUnpaidAbsence = false;
+            if (dayData.containsKey("isUnpaidAbsence")) {
+                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
+            } else {
+                String absenceType = (String) dayData.getOrDefault("absenceType", "");
+                if (absenceType != null && !absenceType.isEmpty()) {
+                    String type = absenceType.toLowerCase();
+                    isUnpaidAbsence = type.contains("unpaid") ||
+                            type.contains("unauthoriz") ||
+                            type.contains("unapproved");
+                }
+            }
+
+            if (isUnpaidAbsence) {
+                hasUnpaidAbsences = true;
+            }
+
+            // Format display time out (capped at 5:00 PM for late employees)
+            String displayTimeOut = timeOutStr;
+            if (lateMinutes > 0 && timeOut != null && timeOut.isAfter(standardEndTime)) {
+                displayTimeOut = "5:00 PM";
+            }
+
+            // Format values for display
+            String dateStr = DateTimeUtil.formatDateStandard(date);
+            String baseHoursStr = String.format("%.1f", baseHours);
+            String lateStr = lateMinutes > 0 ? String.format("%.0fm", lateMinutes) : "-";
+            String undertimeStr = undertimeMinutes > 0 ? String.format("%.0fm", undertimeMinutes) : "-";
+            String overtimeStr = overtimeHours > 0 ? String.format("%.2f", overtimeHours) : "-";
+            String unpaidAbsenceStr = isUnpaidAbsence ? "X" : "-";
+            String leaveStr = "-"; // Placeholder
+            String actualHoursStr = String.format("%.2f", actualHours);
+
+            // Display row
+            System.out.printf("%-10s %-5s %-8s %-8s %-5s %-5s %-5s %-5s %-5s %-6s\n",
+                    dateStr, baseHoursStr, timeInStr, displayTimeOut,
+                    lateStr, undertimeStr, overtimeStr, unpaidAbsenceStr, leaveStr, actualHoursStr);
+
+            // Update totals
+            totalActualHours += actualHours;
+            totalOvertimeHours += overtimeHours;
+            totalLateMinutes += lateMinutes;
+            totalUndertimeMinutes += undertimeMinutes;
+        }
+
+        // Display totals
+        System.out.println("----------------------------------------------------------------------");
+        System.out.printf("%-10s %-5.1f %-17s %-5.0fm %-5.0fm %-5.2f %-5s %-5s %-6.2f\n",
+                "TOTALS:", totalBaseHours, "", totalLateMinutes, totalUndertimeMinutes,
+                totalOvertimeHours, "-", "-", totalActualHours);
+
+        // Add legends
+        System.out.println("\nLEGENDS:");
+        System.out.println("Base = Base hours expected (8 hours per day)");
+        System.out.println("Late = Late minutes (after 8:10 AM grace period)");
+        System.out.println("UT = Undertime minutes (left before 5:00 PM)");
+        System.out.println("OT = Overtime hours (after 5:00 PM, only for on-time employees)");
+        System.out.println("UA = Unapproved Absence");
+        System.out.println("LV = Leave");
+        System.out.println("Actual = Actual hours worked (1-hour lunch break deducted)");
+
+        // Create summary
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("hours", totalActualHours);
+        summary.put("overtimeHours", totalOvertimeHours);
+        summary.put("lateMinutes", totalLateMinutes);
+        summary.put("undertimeMinutes", totalUndertimeMinutes);
+        summary.put("isLateAnyDay", isLateAnyDay);
+        summary.put("hasUnpaidAbsences", hasUnpaidAbsences);
+        summary.put("recordCount", recordCount);
+        summary.put("baseHours", totalBaseHours);
+
+        return summary;
     }
 
     /**
-     * Display salary details
+     * Display salary details for an employee
      *
-     * @param employee Employee to display salary details for
+     * @param employee The employee to display details for
      */
     public void displaySalaryDetails(Employee employee) {
         payrollProcessor.displaySalaryDetails(employee);
@@ -228,7 +379,8 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display daily attendance
+     * Display daily attendance with the enhanced format
+     * Accounts for 1-hour lunch break
      *
      * @param employee Employee to display attendance for
      * @param startDate Start date of range
@@ -249,67 +401,110 @@ public class PayrollOutputManager {
             return;
         }
 
-        // Display daily breakdown
+        // Display header for the enhanced format
         System.out.println("\n--- ATTENDANCE DETAILS ---");
-        System.out.printf("%-12s %-10s %-10s %-10s %-10s %-10s %-10s %-15s\n",
-                "Date", "Time In", "Time Out", "Hours", "OT Hours", "Late", "Undertime", "Absence Type");
-        System.out.println("----------------------------------------------------------------------------------------");
+        System.out.printf("%-10s %-5s %-8s %-8s %-5s %-5s %-5s %-5s %-5s %-6s\n",
+                "Date", "Base", "Time In", "Time Out", "Late", "UT", "OT", "UA", "LV", "Actual");
+        System.out.println("----------------------------------------------------------------------");
 
-        double totalHours = 0;
-        double totalOvertimeHours = 0;
+        // Track totals
+        double totalBaseHours = 0;
+        double totalActualHours = 0;
         double totalLateMinutes = 0;
         double totalUndertimeMinutes = 0;
-        int unpaidAbsenceCount = 0;
+        double totalOvertimeHours = 0;
 
-        // Display records sorted by date
-        for (LocalDate date : dailyAttendance.keySet().stream().sorted().toList()) {
+        // Process each day
+        List<LocalDate> sortedDates = new ArrayList<>(dailyAttendance.keySet());
+        java.util.Collections.sort(sortedDates);
+
+        for (LocalDate date : sortedDates) {
             Map<String, Object> dayData = dailyAttendance.get(date);
 
-            String timeIn = (String) dayData.get("timeIn");
-            String timeOut = (String) dayData.get("timeOut");
-            double hours = (double) dayData.get("hours");
-            double overtimeHours = (double) dayData.get("overtimeHours");
-            double lateMinutes = (double) dayData.get("lateMinutes");
-            double undertimeMinutes = (double) dayData.getOrDefault("undertimeMinutes", 0.0);
-            String absenceType = (String) dayData.getOrDefault("absenceType", "");
-            boolean isUnpaidAbsence = false;
+            // Base hours is always 8.0
+            double baseHours = 8.0;
+            totalBaseHours += baseHours;
 
-            if (dayData.containsKey("isUnpaidAbsence")) {
-                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
-            } else if (absenceType != null && !absenceType.isEmpty()) {
-                // For backward compatibility
-                String type = absenceType.toLowerCase();
-                isUnpaidAbsence = type.contains("unpaid") ||
-                        type.contains("unauthoriz") ||
-                        type.contains("unapproved");
+            String timeInStr = (String) dayData.get("timeIn");
+            String timeOutStr = (String) dayData.get("timeOut");
+
+            LocalTime timeIn = DateTimeUtil.parseTime(timeInStr);
+            LocalTime timeOut = DateTimeUtil.parseTime(timeOutStr);
+
+            // Standard times
+            LocalTime graceEndTime = LocalTime.of(8, 10);
+            LocalTime standardEndTime = LocalTime.of(17, 0);
+
+            // Calculate late minutes (after 8:10 AM)
+            double lateMinutes = 0;
+            if (timeIn != null && timeIn.isAfter(graceEndTime)) {
+                Duration lateBy = Duration.between(graceEndTime, timeIn);
+                lateMinutes = lateBy.toMinutes();
             }
+
+            // Calculate undertime minutes (before 5:00 PM)
+            double undertimeMinutes = 0;
+            if (timeOut != null && timeOut.isBefore(standardEndTime)) {
+                Duration undertimeBy = Duration.between(timeOut, standardEndTime);
+                undertimeMinutes = undertimeBy.toMinutes();
+            }
+
+            // Calculate overtime hours (only for non-late employees after 5:00 PM)
+            double overtimeHours = 0;
+            if (timeIn != null && timeOut != null && !isLate(timeIn) && timeOut.isAfter(standardEndTime)) {
+                Duration overtimeDuration = Duration.between(standardEndTime, timeOut);
+                overtimeHours = overtimeDuration.toMinutes() / 60.0;
+                // Round to 2 decimal places
+                overtimeHours = Math.round(overtimeHours * 100) / 100.0;
+            }
+
+            // Calculate actual hours worked using the helper method
+            double actualHours = calculateActualHours(timeIn, timeOut, lateMinutes > 0);
+
+            // Format display time out (capped at 5:00 PM for late employees)
+            String displayTimeOut = timeOutStr;
+            if (lateMinutes > 0 && timeOut != null && timeOut.isAfter(standardEndTime)) {
+                displayTimeOut = "5:00 PM";
+            }
+
+            // Format values for display
+            String dateStr = DateTimeUtil.formatDateStandard(date);
+            String baseHoursStr = String.format("%.1f", baseHours);
+            String lateStr = lateMinutes > 0 ? String.format("%.0fm", lateMinutes) : "-";
+            String undertimeStr = undertimeMinutes > 0 ? String.format("%.0fm", undertimeMinutes) : "-";
+            String overtimeStr = overtimeHours > 0 ? String.format("%.2f", overtimeHours) : "-";
+            String unpaidAbsenceStr = "-"; // Placeholder
+            String leaveStr = "-"; // Placeholder
+            String actualHoursStr = String.format("%.2f", actualHours);
+
+            // Display row
+            // Display row
+                System.out.printf("%-10s %-5s %-8s %-8s %-5s %-5s %-5s %-5s %-5s %-6s\n",
+                        dateStr, baseHoursStr, timeInStr, displayTimeOut,
+                        lateStr, undertimeStr, overtimeStr, unpaidAbsenceStr, leaveStr, actualHoursStr);
 
             // Update totals
-            totalHours += hours;
-            totalOvertimeHours += overtimeHours;
+            totalActualHours += actualHours;
             totalLateMinutes += lateMinutes;
             totalUndertimeMinutes += undertimeMinutes;
-
-            if (isUnpaidAbsence) {
-                unpaidAbsenceCount++;
-            }
-
-            // Format the line
-            System.out.printf("%-12s %-10s %-10s %-10.2f %-10.2f %-10s %-10s %-15s\n",
-                    DateTimeUtil.formatDateStandard(date),
-                    timeIn, timeOut, hours, overtimeHours,
-                    (lateMinutes > 0 ? lateMinutes + " min" : "-"),
-                    (undertimeMinutes > 0 ? undertimeMinutes + " min" : "-"),
-                    (absenceType != null && !absenceType.isEmpty() ? absenceType : "-"));
+            totalOvertimeHours += overtimeHours;
         }
 
-        System.out.println("----------------------------------------------------------------------------------------");
-        System.out.printf("%-34s %-10.2f %-10.2f %-10.2f %-10.2f\n",
-                "TOTALS:", totalHours, totalOvertimeHours, totalLateMinutes, totalUndertimeMinutes);
+        // Display totals
+        System.out.println("----------------------------------------------------------------------");
+        System.out.printf("%-10s %-5.1f %-17s %-5.0fm %-5.0fm %-5.2f %-5s %-5s %-6.2f\n",
+                "TOTALS:", totalBaseHours, "", totalLateMinutes, totalUndertimeMinutes,
+                totalOvertimeHours, "-", "-", totalActualHours);
 
-        if (unpaidAbsenceCount > 0) {
-            System.out.println("Unpaid Absences: " + unpaidAbsenceCount + " day(s)");
-        }
+        // Add legends
+        System.out.println("\nLEGENDS:");
+        System.out.println("Base = Base hours expected (8 hours per day)");
+        System.out.println("Late = Late minutes (after 8:10 AM grace period)");
+        System.out.println("UT = Undertime minutes (left before 5:00 PM)");
+        System.out.println("OT = Overtime hours (after 5:00 PM, only for on-time employees)");
+        System.out.println("UA = Unapproved Absence");
+        System.out.println("LV = Leave");
+        System.out.println("Actual = Actual hours worked (1-hour lunch break deducted)");
 
         // Wait for user
         System.out.print("\nPress Enter to continue...");

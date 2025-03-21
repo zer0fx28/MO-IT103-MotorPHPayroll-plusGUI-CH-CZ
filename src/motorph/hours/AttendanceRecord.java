@@ -25,6 +25,7 @@ public class AttendanceRecord {
     public static final LocalTime STANDARD_START_TIME = LocalTime.of(8, 0); // 8:00 AM
     public static final LocalTime GRACE_PERIOD_END = LocalTime.of(8, 10);   // 8:10 AM (10-minute grace period)
     public static final LocalTime STANDARD_END_TIME = LocalTime.of(17, 0);  // 5:00 PM
+    public static final int LUNCH_BREAK_MINUTES = 60; // 1-hour lunch break
 
     /**
      * Create record from CSV data array
@@ -104,16 +105,32 @@ public class AttendanceRecord {
 
     /**
      * Calculate the total hours worked for this record
+     * Accounts for 1-hour lunch break
      *
-     * @return Total hours worked (including overtime)
+     * @return Total hours worked (with lunch break deducted)
      */
     public double getTotalHoursWorked() {
         if (timeIn == null || timeOut == null || timeOut.isBefore(timeIn)) {
             return 0.0;
         }
 
-        Duration workDuration = Duration.between(timeIn, timeOut);
-        return workDuration.toMinutes() / 60.0;
+        // For late employees, cap timeOut at STANDARD_END_TIME
+        LocalTime effectiveTimeOut = timeOut;
+        if (isLate() && timeOut.isAfter(STANDARD_END_TIME)) {
+            effectiveTimeOut = STANDARD_END_TIME;
+        }
+
+        Duration workDuration = Duration.between(timeIn, effectiveTimeOut);
+        double totalMinutes = workDuration.toMinutes();
+
+        // Deduct 1 hour (60 minutes) for lunch break if working more than 5 hours
+        if (totalMinutes >= 300) { // Only deduct lunch if worked at least 5 hours
+            totalMinutes -= LUNCH_BREAK_MINUTES;
+        }
+
+        // Convert to hours and round to 2 decimal places
+        double hours = totalMinutes / 60.0;
+        return Math.round(hours * 100) / 100.0;
     }
 
     /**
@@ -136,8 +153,16 @@ public class AttendanceRecord {
             return 0.0;
         }
 
-        double totalHours = getTotalHoursWorked();
-        return totalHours > 8.0 ? (totalHours - 8.0) : 0.0;
+        // Check if worked past 5:00 PM
+        if (timeOut == null || !timeOut.isAfter(STANDARD_END_TIME)) {
+            return 0.0;
+        }
+
+        Duration overtimeDuration = Duration.between(STANDARD_END_TIME, timeOut);
+        double overtimeHours = overtimeDuration.toMinutes() / 60.0;
+
+        // Round to 2 decimal places
+        return Math.round(overtimeHours * 100) / 100.0;
     }
 
     // Getters and Setters
