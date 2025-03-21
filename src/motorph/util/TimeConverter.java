@@ -1,7 +1,6 @@
 // File: motorph/util/TimeConverter.java
 package motorph.util;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -9,120 +8,117 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utility class for time format conversion and parsing
+ * Handles time conversions between different formats
  */
 public class TimeConverter {
-    // Common time formats
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
-    private static final DateTimeFormatter STANDARD_TIME_FORMAT = DateTimeFormatter.ofPattern("hh:mm a");
 
-    // Pattern for simple time format "H:MM" or "HH:MM"
-    private static final Pattern SIMPLE_TIME_PATTERN = Pattern.compile("^(\\d{1,2}):(\\d{2})$");
+    private static final DateTimeFormatter MILITARY_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter STANDARD_FORMAT = DateTimeFormatter.ofPattern("h:mm a");
+
+    // Common patterns for time formats in attendance data
+    private static final Pattern FOUR_DIGIT_PATTERN = Pattern.compile("(\\d{2})(\\d{2})");
+    private static final Pattern THREE_DIGIT_PATTERN = Pattern.compile("(\\d)(\\d{2})");
+    private static final Pattern STANDARD_PATTERN = Pattern.compile("(\\d{1,2}):(\\d{2})\\s*(AM|PM|am|pm)?");
 
     /**
-     * Parse time from user input in various formats
-     *
-     * @param timeStr Time string (HH:mm, H:MM, etc.)
-     * @return LocalTime object or null if parsing fails
+     * Convert time string to LocalTime
+     * Handles common formats found in attendance data
      */
     public static LocalTime parseUserTime(String timeStr) {
         if (timeStr == null || timeStr.trim().isEmpty()) {
             return null;
         }
 
-        String cleanTimeStr = timeStr.trim();
+        String cleanTime = timeStr.trim();
 
-        // Try parsing with simple pattern first
-        Matcher matcher = SIMPLE_TIME_PATTERN.matcher(cleanTimeStr);
-        if (matcher.matches()) {
+        try {
+            // Try pattern matching approach first (most reliable)
+
+            // Check for four-digit format (e.g., "0800", "1700")
+            Matcher fourDigitMatcher = FOUR_DIGIT_PATTERN.matcher(cleanTime);
+            if (fourDigitMatcher.matches()) {
+                int hour = Integer.parseInt(fourDigitMatcher.group(1));
+                int minute = Integer.parseInt(fourDigitMatcher.group(2));
+                return LocalTime.of(hour, minute);
+            }
+
+            // Check for three-digit format (e.g., "800", "130")
+            Matcher threeDigitMatcher = THREE_DIGIT_PATTERN.matcher(cleanTime);
+            if (threeDigitMatcher.matches()) {
+                int hour = Integer.parseInt(threeDigitMatcher.group(1));
+                int minute = Integer.parseInt(threeDigitMatcher.group(2));
+                return LocalTime.of(hour, minute);
+            }
+
+            // Check for standard time format with optional AM/PM (e.g., "8:00", "8:00 AM", "17:00")
+            Matcher standardMatcher = STANDARD_PATTERN.matcher(cleanTime);
+            if (standardMatcher.matches()) {
+                int hour = Integer.parseInt(standardMatcher.group(1));
+                int minute = Integer.parseInt(standardMatcher.group(2));
+                String amPm = standardMatcher.group(3);
+
+                // Adjust for 12-hour format with AM/PM
+                if (amPm != null) {
+                    if ((amPm.equalsIgnoreCase("PM")) && hour < 12) {
+                        hour += 12;
+                    } else if ((amPm.equalsIgnoreCase("AM")) && hour == 12) {
+                        hour = 0;
+                    }
+                } else {
+                    // No AM/PM indicator - use common sense for work hours
+                    // If it's 1:00-7:59 with no AM/PM, assume PM during work hours
+                    if (hour >= 1 && hour <= 7) {
+                        hour += 12;
+                    }
+                }
+
+                return LocalTime.of(hour, minute);
+            }
+
+            // Fallback to standard parsers if pattern matching fails
+
+            // Try with standard AM/PM format
+            if (cleanTime.toUpperCase().contains("AM") || cleanTime.toUpperCase().contains("PM")) {
+                try {
+                    return LocalTime.parse(cleanTime.toUpperCase(), STANDARD_FORMAT);
+                } catch (Exception e) {
+                    // Try next method
+                }
+            }
+
+            // Try military time format
             try {
-                int hours = Integer.parseInt(matcher.group(1));
-                int minutes = Integer.parseInt(matcher.group(2));
-
-                // Basic validation
-                if (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
-                    return LocalTime.of(hours, minutes);
-                }
-            } catch (NumberFormatException e) {
-                // Fall through to other parsing methods
-            }
-        }
-
-        // Try with standard time format directly
-        try {
-            return LocalTime.parse(cleanTimeStr, TIME_FORMAT);
-        } catch (DateTimeParseException e) {
-            // Fall through to other methods
-        }
-
-        // Try with numeric time formats
-        try {
-            // Handle "HHMM" format (e.g., "0800")
-            if (cleanTimeStr.matches("\\d{4}")) {
-                int hours = Integer.parseInt(cleanTimeStr.substring(0, 2));
-                int minutes = Integer.parseInt(cleanTimeStr.substring(2, 4));
-                return LocalTime.of(hours, minutes);
+                return LocalTime.parse(cleanTime, MILITARY_FORMAT);
+            } catch (Exception e) {
+                // Try next method
             }
 
-            // Handle "HMM" format (e.g., "800")
-            if (cleanTimeStr.matches("\\d{3}")) {
-                int hours = Integer.parseInt(cleanTimeStr.substring(0, 1));
-                int minutes = Integer.parseInt(cleanTimeStr.substring(1, 3));
-                return LocalTime.of(hours, minutes);
-            }
-        } catch (Exception ignored) {
-            // Fall through to final attempt
-        }
+            // Last resort: try default parsing
+            return LocalTime.parse(cleanTime);
 
-        // Try to parse in various formats as a last resort
-        try {
-            // Try with 12-hour format
-            if (cleanTimeStr.toLowerCase().contains("am") || cleanTimeStr.toLowerCase().contains("pm")) {
-                return LocalTime.parse(cleanTimeStr, DateTimeFormatter.ofPattern("h:mm a"));
-            }
-
-            // Try to extract hours and minutes with regex if all else fails
-            Pattern anyTimePattern = Pattern.compile("(\\d{1,2})[:\\s]?(\\d{2})");
-            Matcher anyMatcher = anyTimePattern.matcher(cleanTimeStr);
-            if (anyMatcher.find()) {
-                int hours = Integer.parseInt(anyMatcher.group(1));
-                int minutes = Integer.parseInt(anyMatcher.group(2));
-
-                // Basic validation
-                if (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
-                    return LocalTime.of(hours, minutes);
-                }
-            }
         } catch (Exception e) {
-            // Give up and return null
+            System.out.println("Error parsing time: " + timeStr);
+            return null;
         }
-
-        return null;
     }
 
     /**
-     * Format time to standard format (HH:MM)
-     *
-     * @param time LocalTime to format
-     * @return Formatted time string
+     * Format time to standard format (e.g., 5:00 PM)
      */
     public static String formatToStandardTime(LocalTime time) {
         if (time == null) {
             return "";
         }
-        return time.format(TIME_FORMAT);
+        return time.format(STANDARD_FORMAT);
     }
 
     /**
-     * Format time to 12-hour format (hh:mm AM/PM)
-     *
-     * @param time LocalTime to format
-     * @return Formatted time string
+     * Format time to military format (e.g., 17:00)
      */
-    public static String format12HourTime(LocalTime time) {
+    public static String formatToMilitaryTime(LocalTime time) {
         if (time == null) {
             return "";
         }
-        return time.format(STANDARD_TIME_FORMAT);
+        return time.format(MILITARY_FORMAT);
     }
 }

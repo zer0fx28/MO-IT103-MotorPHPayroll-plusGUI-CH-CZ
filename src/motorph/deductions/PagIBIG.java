@@ -2,15 +2,9 @@ package motorph.deductions;
 
 /**
  * Calculates Pag-IBIG Fund contributions based on salary range
- * This class handles the computation of monthly Pag-IBIG Fund contributions
- * based on the government-mandated rates:
- * - 1% for salaries between ₱1,000 to ₱1,500
- * - 2% for salaries over ₱1,500
- * - Minimum contribution: ₱100
- * - Maximum contribution: ₱100
  */
 public class PagIBIG {
-    // Contribution rates and thresholds
+    // Contribution rates
     private static final double RATE_LOWER = 0.01; // 1% for salaries from 1,000 to 1,500
     private static final double RATE_HIGHER = 0.02; // 2% for salaries over 1,500
     private static final double MIN_SALARY = 1000.0; // Minimum salary threshold
@@ -21,17 +15,11 @@ public class PagIBIG {
     /**
      * Calculate Pag-IBIG contribution based on monthly salary
      *
-     * @param monthlySalary Monthly basic salary (should be non-negative)
+     * @param monthlySalary Monthly basic salary
      * @return Pag-IBIG contribution amount (monthly)
      */
     public static double calculateContribution(double monthlySalary) {
-        // Validate input: salary can't be negative
-        if (monthlySalary < 0) {
-            System.out.println("Error: Negative salary provided. Using 0.0");
-            monthlySalary = 0.0;
-        }
-
-        // For debugging purposes
+        // Debug: Print the input salary
         System.out.println("Monthly Salary: " + monthlySalary);
 
         // If salary is below minimum threshold, no contribution
@@ -45,11 +33,11 @@ public class PagIBIG {
         if (monthlySalary <= MID_SALARY) {
             // 1% for salaries from 1,000 to 1,500
             contribution = monthlySalary * RATE_LOWER;
-            System.out.println("Salary <= 1,500. Contribution rate: 1%. Calculated: " + contribution);
+            System.out.println("Salary <= 1,500. Contribution: " + contribution);
         } else {
             // 2% for salaries over 1,500
             contribution = monthlySalary * RATE_HIGHER;
-            System.out.println("Salary > 1,500. Contribution rate: 2%. Calculated: " + contribution);
+            System.out.println("Salary > 1,500. Contribution: " + contribution);
         }
 
         // Ensure contribution is at least the minimum contribution amount
@@ -58,7 +46,7 @@ public class PagIBIG {
 
         // Cap at maximum contribution amount
         contribution = Math.min(contribution, MAX_CONTRIBUTION);
-        System.out.println("Final Contribution (after applying cap): " + contribution);
+        System.out.println("Final Contribution: " + contribution);
 
         return contribution;
     }

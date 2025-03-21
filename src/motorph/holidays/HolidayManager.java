@@ -11,88 +11,86 @@ import java.util.Map;
  * Manages holidays and calculates holiday pay
  */
 public class HolidayManager {
+    // List of all holidays
     private List<Holiday> regularHolidays;
     private List<Holiday> specialNonWorkingHolidays;
 
+    // Constructor
     public HolidayManager() {
         regularHolidays = new ArrayList<>();
         specialNonWorkingHolidays = new ArrayList<>();
 
+        // Set up 2024 holidays
         setup2024Holidays();
+
+        // Set up 2025 holidays
         setup2025Holidays();
     }
 
+    // Set up 2024 holidays
     private void setup2024Holidays() {
         // Regular Holidays 2024
-        addRegularHoliday("New Year's Day", 2024, 1, 1);
-        addRegularHoliday("Maundy Thursday", 2024, 3, 28);
-        addRegularHoliday("Good Friday", 2024, 3, 29);
-        addRegularHoliday("Araw ng Kagitingan", 2024, 4, 9);
-        addRegularHoliday("Eid'l Fitr", 2024, 4, 10);
-        addRegularHoliday("Labor Day", 2024, 5, 1);
-        addRegularHoliday("Independence Day", 2024, 6, 12);
-        addRegularHoliday("Eid'l Adha", 2024, 6, 17);
-        addRegularHoliday("National Heroes Day", 2024, 8, 26);
-        addRegularHoliday("Bonifacio Day", 2024, 11, 30);
-        addRegularHoliday("Christmas Day", 2024, 12, 25);
-        addRegularHoliday("Rizal Day", 2024, 12, 30);
+        regularHolidays.add(new Holiday("New Year's Day", LocalDate.of(2024, 1, 1)));
+        regularHolidays.add(new Holiday("Maundy Thursday", LocalDate.of(2024, 3, 28)));
+        regularHolidays.add(new Holiday("Good Friday", LocalDate.of(2024, 3, 29)));
+        regularHolidays.add(new Holiday("Araw ng Kagitingan", LocalDate.of(2024, 4, 9)));
+        regularHolidays.add(new Holiday("Eid'l Fitr", LocalDate.of(2024, 4, 10)));
+        regularHolidays.add(new Holiday("Labor Day", LocalDate.of(2024, 5, 1)));
+        regularHolidays.add(new Holiday("Independence Day", LocalDate.of(2024, 6, 12)));
+        regularHolidays.add(new Holiday("Eid'l Adha", LocalDate.of(2024, 6, 17)));
+        regularHolidays.add(new Holiday("National Heroes Day", LocalDate.of(2024, 8, 26)));
+        regularHolidays.add(new Holiday("Bonifacio Day", LocalDate.of(2024, 11, 30)));
+        regularHolidays.add(new Holiday("Christmas Day", LocalDate.of(2024, 12, 25)));
+        regularHolidays.add(new Holiday("Rizal Day", LocalDate.of(2024, 12, 30)));
 
         // Special Non-Working Holidays 2024
-        addSpecialNonWorkingHoliday("Additional Special Day", 2024, 2, 9);
-        addSpecialNonWorkingHoliday("Chinese New Year", 2024, 2, 10);
-        addSpecialNonWorkingHoliday("Black Saturday", 2024, 3, 30);
-        addSpecialNonWorkingHoliday("Ninoy Aquino Day", 2024, 8, 23);
-        addSpecialNonWorkingHoliday("All Saints' Day", 2024, 11, 1);
-        addSpecialNonWorkingHoliday("All Souls' Day", 2024, 11, 2);
-        addSpecialNonWorkingHoliday("Feast of Immaculate Conception", 2024, 12, 8);
-        addSpecialNonWorkingHoliday("Christmas Eve", 2024, 12, 24);
-        addSpecialNonWorkingHoliday("Last Day of the Year", 2024, 12, 31);
+        specialNonWorkingHolidays.add(new Holiday("Additional Special Day", LocalDate.of(2024, 2, 9)));
+        specialNonWorkingHolidays.add(new Holiday("Chinese New Year", LocalDate.of(2024, 2, 10)));
+        specialNonWorkingHolidays.add(new Holiday("Black Saturday", LocalDate.of(2024, 3, 30)));
+        specialNonWorkingHolidays.add(new Holiday("Ninoy Aquino Day", LocalDate.of(2024, 8, 23)));
+        specialNonWorkingHolidays.add(new Holiday("All Saints' Day", LocalDate.of(2024, 11, 1)));
+        specialNonWorkingHolidays.add(new Holiday("All Souls' Day", LocalDate.of(2024, 11, 2)));
+        specialNonWorkingHolidays.add(new Holiday("Feast of Immaculate Conception", LocalDate.of(2024, 12, 8)));
+        specialNonWorkingHolidays.add(new Holiday("Christmas Eve", LocalDate.of(2024, 12, 24)));
+        specialNonWorkingHolidays.add(new Holiday("Last Day of the Year", LocalDate.of(2024, 12, 31)));
     }
 
+    // Set up 2025 holidays
     private void setup2025Holidays() {
         // Regular Holidays 2025
-        addRegularHoliday("New Year's Day", 2025, 1, 1);
-        addRegularHoliday("Araw ng Kagitingan", 2025, 4, 9);
-        addRegularHoliday("Maundy Thursday", 2025, 4, 17);
-        addRegularHoliday("Good Friday", 2025, 4, 18);
-        addRegularHoliday("Labor Day", 2025, 5, 1);
-        addRegularHoliday("Independence Day", 2025, 6, 12);
-        addRegularHoliday("National Heroes Day", 2025, 8, 25);
-        addRegularHoliday("Bonifacio Day", 2025, 11, 30);
-        addRegularHoliday("Christmas Day", 2025, 12, 25);
-        addRegularHoliday("Rizal Day", 2025, 12, 30);
+        regularHolidays.add(new Holiday("New Year's Day", LocalDate.of(2025, 1, 1)));
+        regularHolidays.add(new Holiday("Araw ng Kagitingan", LocalDate.of(2025, 4, 9)));
+        regularHolidays.add(new Holiday("Maundy Thursday", LocalDate.of(2025, 4, 17)));
+        regularHolidays.add(new Holiday("Good Friday", LocalDate.of(2025, 4, 18)));
+        regularHolidays.add(new Holiday("Labor Day", LocalDate.of(2025, 5, 1)));
+        regularHolidays.add(new Holiday("Independence Day", LocalDate.of(2025, 6, 12)));
+        regularHolidays.add(new Holiday("National Heroes Day", LocalDate.of(2025, 8, 25)));
+        regularHolidays.add(new Holiday("Bonifacio Day", LocalDate.of(2025, 11, 30)));
+        regularHolidays.add(new Holiday("Christmas Day", LocalDate.of(2025, 12, 25)));
+        regularHolidays.add(new Holiday("Rizal Day", LocalDate.of(2025, 12, 30)));
 
         // Special Non-Working Holidays 2025
-        addSpecialNonWorkingHoliday("Chinese New Year", 2025, 1, 29);
-        addSpecialNonWorkingHoliday("Black Saturday", 2025, 4, 19);
-        addSpecialNonWorkingHoliday("Ninoy Aquino Day", 2025, 8, 21);
-        addSpecialNonWorkingHoliday("All Saints' Day Eve", 2025, 10, 31);
-        addSpecialNonWorkingHoliday("All Saints' Day", 2025, 11, 1);
-        addSpecialNonWorkingHoliday("Feast of Immaculate Conception", 2025, 12, 8);
-        addSpecialNonWorkingHoliday("Christmas Eve", 2025, 12, 24);
-        addSpecialNonWorkingHoliday("Last Day of the Year", 2025, 12, 31);
+        specialNonWorkingHolidays.add(new Holiday("Chinese New Year", LocalDate.of(2025, 1, 29)));
+        specialNonWorkingHolidays.add(new Holiday("Black Saturday", LocalDate.of(2025, 4, 19)));
+        specialNonWorkingHolidays.add(new Holiday("Ninoy Aquino Day", LocalDate.of(2025, 8, 21)));
+        specialNonWorkingHolidays.add(new Holiday("All Saints' Day Eve", LocalDate.of(2025, 10, 31)));
+        specialNonWorkingHolidays.add(new Holiday("All Saints' Day", LocalDate.of(2025, 11, 1)));
+        specialNonWorkingHolidays.add(new Holiday("Feast of Immaculate Conception", LocalDate.of(2025, 12, 8)));
+        specialNonWorkingHolidays.add(new Holiday("Christmas Eve", LocalDate.of(2025, 12, 24)));
+        specialNonWorkingHolidays.add(new Holiday("Last Day of the Year", LocalDate.of(2025, 12, 31)));
     }
 
-    private void addRegularHoliday(String name, int year, int month, int day) {
-        regularHolidays.add(new Holiday(name, LocalDate.of(year, month, day)));
-    }
-
-    private void addSpecialNonWorkingHoliday(String name, int year, int month, int day) {
-        specialNonWorkingHolidays.add(new Holiday(name, LocalDate.of(year, month, day)));
-    }
-
+    /**
+     * Check if a date is a holiday
+     */
     public boolean isHoliday(LocalDate date) {
-        if (date == null) {
-            return false;
-        }
         return isRegularHoliday(date) || isSpecialNonWorkingHoliday(date);
     }
 
+    /**
+     * Check if a date is a regular holiday
+     */
     public boolean isRegularHoliday(LocalDate date) {
-        if (date == null) {
-            return false;
-        }
-
         for (Holiday holiday : regularHolidays) {
             if (holiday.getDate().equals(date)) {
                 return true;
@@ -101,11 +99,10 @@ public class HolidayManager {
         return false;
     }
 
+    /**
+     * Check if a date is a special non-working holiday
+     */
     public boolean isSpecialNonWorkingHoliday(LocalDate date) {
-        if (date == null) {
-            return false;
-        }
-
         for (Holiday holiday : specialNonWorkingHolidays) {
             if (holiday.getDate().equals(date)) {
                 return true;
@@ -114,11 +111,10 @@ public class HolidayManager {
         return false;
     }
 
+    /**
+     * Get holiday name if it's a holiday
+     */
     public String getHolidayName(LocalDate date) {
-        if (date == null) {
-            return null;
-        }
-
         for (Holiday holiday : regularHolidays) {
             if (holiday.getDate().equals(date)) {
                 return holiday.getName() + " (Regular Holiday)";
@@ -134,88 +130,94 @@ public class HolidayManager {
         return null;
     }
 
+    /**
+     * Calculate holiday pay for working on a holiday
+     *
+     * @param basePay The employee's base pay for that day
+     * @param hoursWorked Number of hours worked
+     * @param isRegularHoliday Whether it's a regular holiday
+     * @param isRestDay Whether it's the employee's rest day
+     * @param overtimeHours Number of overtime hours worked
+     * @param isLate Whether the employee was late
+     * @return The holiday pay amount
+     */
     public double calculateHolidayPay(double basePay, double hoursWorked,
                                       boolean isRegularHoliday, boolean isRestDay,
                                       double overtimeHours, boolean isLate) {
-        if (basePay < 0) {
-            basePay = 0.0;
-        }
-
-        if (hoursWorked < 0) {
-            hoursWorked = 0.0;
-        }
-
-        if (overtimeHours < 0) {
-            overtimeHours = 0.0;
-        }
-
         double holidayPay = 0.0;
 
         if (isRegularHoliday) {
+            // Regular holiday pay calculation
             if (hoursWorked == 0) {
+                // Non-working employees get 100% of base pay
                 holidayPay = basePay;
             } else {
+                // First 8 hours: 200% of basic wage
                 double regularHours = Math.min(hoursWorked, 8.0);
                 holidayPay = regularHours * (basePay / 8) * 2;
 
+                // Overtime hours: additional 30% + 25% for non-late employees
                 if (overtimeHours > 0 && !isLate) {
                     double hourlyRate = basePay / 8;
-                    double overtimeRate = hourlyRate * 2 * 1.3;
+                    double overtimeRate = hourlyRate * 1.3; // 30% additional
 
                     if (!isLate) {
-                        overtimeRate *= 1.25;
+                        overtimeRate *= 1.25; // Additional 25% for non-late
                     }
 
                     holidayPay += overtimeHours * overtimeRate;
                 }
 
+                // If holiday falls on rest day: additional 30%
                 if (isRestDay) {
-                    holidayPay *= 1.3;
+                    holidayPay *= 1.3; // Additional 30%
                 }
             }
         } else {
+            // Special non-working holiday pay calculation
             if (hoursWorked == 0) {
+                // No extra pay for non-working employees
                 holidayPay = 0;
             } else {
+                // First 8 hours: additional 30% of basic wage
                 double regularHours = Math.min(hoursWorked, 8.0);
                 holidayPay = regularHours * (basePay / 8) * 1.3;
 
+                // Overtime: 30% holiday + 25% overtime for non-late
                 if (overtimeHours > 0 && !isLate) {
                     double hourlyRate = basePay / 8;
-                    double overtimeRate = hourlyRate * 1.3;
+                    double overtimeRate = hourlyRate * 1.3; // 30% holiday premium
 
                     if (!isLate) {
-                        overtimeRate *= 1.25;
+                        overtimeRate *= 1.25; // Additional 25% for non-late
                     }
 
                     holidayPay += overtimeHours * overtimeRate;
-                }
-
-                if (isRestDay) {
-                    holidayPay *= 1.3;
                 }
             }
         }
 
         return holidayPay;
     }
+}
 
-    public Map<LocalDate, String> getHolidaysInRange(LocalDate startDate, LocalDate endDate) {
-        Map<LocalDate, String> holidaysInRange = new HashMap<>();
+/**
+ * Simple class to store holiday information
+ */
+class Holiday {
+    private String name;
+    private LocalDate date;
 
-        if (startDate == null || endDate == null || endDate.isBefore(startDate)) {
-            return holidaysInRange;
-        }
+    public Holiday(String name, LocalDate date) {
+        this.name = name;
+        this.date = date;
+    }
 
-        LocalDate currentDate = startDate;
-        while (!currentDate.isAfter(endDate)) {
-            String holidayName = getHolidayName(currentDate);
-            if (holidayName != null) {
-                holidaysInRange.put(currentDate, holidayName);
-            }
-            currentDate = currentDate.plusDays(1);
-        }
+    public String getName() {
+        return name;
+    }
 
-        return holidaysInRange;
+    public LocalDate getDate() {
+        return date;
     }
 }

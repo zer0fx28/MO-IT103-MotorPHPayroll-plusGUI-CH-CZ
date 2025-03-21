@@ -3,7 +3,6 @@ package motorph.ui;
 
 import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
-import motorph.exceptions.ValidationException;
 import motorph.hours.AttendanceReader;
 import motorph.output.PayrollOutputManager;
 import motorph.process.PayrollDateManager;
@@ -16,10 +15,6 @@ import java.util.Scanner;
 
 /**
  * Handles user interface for payroll processing
- *
- * This class provides a text-based user interface for the payroll system,
- * handling user interactions and delegating operations to the appropriate
- * components.
  */
 public class PayrollUI {
     private final Scanner scanner;
@@ -31,12 +26,6 @@ public class PayrollUI {
 
     /**
      * Create the payroll UI
-     *
-     * @param employeeDataReader EmployeeDataReader for employee data
-     * @param attendanceReader AttendanceReader for attendance data
-     * @param payrollProcessor PayrollProcessor for calculations
-     * @param outputManager PayrollOutputManager for display
-     * @param scanner Scanner for user input
      */
     public PayrollUI(EmployeeDataReader employeeDataReader,
                      AttendanceReader attendanceReader,
@@ -59,9 +48,8 @@ public class PayrollUI {
         System.out.println("1. Process Payroll");
         System.out.println("2. Find Employee");
         System.out.println("3. View Payroll Dates");
-        System.out.println("4. View Employee Details");
-        System.out.println("5. Exit");
-        System.out.print("Enter choice (1-5): ");
+        System.out.println("4. Exit");
+        System.out.print("Enter choice (1-4): ");
     }
 
     /**
@@ -86,7 +74,12 @@ public class PayrollUI {
         LocalDate endDate = cutoffDates[1];
 
         // Display payroll info
-        displayPayrollInfo(year, month, payrollType, payrollDate, startDate, endDate);
+        System.out.println("\nPayroll Information:");
+        System.out.println("Year: " + year);
+        System.out.println("Month: " + PayrollDateManager.getMonthName(month));
+        System.out.println("Payroll Type: " + (payrollType == PayrollDateManager.MID_MONTH ? "Mid-month" : "End-month"));
+        System.out.println("Payroll Date: " + PayrollDateManager.formatDate(payrollDate));
+        System.out.println("Cutoff Period: " + PayrollDateManager.getFormattedDateRange(startDate, endDate));
 
         // Get employee to process
         System.out.print("\nEnter Employee Full Name or ID: ");
@@ -96,7 +89,7 @@ public class PayrollUI {
             return;
         }
 
-        // Get attendance summary
+        // Get attendance summary - Fixed: Added payrollType parameter
         Map<String, Object> attendanceSummary = outputManager.displayPayrollSummary(
                 employee, startDate, endDate, payrollType);
 
@@ -111,45 +104,6 @@ public class PayrollUI {
             return;
         }
 
-        // Process payroll
-        try {
-            processEmployeePayroll(employee, attendanceSummary, payrollType, startDate, endDate,
-                    year, month, payrollDate);
-        } catch (ValidationException e) {
-            System.out.println("Error processing payroll: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Display payroll information
-     */
-    private void displayPayrollInfo(int year, int month, int payrollType,
-                                    LocalDate payrollDate, LocalDate startDate, LocalDate endDate) {
-        System.out.println("\nPayroll Information:");
-        System.out.println("Year: " + year);
-        System.out.println("Month: " + PayrollDateManager.getMonthName(month));
-        System.out.println("Payroll Type: " + (payrollType == PayrollDateManager.MID_MONTH ? "Mid-month" : "End-month"));
-        System.out.println("Payroll Date: " + PayrollDateManager.formatDate(payrollDate));
-        System.out.println("Cutoff Period: " + PayrollDateManager.getFormattedDateRange(startDate, endDate));
-    }
-
-    /**
-     * Process payroll for an employee
-     *
-     * @param employee Employee object
-     * @param attendanceSummary Attendance summary data
-     * @param payrollType Pay period type
-     * @param startDate Start date
-     * @param endDate End date
-     * @param year Year
-     * @param month Month
-     * @param payrollDate Payroll date
-     * @throws ValidationException If validation fails
-     */
-    private void processEmployeePayroll(Employee employee, Map<String, Object> attendanceSummary,
-                                        int payrollType, LocalDate startDate, LocalDate endDate,
-                                        int year, int month, LocalDate payrollDate)
-            throws ValidationException {
         System.out.println("\nCalculating salary...");
 
         // Extract attendance data
@@ -158,16 +112,11 @@ public class PayrollUI {
         double lateMinutes = (double) attendanceSummary.get("lateMinutes");
         double undertimeMinutes = (double) attendanceSummary.get("undertimeMinutes");
         boolean isLateAnyDay = (boolean) attendanceSummary.get("isLateAnyDay");
-        boolean hasUnpaidAbsences = false;
 
-        if (attendanceSummary.containsKey("hasUnpaidAbsences")) {
-            hasUnpaidAbsences = (boolean) attendanceSummary.get("hasUnpaidAbsences");
-        }
-
-        // Process payroll with proper exception handling
+        // Process payroll
         payrollProcessor.processPayrollForPeriod(
                 employee, totalHours, overtimeHours, lateMinutes, undertimeMinutes,
-                isLateAnyDay, payrollType, startDate, endDate, year, month, hasUnpaidAbsences
+                isLateAnyDay, payrollType, startDate, endDate, year, month
         );
 
         // Display results
@@ -202,7 +151,6 @@ public class PayrollUI {
 
         // Display information
         System.out.println("\nPayroll Dates for " + PayrollDateManager.getMonthName(month) + " " + year);
-
         System.out.println("\nMid-month:");
         System.out.println("  Payroll Date: " + PayrollDateManager.formatDate(midMonth));
         System.out.println("  Cutoff Period: " + PayrollDateManager.getFormattedDateRange(midCutoff[0], midCutoff[1]));
@@ -214,13 +162,12 @@ public class PayrollUI {
         System.out.println("  Deductions: Withholding Tax");
 
         // Wait for user
-        waitForEnter();
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     /**
      * Find an employee by name or ID
-     *
-     * @return Employee object if found, null otherwise
      */
     public Employee findEmployee() {
         String searchTerm = scanner.nextLine().trim();
@@ -233,35 +180,14 @@ public class PayrollUI {
         Employee employee = employeeDataReader.findEmployee(searchTerm);
 
         if (employee == null) {
-            // The employeeDataReader will already print a message about not finding the employee
-            waitForEnter();
-        } else {
-            // Display employee details
-            displayEmployeeBasicInfo(employee);
+            System.out.println("Employee not found. Please try again.");
         }
 
         return employee;
     }
 
     /**
-     * Display basic employee information
-     *
-     * @param employee The employee to display information for
-     */
-    private void displayEmployeeBasicInfo(Employee employee) {
-        System.out.println("\n--- EMPLOYEE INFORMATION ---");
-        System.out.println("Employee ID: " + employee.getEmployeeId());
-        System.out.println("Name: " + employee.getFullName());
-        System.out.println("Position: " + employee.getPosition());
-        System.out.println("Status: " + employee.getStatus());
-        waitForEnter();
-    }
-
-    /**
      * Get confirmation from user
-     *
-     * @param message Confirmation message to display
-     * @return true if confirmed, false otherwise
      */
     private boolean getConfirmation(String message) {
         System.out.print(message);
@@ -271,23 +197,11 @@ public class PayrollUI {
 
     /**
      * Get the current year or let user enter a year
-     *
-     * @return Selected year
      */
     private int getCurrentYear() {
         System.out.print("Enter Year (YYYY): ");
         try {
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty()) {
-                return LocalDate.now().getYear();
-            }
-
-            int year = Integer.parseInt(input);
-            if (year < 2000 || year > 2100) {
-                System.out.println("Year must be between 2000 and 2100. Using current year.");
-                return LocalDate.now().getYear();
-            }
-            return year;
+            return Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
             System.out.println("Invalid year. Using current year.");
             return LocalDate.now().getYear();
@@ -296,21 +210,13 @@ public class PayrollUI {
 
     /**
      * Get the current month or let user enter a month
-     *
-     * @return Selected month (1-12)
      */
     private int getCurrentMonth() {
         System.out.print("Enter Month (1-12): ");
         try {
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty()) {
-                return LocalDate.now().getMonthValue();
-            }
-
-            int month = Integer.parseInt(input);
+            int month = Integer.parseInt(scanner.nextLine().trim());
             if (month < 1 || month > 12) {
-                System.out.println("Month must be between 1 and 12. Using current month.");
-                return LocalDate.now().getMonthValue();
+                throw new NumberFormatException();
             }
             return month;
         } catch (NumberFormatException e) {
@@ -321,8 +227,6 @@ public class PayrollUI {
 
     /**
      * Get payroll type from user
-     *
-     * @return PayrollDateManager.MID_MONTH or PayrollDateManager.END_MONTH
      */
     private int getPayrollType() {
         System.out.println("\nSelect payroll type:");
@@ -331,83 +235,14 @@ public class PayrollUI {
         System.out.print("Enter choice (1-2): ");
 
         try {
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty()) {
-                System.out.println("No choice entered. Using Mid-month.");
-                return PayrollDateManager.MID_MONTH;
+            int choice = Integer.parseInt(scanner.nextLine().trim());
+            if (choice < 1 || choice > 2) {
+                throw new NumberFormatException();
             }
-
-            int choice = Integer.parseInt(input);
-            if (choice == 1) {
-                return PayrollDateManager.MID_MONTH;
-            } else if (choice == 2) {
-                return PayrollDateManager.END_MONTH;
-            } else {
-                System.out.println("Invalid choice. Using Mid-month.");
-                return PayrollDateManager.MID_MONTH;
-            }
+            return choice;
         } catch (NumberFormatException e) {
             System.out.println("Invalid choice. Using Mid-month.");
             return PayrollDateManager.MID_MONTH;
         }
-    }
-
-    /**
-     * Wait for user to press Enter
-     */
-    private void waitForEnter() {
-        System.out.print("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
-
-    /**
-     * View detailed employee information
-     * Provides comprehensive view of all employee data from the CSV
-     */
-    public void viewEmployeeDetails() {
-        System.out.println("\n===== EMPLOYEE DETAILS VIEWER =====");
-        System.out.print("Enter Employee ID or Name: ");
-        Employee employee = findEmployee();
-
-        if (employee == null) {
-            System.out.println("No employee found or selected.");
-            return;
-        }
-
-        // Display comprehensive employee information
-        System.out.println("\n========================================");
-        System.out.println("         COMPLETE EMPLOYEE DETAILS      ");
-        System.out.println("========================================");
-        System.out.println("PERSONAL INFORMATION:");
-        System.out.println("ID: " + employee.getEmployeeId());
-        System.out.println("Name: " + employee.getFullName());
-        System.out.println("Birthday: " + employee.getBirthday());
-        System.out.println("Address: " + employee.getAddress());
-        System.out.println("Phone: " + employee.getPhoneNumber());
-
-        System.out.println("\nEMPLOYMENT INFORMATION:");
-        System.out.println("Position: " + employee.getPosition());
-        System.out.println("Status: " + employee.getStatus());
-        System.out.println("Immediate Supervisor: " + employee.getImmediateSupervisor());
-
-        System.out.println("\nGOVERNMENT IDs:");
-        System.out.println("SSS Number: " + employee.getSssNo());
-        System.out.println("PhilHealth Number: " + employee.getPhilhealthNo());
-        System.out.println("Pag-IBIG Number: " + employee.getPagibigNo());
-        System.out.println("TIN: " + employee.getTinNo());
-
-        System.out.println("\nSALARY INFORMATION:");
-        System.out.println("Basic Salary: ₱" + String.format("%,.2f", employee.getBasicSalary()) + "/month");
-        System.out.println("Semi-Monthly Rate: ₱" + String.format("%,.2f", employee.getGrossSemiMonthlyRate()));
-        System.out.println("Hourly Rate: ₱" + String.format("%.2f", employee.getHourlyRate()) + "/hour");
-
-        System.out.println("\nBENEFITS:");
-        System.out.println("Rice Subsidy: ₱" + String.format("%,.2f", employee.getRiceSubsidy()) + "/month");
-        System.out.println("Phone Allowance: ₱" + String.format("%,.2f", employee.getPhoneAllowance()) + "/month");
-        System.out.println("Clothing Allowance: ₱" + String.format("%,.2f", employee.getClothingAllowance()) + "/month");
-        System.out.println("Total Benefits: ₱" + String.format("%,.2f", employee.getTotalBenefits()) + "/month");
-        System.out.println("========================================");
-
-        waitForEnter();
     }
 }

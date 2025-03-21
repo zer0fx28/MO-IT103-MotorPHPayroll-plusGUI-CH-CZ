@@ -11,9 +11,6 @@ import java.util.*;
 
 /**
  * Reads and processes attendance data from CSV file
- *
- * This class handles loading attendance records from a CSV file, calculating
- * hours worked and overtime, and generating attendance summaries for employees.
  */
 public class AttendanceReader {
     private final String attendanceFilePath;
@@ -23,8 +20,6 @@ public class AttendanceReader {
 
     /**
      * Load attendance data from CSV file
-     *
-     * @param attendanceFilePath Path to the attendance CSV file
      */
     public AttendanceReader(String attendanceFilePath) {
         this.attendanceFilePath = attendanceFilePath;
@@ -37,24 +32,15 @@ public class AttendanceReader {
      * Read attendance data from file
      */
     private void loadAttendance() {
-        if (attendanceFilePath == null || attendanceFilePath.trim().isEmpty()) {
-            System.out.println("Error: Attendance file path is null or empty");
-            return;
-        }
-
         List<String[]> attendanceData = new ArrayList<>();
         try {
             attendanceData = CSVReader.read(attendanceFilePath);
-            System.out.println("Successfully read " + attendanceData.size() + " attendance records");
         } catch (Exception e) {
             System.out.println("Error reading attendance file: " + e.getMessage());
             return;
         }
 
         // Process each row into an attendance record
-        int recordCount = 0;
-        int skippedRecords = 0;
-
         for (String[] row : attendanceData) {
             if (row.length >= 6) {  // Make sure we have all needed columns
                 try {
@@ -62,20 +48,6 @@ public class AttendanceReader {
                     LocalDate date = LocalDate.parse(row[3], DATE_FORMAT);
                     LocalTime timeIn = TimeConverter.parseUserTime(row[4]);
                     LocalTime timeOut = TimeConverter.parseUserTime(row[5]);
-
-                    // Skip records with null times (likely invalid)
-                    if (timeIn == null || timeOut == null) {
-                        skippedRecords++;
-                        continue;
-                    }
-
-                    // Skip records where timeout is before timein (likely error)
-                    if (timeOut.isBefore(timeIn)) {
-                        System.out.println("Warning: Time out before time in for employee " +
-                                row[0] + " on " + row[3] + ". Skipping record.");
-                        skippedRecords++;
-                        continue;
-                    }
 
                     // Create attendance record
                     AttendanceRecord record = new AttendanceRecord();
@@ -87,33 +59,17 @@ public class AttendanceReader {
                     record.setTimeOut(timeOut);
 
                     attendanceRecords.add(record);
-                    recordCount++;
                 } catch (Exception e) {
-                    System.out.println("Error processing attendance record: " + e.getMessage());
-                    skippedRecords++;
+                    // Skip bad records
                 }
-            } else {
-                System.out.println("Warning: Incomplete attendance record - expected 6 fields, got " + row.length);
-                skippedRecords++;
             }
         }
-
-        System.out.println("Processed " + recordCount + " attendance records successfully");
-        System.out.println("Skipped " + skippedRecords + " invalid records");
     }
 
     /**
      * Get all attendance records for one employee
-     *
-     * @param employeeId ID of the employee
-     * @return List of attendance records for the employee
      */
     public List<AttendanceRecord> getRecordsForEmployee(String employeeId) {
-        if (employeeId == null || employeeId.trim().isEmpty()) {
-            System.out.println("Warning: Empty employee ID provided");
-            return new ArrayList<>();
-        }
-
         List<AttendanceRecord> employeeRecords = new ArrayList<>();
 
         for (AttendanceRecord record : attendanceRecords) {
@@ -122,39 +78,14 @@ public class AttendanceReader {
             }
         }
 
-        if (employeeRecords.isEmpty()) {
-            System.out.println("No attendance records found for employee ID: " + employeeId);
-        }
-
         return employeeRecords;
     }
 
     /**
      * Get daily attendance for an employee within date range
-     *
-     * @param employeeId Employee ID
-     * @param startDate Start date of the range
-     * @param endDate End date of the range
-     * @return Map of dates to attendance data
      */
     public Map<LocalDate, Map<String, Object>> getDailyAttendanceForEmployee(
             String employeeId, LocalDate startDate, LocalDate endDate) {
-
-        // Input validation
-        if (employeeId == null || employeeId.trim().isEmpty()) {
-            System.out.println("Warning: Empty employee ID provided");
-            return new HashMap<>();
-        }
-
-        if (startDate == null || endDate == null) {
-            System.out.println("Warning: Invalid date range provided");
-            return new HashMap<>();
-        }
-
-        if (endDate.isBefore(startDate)) {
-            System.out.println("Warning: End date is before start date");
-            return new HashMap<>();
-        }
 
         // Get all records for this employee
         List<AttendanceRecord> employeeRecords = getRecordsForEmployee(employeeId);
@@ -210,11 +141,6 @@ public class AttendanceReader {
 
     /**
      * Get weekly attendance summary for an employee
-     *
-     * @param employeeId Employee ID
-     * @param startDate Start date of the range
-     * @param endDate End date of the range
-     * @return Map of week labels to attendance summaries
      */
     public Map<String, Map<String, Double>> getWeeklyAttendanceForEmployee(
             String employeeId, LocalDate startDate, LocalDate endDate) {
@@ -231,30 +157,9 @@ public class AttendanceReader {
 
     /**
      * Get weekly attendance with daily logs for an employee
-     *
-     * @param employeeId Employee ID
-     * @param startDate Start date of the range
-     * @param endDate End date of the range
-     * @return Map containing weekly records and daily logs
      */
     public Map<String, Object> getWeeklyAttendanceWithDailyLogs(
             String employeeId, LocalDate startDate, LocalDate endDate) {
-
-        // Input validation
-        if (employeeId == null || employeeId.trim().isEmpty()) {
-            System.out.println("Warning: Empty employee ID provided");
-            return new HashMap<>();
-        }
-
-        if (startDate == null || endDate == null) {
-            System.out.println("Warning: Invalid date range provided");
-            return new HashMap<>();
-        }
-
-        if (endDate.isBefore(startDate)) {
-            System.out.println("Warning: End date is before start date");
-            return new HashMap<>();
-        }
 
         // Get daily attendance records
         Map<LocalDate, Map<String, Object>> dailyAttendance =
@@ -295,15 +200,6 @@ public class AttendanceReader {
             weekData.put("undertimeMinutes", weekData.getOrDefault("undertimeMinutes", 0.0) + undertimeMinutes);
             weekData.put("overtimeHours", weekData.getOrDefault("overtimeHours", 0.0) + overtimeHours);
 
-            // Check for late and undertime flags
-            if ((boolean) dayData.get("isLate")) {
-                weekData.put("isLateCount", weekData.getOrDefault("isLateCount", 0.0) + 1.0);
-            }
-
-            if ((boolean) dayData.get("isUndertime")) {
-                weekData.put("isUndertimeCount", weekData.getOrDefault("isUndertimeCount", 0.0) + 1.0);
-            }
-
             // Create a copy of the day data with the date included
             Map<String, Object> dayLog = new HashMap<>(dayData);
             dayLog.put("date", date);
@@ -324,21 +220,13 @@ public class AttendanceReader {
 
     /**
      * Format date as MM/dd for display
-     *
-     * @param date Date to format
-     * @return Formatted date string
      */
     private String formatShortDate(LocalDate date) {
-        if (date == null) {
-            return "";
-        }
         return (date.getMonthValue() + "/" + date.getDayOfMonth());
     }
 
     /**
      * Calculate total hours per employee
-     *
-     * @return Map of employee IDs to total hours worked
      */
     public Map<String, Double> calculateTotalHoursPerEmployee() {
         Map<String, Double> hoursPerEmployee = new HashMap<>();
@@ -363,8 +251,6 @@ public class AttendanceReader {
 
     /**
      * Calculate overtime details for all employees
-     *
-     * @return Map of employee IDs to overtime information
      */
     public Map<String, OvertimeInfo> calculateOvertimeDetails() {
         Map<String, OvertimeInfo> overtimeDetails = new HashMap<>();

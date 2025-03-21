@@ -3,8 +3,6 @@ package motorph.employee;
 
 /**
  * Stores all employee information
- * This class represents an employee in the MotorPH system and contains
- * all relevant personal, employment, and salary information.
  */
 public class Employee {
     // Employee basic details
@@ -32,15 +30,8 @@ public class Employee {
 
     /**
      * Create employee from CSV data
-     *
-     * @param data Array of CSV data values (must contain at least basic employee information)
      */
     public Employee(String[] data) {
-        // Validate input
-        if (data == null) {
-            throw new IllegalArgumentException("Employee data array cannot be null");
-        }
-
         // Check if we have enough data
         if (data.length >= 19) {
             this.employeeId = data[0].trim();
@@ -74,10 +65,7 @@ public class Employee {
     }
 
     /**
-     * Convert string to number, handling currency symbols and formatting
-     *
-     * @param value String value to parse
-     * @return Parsed double value, or 0.0 if parsing fails
+     * Convert string to number
      */
     private double parseDouble(String value) {
         if (value == null || value.trim().isEmpty()) {
@@ -106,25 +94,20 @@ public class Employee {
         }
     }
 
-    // Getters for employee information
+    // Getters
     public String getEmployeeId() { return employeeId; }
     public String getLastName() { return lastName; }
     public String getFirstName() { return firstName; }
     public String getFullName() { return firstName + " " + lastName; }
-    public String getBirthday() { return birthday; }
-    public String getAddress() { return address; }
-    public String getPhoneNumber() { return phoneNumber; }
+
     public String getPosition() { return position; }
     public String getStatus() { return status; }
-    public String getImmediateSupervisor() { return immediateSupervisor; }
-
-    // Getters for government ID numbers
     public String getSssNo() { return sssNo; }
     public String getPhilhealthNo() { return philhealthNo; }
     public String getTinNo() { return tinNo; }
     public String getPagibigNo() { return pagibigNo; }
 
-    // Getters for salary information
+    // Salary getters
     public double getBasicSalary() { return basicSalary; }
     public double getHourlyRate() {
         // Calculate hourly rate if not provided
@@ -134,49 +117,29 @@ public class Employee {
         return hourlyRate;
     }
 
-    // Getters for benefits
+    // Benefits getters
     public double getRiceSubsidy() { return riceSubsidy; }
     public double getPhoneAllowance() { return phoneAllowance; }
     public double getClothingAllowance() { return clothingAllowance; }
-    public double getGrossSemiMonthlyRate() { return grossSemiMonthlyRate; }
-
-    /**
-     * Calculate total monthly benefits
-     *
-     * @return Sum of all monthly benefits
-     */
     public double getTotalBenefits() {
         return riceSubsidy + phoneAllowance + clothingAllowance;
     }
 
-    /**
-     * Convert employee to string for display
-     *
-     * @return Formatted string with employee details
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Employee ID: ").append(employeeId).append("\n");
         sb.append("Name: ").append(firstName).append(" ").append(lastName).append("\n");
-        sb.append("Birthday: ").append(birthday).append("\n");
-        sb.append("Address: ").append(address).append("\n");
-        sb.append("Phone: ").append(phoneNumber).append("\n");
         sb.append("Position: ").append(position).append("\n");
         sb.append("Status: ").append(status).append("\n");
-        sb.append("Supervisor: ").append(immediateSupervisor).append("\n");
-
         sb.append("\nSalary Information:\n");
-        sb.append("  Basic Salary: ₱").append(String.format("%,.2f", basicSalary)).append("/month\n");
-        sb.append("  Semi-Monthly Rate: ₱").append(String.format("%,.2f", grossSemiMonthlyRate)).append("\n");
-        sb.append("  Hourly Rate: ₱").append(String.format("%.2f", hourlyRate)).append("/hour\n");
-
-        sb.append("\nGovernment IDs:\n");
+        sb.append("  Basic Salary: ₱").append(String.format("%,.2f", basicSalary)).append("\n");
+        sb.append("  Hourly Rate: ₱").append(String.format("%.2f", hourlyRate)).append("\n");
+        sb.append("\nID Numbers:\n");
         sb.append("  SSS: ").append(sssNo).append("\n");
         sb.append("  PhilHealth: ").append(philhealthNo).append("\n");
         sb.append("  Pag-IBIG: ").append(pagibigNo).append("\n");
         sb.append("  TIN: ").append(tinNo).append("\n");
-
         sb.append("\nMonthly Benefits:\n");
         sb.append("  Rice Subsidy: ₱").append(String.format("%,.2f", riceSubsidy)).append("\n");
         sb.append("  Phone Allowance: ₱").append(String.format("%,.2f", phoneAllowance)).append("\n");

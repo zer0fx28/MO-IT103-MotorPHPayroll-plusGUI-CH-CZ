@@ -15,9 +15,6 @@ import java.util.Scanner;
 
 /**
  * Handles display of payroll information
- *
- * This class is responsible for presenting payroll data to the user,
- * including menus, employee details, attendance records, and salary information.
  */
 public class PayrollOutputManager {
     private final Scanner scanner;
@@ -27,10 +24,6 @@ public class PayrollOutputManager {
 
     /**
      * Create a new output manager
-     *
-     * @param scanner Scanner for user input
-     * @param attendanceReader AttendanceReader for attendance data
-     * @param payrollProcessor PayrollProcessor for salary calculations
      */
     public PayrollOutputManager(Scanner scanner, AttendanceReader attendanceReader, PayrollProcessor payrollProcessor) {
         this.scanner = scanner;
@@ -53,12 +46,9 @@ public class PayrollOutputManager {
 
     /**
      * Display employee details
-     *
-     * @param employee Employee to display details for
      */
     public void displayEmployeeDetails(Employee employee) {
         if (employee == null) {
-            System.out.println("Error: Cannot display details for null employee");
             return;
         }
 
@@ -81,16 +71,9 @@ public class PayrollOutputManager {
 
     /**
      * Display payroll summary
-     *
-     * @param employee Employee to display summary for
-     * @param startDate Start date of pay period
-     * @param endDate End date of pay period
-     * @param payPeriodType Type of pay period (mid-month or end-month)
-     * @return Map with attendance summary data, or null if no records found
      */
     public Map<String, Object> displayPayrollSummary(Employee employee, LocalDate startDate, LocalDate endDate, int payPeriodType) {
         if (employee == null) {
-            System.out.println("Error: Cannot display payroll summary for null employee");
             return null;
         }
 
@@ -108,12 +91,8 @@ public class PayrollOutputManager {
             return null;
         }
 
-        // Use the improved formatter to display attendance
-        AttendanceDisplayFormatter.displayAttendanceReport(dailyAttendance);
-
-        // Calculate totals from the displayed data
+        // Calculate totals
         double totalHours = 0;
-        double totalActualHours = 0;
         double totalOvertimeHours = 0;
         double totalLateMinutes = 0;
         double totalUndertimeMinutes = 0;
@@ -121,29 +100,38 @@ public class PayrollOutputManager {
         boolean hasUnpaidAbsences = false;
         int unpaidAbsenceCount = 0;
 
+        // Display daily breakdown
+        System.out.println("\n--- ATTENDANCE DETAILS ---");
+        System.out.printf("%-12s %-10s %-10s %-10s %-10s %-10s %-15s\n",
+                "Date", "Time In", "Time Out", "Hours", "OT Hours", "Late", "Absence Type");
+        System.out.println("--------------------------------------------------------------------------------");
+
         for (Map.Entry<LocalDate, Map<String, Object>> entry : dailyAttendance.entrySet()) {
+            LocalDate date = entry.getKey();
             Map<String, Object> dayData = entry.getValue();
 
-            double hours = (double) dayData.getOrDefault("hours", 0.0);
-            double overtimeHours = (double) dayData.getOrDefault("overtimeHours", 0.0);
-            double lateMinutes = (double) dayData.getOrDefault("lateMinutes", 0.0);
+            String timeIn = (String) dayData.get("timeIn");
+            String timeOut = (String) dayData.get("timeOut");
+            double hours = (double) dayData.get("hours");
+            double overtimeHours = (double) dayData.get("overtimeHours");
+            double lateMinutes = (double) dayData.get("lateMinutes");
             double undertimeMinutes = (double) dayData.getOrDefault("undertimeMinutes", 0.0);
-            boolean isLate = (boolean) dayData.getOrDefault("isLate", false);
+            boolean isLate = (boolean) dayData.get("isLate");
             String absenceType = (String) dayData.getOrDefault("absenceType", "");
+            boolean isUnpaidAbsence = false;
 
-            // Calculate actual hours after deducting late and undertime
-            double lateHoursDeduction = lateMinutes / 60.0;
-            double undertimeHoursDeduction = undertimeMinutes / 60.0;
-            double actualHours = Math.max(0, hours - lateHoursDeduction - undertimeHoursDeduction);
-
-            // For late employees, no overtime
-            if (isLate) {
-                overtimeHours = 0;
+            if (dayData.containsKey("isUnpaidAbsence")) {
+                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
+            } else if (absenceType != null && !absenceType.isEmpty()) {
+                // For backward compatibility when there's no isUnpaidAbsence field
+                String type = absenceType.toLowerCase();
+                isUnpaidAbsence = type.contains("unpaid") ||
+                        type.contains("unauthoriz") ||
+                        type.contains("unapproved");
             }
 
             // Update totals
             totalHours += hours;
-            totalActualHours += actualHours;
             totalOvertimeHours += overtimeHours;
             totalLateMinutes += lateMinutes;
             totalUndertimeMinutes += undertimeMinutes;
@@ -152,28 +140,26 @@ public class PayrollOutputManager {
                 isLateAnyDay = true;
             }
 
-            // Check for unpaid absences
-            boolean isUnpaidAbsence = false;
-            if (dayData.containsKey("isUnpaidAbsence")) {
-                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
-            } else if (absenceType != null && !absenceType.isEmpty()) {
-                // For backward compatibility
-                String type = absenceType.toLowerCase();
-                isUnpaidAbsence = type.contains("unpaid") ||
-                        type.contains("unauthoriz") ||
-                        type.contains("unapproved");
-            }
-
             if (isUnpaidAbsence) {
                 hasUnpaidAbsences = true;
                 unpaidAbsenceCount++;
             }
+
+            // Format the line
+            System.out.printf("%-12s %-10s %-10s %-10.2f %-10.2f %-10s %-15s\n",
+                    date.format(dateFormatter),
+                    timeIn, timeOut, hours, overtimeHours,
+                    (lateMinutes > 0 ? lateMinutes + " min" : "-"),
+                    absenceType != null ? absenceType : "-");
         }
+
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.printf("%-34s %-10.2f %-10.2f %-10.2f\n",
+                "TOTALS:", totalHours, totalOvertimeHours, totalLateMinutes);
 
         // Create summary for return
         Map<String, Object> summary = new HashMap<>();
         summary.put("hours", totalHours);
-        summary.put("actualHours", totalActualHours);
         summary.put("overtimeHours", totalOvertimeHours);
         summary.put("lateMinutes", totalLateMinutes);
         summary.put("undertimeMinutes", totalUndertimeMinutes);
@@ -185,25 +171,16 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display salary details for an employee
-     *
-     * @param employee Employee to display salary details for
+     * Display salary details
      */
     public void displaySalaryDetails(Employee employee) {
         payrollProcessor.displaySalaryDetails(employee);
     }
 
     /**
-     * Display attendance options for an employee
-     *
-     * @param employee Employee to display options for
+     * Display attendance options
      */
     public void displayAttendanceOptions(Employee employee) {
-        if (employee == null) {
-            System.out.println("Error: Cannot display options for null employee");
-            return;
-        }
-
         System.out.println("\n===== ATTENDANCE OPTIONS =====");
         System.out.println("Employee: " + employee.getFullName());
         System.out.println("\nSelect view type:");
@@ -213,18 +190,9 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display daily attendance for an employee
-     *
-     * @param employee Employee to display attendance for
-     * @param startDate Start date of the range
-     * @param endDate End date of the range
+     * Display daily attendance
      */
     public void displayDailyAttendance(Employee employee, LocalDate startDate, LocalDate endDate) {
-        if (employee == null || startDate == null || endDate == null) {
-            System.out.println("Error: Invalid parameters for daily attendance");
-            return;
-        }
-
         System.out.println("\n===== DAILY ATTENDANCE =====");
         System.out.println("Employee: " + employee.getFullName());
         System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
@@ -238,8 +206,67 @@ public class PayrollOutputManager {
             return;
         }
 
-        // Use the improved formatter to display attendance
-        AttendanceDisplayFormatter.displayAttendanceReport(dailyAttendance);
+        // Display daily breakdown
+        System.out.println("\n--- ATTENDANCE DETAILS ---");
+        System.out.printf("%-12s %-10s %-10s %-10s %-10s %-10s %-10s %-15s\n",
+                "Date", "Time In", "Time Out", "Hours", "OT Hours", "Late", "Undertime", "Absence Type");
+        System.out.println("----------------------------------------------------------------------------------------");
+
+        double totalHours = 0;
+        double totalOvertimeHours = 0;
+        double totalLateMinutes = 0;
+        double totalUndertimeMinutes = 0;
+        int unpaidAbsenceCount = 0;
+
+        for (Map.Entry<LocalDate, Map<String, Object>> entry : dailyAttendance.entrySet()) {
+            LocalDate date = entry.getKey();
+            Map<String, Object> dayData = entry.getValue();
+
+            String timeIn = (String) dayData.get("timeIn");
+            String timeOut = (String) dayData.get("timeOut");
+            double hours = (double) dayData.get("hours");
+            double overtimeHours = (double) dayData.get("overtimeHours");
+            double lateMinutes = (double) dayData.get("lateMinutes");
+            double undertimeMinutes = (double) dayData.getOrDefault("undertimeMinutes", 0.0);
+            String absenceType = (String) dayData.getOrDefault("absenceType", "");
+            boolean isUnpaidAbsence = false;
+
+            if (dayData.containsKey("isUnpaidAbsence")) {
+                isUnpaidAbsence = (boolean) dayData.get("isUnpaidAbsence");
+            } else if (absenceType != null && !absenceType.isEmpty()) {
+                // For backward compatibility when there's no isUnpaidAbsence field
+                String type = absenceType.toLowerCase();
+                isUnpaidAbsence = type.contains("unpaid") ||
+                        type.contains("unauthoriz") ||
+                        type.contains("unapproved");
+            }
+
+            // Update totals
+            totalHours += hours;
+            totalOvertimeHours += overtimeHours;
+            totalLateMinutes += lateMinutes;
+            totalUndertimeMinutes += undertimeMinutes;
+
+            if (isUnpaidAbsence) {
+                unpaidAbsenceCount++;
+            }
+
+            // Format the line
+            System.out.printf("%-12s %-10s %-10s %-10.2f %-10.2f %-10s %-10s %-15s\n",
+                    date.format(dateFormatter),
+                    timeIn, timeOut, hours, overtimeHours,
+                    (lateMinutes > 0 ? lateMinutes + " min" : "-"),
+                    (undertimeMinutes > 0 ? undertimeMinutes + " min" : "-"),
+                    (absenceType != null && !absenceType.isEmpty() ? absenceType : "-"));
+        }
+
+        System.out.println("----------------------------------------------------------------------------------------");
+        System.out.printf("%-34s %-10.2f %-10.2f %-10.2f %-10.2f\n",
+                "TOTALS:", totalHours, totalOvertimeHours, totalLateMinutes, totalUndertimeMinutes);
+
+        if (unpaidAbsenceCount > 0) {
+            System.out.println("Unpaid Absences: " + unpaidAbsenceCount + " day(s)");
+        }
 
         // Wait for user
         System.out.print("\nPress Enter to continue...");
@@ -247,18 +274,9 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display weekly attendance for an employee
-     *
-     * @param employee Employee to display attendance for
-     * @param startDate Start date of the range
-     * @param endDate End date of the range
+     * Display weekly attendance
      */
     public void displayWeeklyAttendance(Employee employee, LocalDate startDate, LocalDate endDate) {
-        if (employee == null || startDate == null || endDate == null) {
-            System.out.println("Error: Invalid parameters for weekly attendance");
-            return;
-        }
-
         System.out.println("\n===== WEEKLY ATTENDANCE =====");
         System.out.println("Employee: " + employee.getFullName());
         System.out.println("Period: " + startDate.format(dateFormatter) + " to " + endDate.format(dateFormatter));
@@ -359,10 +377,7 @@ public class PayrollOutputManager {
     }
 
     /**
-     * Display payroll calendar for a specific month
-     *
-     * @param year Year to display
-     * @param month Month to display (1-12)
+     * Display payroll calendar
      */
     public void displayPayrollCalendar(int year, int month) {
         System.out.println("\n===== PAYROLL CALENDAR =====");
