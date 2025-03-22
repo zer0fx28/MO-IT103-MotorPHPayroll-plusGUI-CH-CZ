@@ -13,9 +13,12 @@ The system is structured into the following key components:
 - **Payroll Processing**: Calculates salaries, deductions, and net pay
 - **Deduction Calculation**: Computes government-mandated deductions (SSS, PhilHealth, Pag-IBIG, Tax)
 - **Holiday Management**: Tracks holidays and calculates holiday pay
+- **Testing Framework**: Provides comprehensive testing for system components
+- **Reporting System**: Generates detailed financial and attendance reports
 - **UI Layer**: Provides user interface for payroll operations
 
 ### Package Structure
+- `motorph`: Main package containing the application entry point
 - `motorph.employee`: Employee data models and management
 - `motorph.hours`: Attendance tracking and work hour calculations
 - `motorph.deductions`: Statutory deduction calculations
@@ -26,32 +29,45 @@ The system is structured into the following key components:
 - `motorph.output`: Output formatting and display
 - `motorph.ui`: User interface components
 - `motorph.util`: Utility classes and helper functions
+- `motorph.test`: Test classes for system validation
 
 ## Features
 
 - **Employee Management**
-    - Store and retrieve employee information
-    - Search employees by ID or name
-    - View employee details and benefits
+  - Store and retrieve employee information
+  - Search employees by ID or name
+  - View employee details and benefits
 
 - **Attendance Tracking**
-    - Process attendance records
-    - Calculate regular and overtime hours
-    - Track late arrivals and undertime
-    - Generate attendance reports
+  - Process attendance records
+  - Calculate regular and overtime hours
+  - Track late arrivals and undertime
+  - Generate attendance reports
 
 - **Payroll Processing**
-    - Calculate gross and net pay
-    - Process mid-month and end-month payrolls
-    - Apply appropriate deductions based on pay period
-    - Handle absences, late arrivals, and overtime
+  - Calculate gross and net pay
+  - Process mid-month and end-month payrolls
+  - Apply appropriate deductions based on pay period
+  - Handle absences, late arrivals, and overtime
 
 - **Statutory Compliance**
-    - SSS contributions
-    - PhilHealth contributions
-    - Pag-IBIG Fund contributions
-    - Withholding tax calculation
-    - Holiday pay computation
+  - SSS contributions
+  - PhilHealth contributions
+  - Pag-IBIG Fund contributions
+  - Withholding tax calculation
+  - Holiday pay computation
+
+- **Reporting**
+  - Weekly Hours Report
+  - Holiday Pay Report
+  - Payroll Calendar
+  - Attendance Summary
+
+- **System Testing**
+  - Statutory Deductions Tests
+  - Payroll Processing Tests
+  - Work Hours Calculator Tests
+  - Holiday Pay Tests
 
 ## Getting Started
 
@@ -60,36 +76,56 @@ The system is structured into the following key components:
 - CSV files for employee and attendance data
 
 ### Data Files
-The system requires two CSV files:
-1. **Employee Data CSV**: Contains employee details, rates, and benefits
-2. **Attendance Records CSV**: Contains time in/out records for employees
+The system requires two CSV files in the resources directory:
+1. **Employee Data CSV**: `resources/MotorPH Employee Data - Employee Details.csv`
+2. **Attendance Records CSV**: `resources/MotorPH Employee Data - Attendance Record.csv`
 
 ### Running the Application
 1. Compile the Java source files
-2. Run the main application class
-3. Follow the on-screen prompts to:
-    - Process payroll
-    - Find employee information
-    - View payroll dates
-    - Generate reports
+2. Run the Main class: `java motorph.Main`
+  - Alternatively, use the AppLauncher: `java motorph.util.AppLauncher`
+3. The system will display the main menu with the following options:
+  - Run Payroll System
+  - Run System Tests
+  - Run Reports
+  - Exit
+4. Select the desired option and follow the on-screen prompts
+
+### Payroll System Menu
+When running the payroll system, you'll have access to:
+1. Process Payroll
+2. Find Employee
+3. View Payroll Calendar
+4. Exit
+
+### Reports Menu
+The system provides the following reports:
+1. Weekly Hours Report
+2. Holiday Pay Report
+
+### System Tests Menu
+For system validation, you can run:
+1. Statutory Deductions Tests
+2. Payroll Processing Tests
+3. Work Hours Calculator Tests
 
 ## Payroll Policies
 
 - **Work Hours**: Regular work is 8 hours per day, 5 days a week
 - **Overtime**: Hours beyond 8 hours per day (25% premium rate)
 - **Late Policy**:
-    - Grace period until 8:10 AM
-    - Employees who arrive after 8:10 AM are marked late
-    - Late employees are not eligible for overtime pay
+  - Grace period until 8:10 AM
+  - Employees who arrive after 8:10 AM are marked late
+  - Late employees are not eligible for overtime pay
 - **Attendance Cutoff**:
-    - Mid-month: 27th of previous month to 12th of current month
-    - End-month: 13th to 26th of current month
+  - Mid-month: 27th of previous month to 12th of current month
+  - End-month: 13th to 26th of current month
 - **Deduction Schedule**:
-    - Mid-month: SSS, PhilHealth, Pag-IBIG
-    - End-month: Withholding Tax
+  - Mid-month: SSS, PhilHealth, Pag-IBIG
+  - End-month: Withholding Tax
 - **Holiday Pay**:
-    - Regular holidays: 100% of daily rate
-    - Special non-working holidays: 30% of daily rate
+  - Regular holidays: 100% of daily rate
+  - Special non-working holidays: 30% of daily rate
 
 ## Calculation Formulas
 
@@ -124,6 +160,12 @@ Withholding tax uses progressive tax rates according to Philippine tax brackets:
 - Create feature branches for new development
 - Submit pull requests for code review
 - Tag releases with version numbers
+
+### Testing
+- Run the built-in test suite regularly
+- Add new tests for any added functionality
+- Ensure all calculations comply with labor regulations
+- Validate input handling and edge cases
 
 ## Maintenance and Support
 
