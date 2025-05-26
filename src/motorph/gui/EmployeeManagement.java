@@ -7,6 +7,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.util.List;
 
 public class EmployeeManagement extends JFrame {
@@ -358,9 +359,9 @@ public class EmployeeManagement extends JFrame {
             return;
         }
 
-        // Create main dialog - larger for all the information
+        // Create main dialog - larger and taller for better UX
         JDialog detailsDialog = new JDialog(this, "Complete Employee Details", true);
-        detailsDialog.setSize(650, 700);
+        detailsDialog.setSize(850, 950); // Increased height for better UX
         detailsDialog.setLocationRelativeTo(this);
         detailsDialog.setLayout(new BorderLayout());
         detailsDialog.getContentPane().setBackground(Color.WHITE);
@@ -374,12 +375,12 @@ public class EmployeeManagement extends JFrame {
         headerLabel.setForeground(Color.WHITE);
         headerPanel.add(headerLabel);
 
-        // Main content with scroll pane for lots of information
+        // Main content panel - organized for better visibility
         JPanel contentPanel = new JPanel(new GridBagLayout());
         contentPanel.setBackground(Color.WHITE);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(6, 0, 6, 20);
+        gbc.insets = new Insets(8, 0, 8, 20);
         gbc.anchor = GridBagConstraints.WEST;
 
         int currentRow = 0;
@@ -424,6 +425,8 @@ public class EmployeeManagement extends JFrame {
 
         // Salary computation section
         addSectionHeader(contentPanel, gbc, "SALARY COMPUTATION", currentRow++);
+
+        // Month selection
         JLabel monthLabel = new JLabel("Select Month:");
         monthLabel.setFont(new Font("Arial", Font.BOLD, 12));
         monthLabel.setForeground(new Color(51, 51, 51));
@@ -433,32 +436,71 @@ public class EmployeeManagement extends JFrame {
         String[] months = {"January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"};
         JComboBox<String> monthCombo = new JComboBox<>(months);
-        monthCombo.setPreferredSize(new Dimension(150, 30));
+        monthCombo.setPreferredSize(new Dimension(130, 30));
         monthCombo.setFont(new Font("Arial", Font.PLAIN, 12));
+        monthCombo.setSelectedIndex(LocalDate.now().getMonthValue() - 1); // Set to current month
         gbc.gridx = 1; gbc.gridy = currentRow++;
         contentPanel.add(monthCombo, gbc);
 
-        // Scroll pane for the content
+        // Year selection
+        JLabel yearLabel = new JLabel("Select Year:");
+        yearLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        yearLabel.setForeground(new Color(51, 51, 51));
+        gbc.gridx = 0; gbc.gridy = currentRow;
+        contentPanel.add(yearLabel, gbc);
+
+        // Create year options (current year ± 2 years for flexibility)
+        int currentYear = LocalDate.now().getYear();
+        Integer[] years = {currentYear - 2, currentYear - 1, currentYear, currentYear + 1, currentYear + 2};
+        JComboBox<Integer> yearCombo = new JComboBox<>(years);
+        yearCombo.setPreferredSize(new Dimension(130, 30));
+        yearCombo.setFont(new Font("Arial", Font.PLAIN, 12));
+        yearCombo.setSelectedItem(currentYear); // Set to current year
+        gbc.gridx = 1; gbc.gridy = currentRow++;
+        contentPanel.add(yearCombo, gbc);
+
+        // Pay Period selection
+        JLabel payPeriodLabel = new JLabel("Select Pay Period:");
+        payPeriodLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        payPeriodLabel.setForeground(new Color(51, 51, 51));
+        gbc.gridx = 0; gbc.gridy = currentRow;
+        contentPanel.add(payPeriodLabel, gbc);
+
+        String[] payPeriods = {"Mid-Month (1st-15th)", "End-Month (16th-30th)"};
+        JComboBox<String> payPeriodCombo = new JComboBox<>(payPeriods);
+        payPeriodCombo.setPreferredSize(new Dimension(180, 30));
+        payPeriodCombo.setFont(new Font("Arial", Font.PLAIN, 12));
+        gbc.gridx = 1; gbc.gridy = currentRow++;
+        contentPanel.add(payPeriodCombo, gbc);
+
+        // Minimal scroll capability as backup
         JScrollPane scrollPane = new JScrollPane(contentPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(null); // Remove scroll pane border for cleaner look
 
         // Button panel
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 20));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         buttonPanel.setBackground(Color.WHITE);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 15, 0));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 20, 0));
 
         JButton computeButton = createStyledButton("Compute Salary", new Color(46, 204, 113));
         computeButton.addActionListener(e -> {
             String selectedMonth = (String) monthCombo.getSelectedItem();
+            Integer selectedYear = (Integer) yearCombo.getSelectedItem();
+            String selectedPayPeriod = (String) payPeriodCombo.getSelectedItem();
+
             JOptionPane.showMessageDialog(detailsDialog,
                     "Computing salary for " + employee.getFullName() +
-                            "\nMonth: " + selectedMonth +
+                            "\nMonth: " + selectedMonth + " " + selectedYear +
+                            "\nPay Period: " + selectedPayPeriod +
+                            "\nEmployee ID: " + employee.getEmployeeId() +
                             "\nBasic Salary: ₱" + String.format("%,.2f", employee.getBasicSalary()) +
                             "\nGross Semi-monthly: ₱" + String.format("%,.2f", employee.getSemiMonthlyRate()) +
                             "\nTotal Benefits: ₱" + String.format("%,.2f", employee.getTotalBenefits()) +
-                            "\n\n(This will connect to your existing payroll calculation logic)",
-                    "Salary Computation",
+                            "\n\n(This is a backup version - payroll calculation will be implemented later)",
+                    "Salary Computation Preview",
                     JOptionPane.INFORMATION_MESSAGE);
         });
 
