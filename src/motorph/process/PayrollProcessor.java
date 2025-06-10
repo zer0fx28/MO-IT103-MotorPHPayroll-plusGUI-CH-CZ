@@ -1,8 +1,8 @@
 package motorph.process;
 
+import motorph.employee.EmployeeDataReader;
 import motorph.deductions.StatutoryDeductions;
 import motorph.employee.Employee;
-import motorph.employee.EmployeeDataReader;
 import motorph.hours.AttendanceReader;
 import motorph.holidays.HolidayManager;
 import motorph.holidays.HolidayPayCalculator;
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class PayrollProcessor {
     // Data readers
-    private final EmployeeDataReader employeeDataReader;
+    private final EmployeeDataReader EmployeeDataReader;
     private final AttendanceReader attendanceReader;
 
     // Holiday handling
@@ -35,7 +35,7 @@ public class PayrollProcessor {
      * @param attendanceFilePath Path to attendance data CSV
      */
     public PayrollProcessor(String employeeFilePath, String attendanceFilePath) {
-        this.employeeDataReader = new EmployeeDataReader(employeeFilePath);
+        this.EmployeeDataReader = new EmployeeDataReader(employeeFilePath);
         this.attendanceReader = new AttendanceReader(attendanceFilePath);
         this.holidayManager = new HolidayManager();
         this.holidayPayCalculator = new HolidayPayCalculator(holidayManager);

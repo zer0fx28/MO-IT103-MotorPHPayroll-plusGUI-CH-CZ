@@ -2,6 +2,7 @@ package motorph.gui;
 
 import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
+import motorph.gui.EmployeeOperationsManager; // Added: For handling CRUD operations
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -13,6 +14,7 @@ import java.util.List;
 public class EmployeeManagement extends JFrame {
     // Employee data management
     private EmployeeDataReader employeeDataReader;
+    private EmployeeOperationsManager operationsManager; // Added: Handles update/delete operations
 
     // Components
     JTable employeeTable;
@@ -179,8 +181,11 @@ public class EmployeeManagement extends JFrame {
 
         try {
             // Initialize EmployeeDataReader with your CSV file path
-            String csvFile = "C:\\Users\\ferna\\IdeaProjects\\MO-IT103-MotorPHPayroll-CH-CZ\\resources\\MotorPH Employee Data - Employee Details.csv";
+            String csvFile = "D:\\Users\\Cherwin\\MO-IT103-MotorPHPayroll-plusGUI-CH-CZ\\resources\\MotorPH Employee Data - Employee Details.csv";
             employeeDataReader = new EmployeeDataReader(csvFile);
+
+            // Initialize operations manager for update/delete functionality
+            operationsManager = new EmployeeOperationsManager(csvFile, this);
 
             // Get all employees using your existing class
             List<Employee> employees = employeeDataReader.getAllEmployees();
@@ -200,10 +205,12 @@ public class EmployeeManagement extends JFrame {
                 tableModel.addRow(rowData);
             }
 
+            // Updated success message to show CRUD operations are ready
             JOptionPane.showMessageDialog(this,
-                    "Employee data loaded successfully!\n" +
-                            "Total employees: " + employees.size(),
-                    "Data Loaded",
+                    "Employee data loaded successfully with OpenCSV!\n" +
+                            "Total employees: " + employees.size() + "\n\n" +
+                            "✅ Update and Delete features are now active!",
+                    "Data Loaded - CRUD Operations Ready",
                     JOptionPane.INFORMATION_MESSAGE);
 
         } catch (Exception e) {
@@ -291,60 +298,103 @@ public class EmployeeManagement extends JFrame {
     }
 
     void createNewEmployee() {
-        new NewEmployeeForm(this); // Open the new employee form
+        // Use operations manager to handle new employee creation
+        if (operationsManager != null) {
+            operationsManager.showAddEmployeeDialog(() -> refreshTable());
+        } else {
+            // Fallback to existing form if operations manager not available
+            new NewEmployeeForm(this);
+        }
     }
 
     void updateSelectedEmployee() {
         int selectedRow = employeeTable.getSelectedRow();
         if (selectedRow != -1) {
-            String employeeNumber = (String) tableModel.getValueAt(selectedRow, 0);
+            String employeeId = (String) tableModel.getValueAt(selectedRow, 0);
 
+            // Use operations manager to show update dialog
+            if (operationsManager != null) {
+                operationsManager.showUpdateDialog(employeeId, () -> refreshTable());
+            } else {
+                // Fallback message if operations manager not available
+                JOptionPane.showMessageDialog(this,
+                        "Update functionality not available.\nPlease restart the application.",
+                        "Feature Not Available",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        } else {
             JOptionPane.showMessageDialog(this,
-                    "Update Employee form will open here.\n" +
-                            "Employee Number: " + employeeNumber +
-                            "\nThis will populate form fields with current data.",
-                    "Update Employee",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-            // TODO: Open update employee form
-            // new UpdateEmployeeForm(employeeNumber, this);
+                    "Please select an employee to update!",
+                    "No Selection",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 
     void deleteSelectedEmployee() {
         int selectedRow = employeeTable.getSelectedRow();
         if (selectedRow != -1) {
-            String employeeNumber = (String) tableModel.getValueAt(selectedRow, 0);
-            String lastName = (String) tableModel.getValueAt(selectedRow, 1);
+            String employeeId = (String) tableModel.getValueAt(selectedRow, 0);
             String firstName = (String) tableModel.getValueAt(selectedRow, 2);
+            String lastName = (String) tableModel.getValueAt(selectedRow, 1);
 
-            int choice = JOptionPane.showConfirmDialog(this,
-                    "Are you sure you want to delete this employee?\n\n" +
-                            "Employee: " + firstName + " " + lastName +
-                            "\nEmployee Number: " + employeeNumber,
-                    "Confirm Delete",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE);
+            // Use operations manager to handle deletion with confirmation
+            if (operationsManager != null) {
+                operationsManager.confirmAndDelete(employeeId, firstName, lastName, () -> refreshTable());
+            } else {
+                // Fallback to simple table removal if operations manager not available
+                int choice = JOptionPane.showConfirmDialog(this,
+                        "Are you sure you want to delete this employee?\n\n" +
+                                "Employee: " + firstName + " " + lastName +
+                                "\nEmployee Number: " + employeeId +
+                                "\n\nNote: This will only remove from display, not from CSV file.",
+                        "Confirm Delete",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
 
-            if (choice == JOptionPane.YES_OPTION) {
-                // Remove from table
-                tableModel.removeRow(selectedRow);
-
-                JOptionPane.showMessageDialog(this,
-                        "Employee deleted successfully!\n" +
-                                "(This will also remove from CSV file)",
-                        "Delete Successful",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-                // TODO: Also remove from CSV file
-                // deleteFromCSV(employeeNumber);
+                if (choice == JOptionPane.YES_OPTION) {
+                    tableModel.removeRow(selectedRow);
+                    JOptionPane.showMessageDialog(this,
+                            "Employee removed from display!\n" +
+                                    "(CSV file not modified - restart application to reload)",
+                            "Display Updated",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Please select an employee to delete!",
+                    "No Selection",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 
     // Method to refresh table data (call this after adding/updating employees)
     public void refreshTable() {
-        loadEmployeeData();
+        // Clear the table
+        tableModel.setRowCount(0);
+
+        // Refresh data in operations manager if available
+        if (operationsManager != null) {
+            operationsManager.refreshData();
+            // Get updated employee data reader
+            employeeDataReader = operationsManager.getEmployeeDataReader();
+        }
+
+        // Reload table data
+        List<Employee> employees = employeeDataReader.getAllEmployees();
+        for (Employee employee : employees) {
+            Object[] rowData = {
+                    employee.getEmployeeId(),     // Employee Number
+                    employee.getLastName(),       // Last Name
+                    employee.getFirstName(),      // First Name
+                    employee.getSssNo(),          // SSS Number
+                    employee.getPhilhealthNo(),   // PhilHealth Number
+                    employee.getTinNo(),          // TIN
+                    employee.getPagibigNo(),      // Pag-IBIG Number
+                    "View Details"                // Button text
+            };
+            tableModel.addRow(rowData);
+        }
     }
 
     // Method to show detailed employee information in popup - Using Employee object

@@ -1,9 +1,5 @@
 package motorph.test;
 
-import motorph.employee.EmployeeDataReader;
-import motorph.hours.AttendanceReader;
-import motorph.process.PayrollProcessor;
-
 /**
  * Test class for payroll processing
  */

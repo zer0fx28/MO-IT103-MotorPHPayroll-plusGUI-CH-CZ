@@ -2,11 +2,11 @@
 package motorph.ui;
 
 import motorph.employee.Employee;
-import motorph.employee.EmployeeDataReader;
 import motorph.hours.AttendanceReader;
 import motorph.output.PayrollOutputManager;
 import motorph.process.PayrollDateManager;
-import motorph.process.PayrollProcessor;
+import motorph.employee.EmployeeDataReader;
+import motorph.process.PayrollProcessor; // <-- FIXED: Removed extra "essor"
 import motorph.process.PayrollProcessor.PayrollResult;
 import motorph.util.DateTimeUtil;
 import motorph.util.InputValidator;
@@ -22,7 +22,7 @@ import java.util.Scanner;
 public class PayrollUI {
     // Input/output components
     private final Scanner scanner;
-    private final EmployeeDataReader employeeDataReader;
+    private final EmployeeDataReader employeeDataReader; // <-- FIXED: Lowercase variable name
     private final AttendanceReader attendanceReader;
     private final PayrollProcessor payrollProcessor;
     private final PayrollOutputManager outputManager;

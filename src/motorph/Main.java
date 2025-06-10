@@ -1,7 +1,7 @@
 package motorph;
 
-import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
+import motorph.employee.Employee;
 import motorph.hours.AttendanceReader;
 import motorph.input.PayrollInputManager;
 import motorph.output.PayrollOutputManager;
@@ -46,13 +46,13 @@ public class Main {
 
         try (Scanner scanner = new Scanner(System.in)) {
             // Initialize components
-            EmployeeDataReader employeeDataReader = new EmployeeDataReader(employeeFilePath);
+            EmployeeDataReader employeeDataReaderBackup = new EmployeeDataReader(employeeFilePath);
             AttendanceReader attendanceReader = new AttendanceReader(attendanceFilePath);
             PayrollProcessor payrollProcessor = new PayrollProcessor(employeeFilePath, attendanceFilePath);
 
             // Managers
             PayrollOutputManager outputManager = new PayrollOutputManager(scanner, attendanceReader, payrollProcessor);
-            PayrollInputManager inputManager = new PayrollInputManager(scanner, employeeDataReader);
+            PayrollInputManager inputManager = new PayrollInputManager(scanner, employeeDataReaderBackup);
 
             // Run main application
             runApplication(inputManager, outputManager, payrollProcessor);

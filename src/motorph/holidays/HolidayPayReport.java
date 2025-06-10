@@ -1,7 +1,7 @@
 package motorph.holidays;
 
-import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
+import motorph.employee.Employee;
 import motorph.hours.AttendanceReader;
 
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ import java.util.Map;
  * Report for holiday pay calculations
  */
 public class HolidayPayReport {
-    private EmployeeDataReader employeeDataReader;
+    private EmployeeDataReader EmployeeDataReader;
     private AttendanceReader attendanceReader;
     private HolidayManager holidayManager;
 
@@ -25,7 +25,7 @@ public class HolidayPayReport {
      * Constructor
      */
     public HolidayPayReport(String employeeFilePath, String attendanceFilePath) {
-        this.employeeDataReader = new EmployeeDataReader(employeeFilePath);
+        this.EmployeeDataReader = new EmployeeDataReader(employeeFilePath);
         this.attendanceReader = new AttendanceReader(attendanceFilePath);
         this.holidayManager = new HolidayManager();
     }
@@ -59,7 +59,7 @@ public class HolidayPayReport {
         }
 
         // Get all employees
-        List<Employee> employees = employeeDataReader.getAllEmployees();
+        List<Employee> employees = EmployeeDataReader.getAllEmployees();
 
         // Display holiday pay summary
         System.out.println("\nHOLIDAY PAY SUMMARY:");

@@ -1,8 +1,8 @@
 // File: motorph/reports/WeeklyHoursReport.java
 package motorph.reports;
 
-import motorph.employee.Employee;
 import motorph.employee.EmployeeDataReader;
+import motorph.employee.Employee;
 import motorph.hours.AttendanceReader;
 import motorph.hours.AttendanceRecord;
 import motorph.util.DateTimeUtil;
