@@ -6,81 +6,81 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainDashboard extends JFrame {
-    // Menu components
-    JPanel mainPanel;
-    JLabel welcomeLabel;
-    JLabel subtitleLabel;
-    JButton employeeButton;
-    JButton payrollButton;
-    JButton reportsButton;
-    JButton logoutButton;
+    // Menu components - these are the building blocks of our dashboard
+    JPanel mainPanel;           // Main container panel
+    JLabel welcomeLabel;        // Big welcome text
+    JLabel subtitleLabel;       // Smaller text under welcome
+    JButton employeeButton;     // Button to open employee management
+    JButton payrollButton;      // Button for payroll processing
+    JButton reportsButton;      // Button for reports
+    JButton logoutButton;       // Button to logout
 
-    // Constructor
+    // Constructor - this runs when we create a new MainDashboard
     public MainDashboard() {
-        // Window setup - professional styling
+        // Window setup - professional styling (keeping your exact design)
         setTitle("MotorPH Payroll System - Dashboard");
-        setSize(600, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center window
-        setResizable(false);
+        setSize(600, 500); // Your original size
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close program when X clicked
+        setLocationRelativeTo(null); // Center window on screen
+        setResizable(false); // Don't allow resizing
         getContentPane().setBackground(new Color(245, 245, 245)); // Light gray background
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout()); // Use BorderLayout for organization
 
-        // Create components
+        // Create all the visual components
         createComponents();
 
-        // Add button actions
+        // Set up what happens when buttons are clicked
         setupButtons();
 
-        // Show window
+        // Make the window visible
         setVisible(true);
     }
 
     void createComponents() {
-        // Main panel with white background
+        // Main panel with white background (keeping your exact design)
         mainPanel = new JPanel();
-        mainPanel.setLayout(null); // Keep simple positioning for beginners
-        mainPanel.setBackground(Color.WHITE);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        mainPanel.setLayout(null); // Manual positioning (beginner-friendly)
+        mainPanel.setBackground(Color.WHITE); // White background
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30)); // Padding
 
-        // Welcome header with professional styling
+        // Welcome header with professional styling (your exact design)
         welcomeLabel = new JLabel("Welcome to MotorPH");
-        welcomeLabel.setBounds(150, 40, 300, 35);
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        welcomeLabel.setBounds(150, 40, 300, 35); // Your exact positioning
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Your exact font
         welcomeLabel.setForeground(new Color(70, 130, 180)); // Professional blue
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(welcomeLabel);
 
-        // Subtitle
+        // Subtitle (your exact design)
         subtitleLabel = new JLabel("Payroll Management System");
-        subtitleLabel.setBounds(150, 75, 300, 20);
-        subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        subtitleLabel.setForeground(new Color(102, 102, 102));
+        subtitleLabel.setBounds(150, 75, 300, 20); // Your exact positioning
+        subtitleLabel.setFont(new Font("Arial", Font.PLAIN, 14)); // Your exact font
+        subtitleLabel.setForeground(new Color(102, 102, 102)); // Gray color
         subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(subtitleLabel);
 
-        // Menu buttons with professional styling and icons
+        // Menu buttons with professional styling and icons (your exact design)
         employeeButton = createMenuButton("👥 Employee Management", new Color(52, 152, 219));
-        employeeButton.setBounds(175, 130, 250, 50);
+        employeeButton.setBounds(175, 130, 250, 50); // Your exact positioning
         mainPanel.add(employeeButton);
 
         payrollButton = createMenuButton("💰 Payroll Processing", new Color(46, 204, 113));
-        payrollButton.setBounds(175, 190, 250, 50);
+        payrollButton.setBounds(175, 190, 250, 50); // Your exact positioning
         mainPanel.add(payrollButton);
 
         reportsButton = createMenuButton("📊 Reports & Analytics", new Color(155, 89, 182));
-        reportsButton.setBounds(175, 250, 250, 50);
+        reportsButton.setBounds(175, 250, 250, 50); // Your exact positioning
         mainPanel.add(reportsButton);
 
         logoutButton = createMenuButton("🔒 Logout", new Color(231, 76, 60));
-        logoutButton.setBounds(175, 330, 250, 45);
+        logoutButton.setBounds(175, 330, 250, 45); // Your exact positioning
         mainPanel.add(logoutButton);
 
-        // Footer text
+        // Footer text (your exact design)
         JLabel footerLabel = new JLabel("Select an option to continue");
-        footerLabel.setBounds(150, 390, 300, 20);
-        footerLabel.setFont(new Font("Arial", Font.ITALIC, 11));
-        footerLabel.setForeground(new Color(149, 165, 166));
+        footerLabel.setBounds(150, 390, 300, 20); // Your exact positioning
+        footerLabel.setFont(new Font("Arial", Font.ITALIC, 11)); // Your exact font
+        footerLabel.setForeground(new Color(149, 165, 166)); // Light gray
         footerLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(footerLabel);
 
@@ -88,67 +88,85 @@ public class MainDashboard extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
     }
 
-    // Helper method to create professional menu buttons
+    // Helper method to create professional menu buttons (your exact styling)
     JButton createMenuButton(String text, Color bgColor) {
         JButton button = new JButton(text);
-        button.setBackground(bgColor);
-        button.setForeground(Color.WHITE);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
-        button.setFocusPainted(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setHorizontalAlignment(SwingConstants.LEFT);
+        button.setBackground(bgColor); // Set background color
+        button.setForeground(Color.WHITE); // White text
+        button.setFont(new Font("Arial", Font.BOLD, 14)); // Your exact font
+        button.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20)); // Your exact padding
+        button.setFocusPainted(false); // Remove ugly focus border
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Hand cursor on hover
+        button.setHorizontalAlignment(SwingConstants.LEFT); // Align text to left
 
-        // Add simple hover effect
+        // Add simple hover effect (your exact design)
         button.addMouseListener(new java.awt.event.MouseAdapter() {
-            Color originalColor = bgColor;
+            Color originalColor = bgColor; // Remember original color
+
+            // When mouse enters button area
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(originalColor.darker());
             }
+
+            // When mouse leaves button area
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(originalColor);
             }
         });
 
-        return button;
+        return button; // Return the finished button
     }
 
     void setupButtons() {
-        // Employee Management button
+        // Employee Management button action
         employeeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                openEmployeeManagement();
+                openEmployeeManagement(); // Call our method to open employee window
             }
         });
 
-        // Payroll Processing button
+        // Payroll Processing button action
         payrollButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                openPayrollProcessing();
+                openPayrollProcessing(); // Call our method for payroll
             }
         });
 
-        // Reports button
+        // Reports button action
         reportsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                openReports();
+                openReports(); // Call our method for reports
             }
         });
 
-        // Logout button
+        // Logout button action
         logoutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                logout();
+                logout(); // Call our logout method
             }
         });
     }
 
     void openEmployeeManagement() {
-        dispose(); // Close dashboard
-        new EmployeeManagement(); // Open employee management
+        // This method opens the Employee Management window
+        try {
+            System.out.println("Opening Employee Management..."); // Debug message
+            dispose(); // Close the dashboard window
+            new EmployeeManagement(); // Open employee management window
+
+        } catch (Exception ex) {
+            // If something goes wrong, show error message
+            JOptionPane.showMessageDialog(this,
+                    "Could not open Employee Management: " + ex.getMessage() +
+                            "\n\nPlease check if all required files are available.",
+                    "Error Opening Employee Management",
+                    JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace(); // Print error details for debugging
+        }
     }
 
     void openPayrollProcessing() {
+        // This feature will be implemented later (your exact message)
         JOptionPane.showMessageDialog(this,
                 "Payroll Processing will open here!\n" +
                         "(This will use your existing payroll calculation logic)",
@@ -160,6 +178,7 @@ public class MainDashboard extends JFrame {
     }
 
     void openReports() {
+        // This feature will be implemented later (your exact message)
         JOptionPane.showMessageDialog(this,
                 "Reports will open here!\n" +
                         "(This will use your existing reports logic)",
@@ -171,19 +190,23 @@ public class MainDashboard extends JFrame {
     }
 
     void logout() {
+        // Ask user if they really want to logout (your exact design)
         int choice = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to logout?",
                 "Confirm Logout",
                 JOptionPane.YES_NO_OPTION);
 
+        // If user clicked "Yes"
         if (choice == JOptionPane.YES_OPTION) {
-            dispose(); // Close dashboard
-            new LoginForm(); // Open login again
+            dispose(); // Close the dashboard
+            new LoginForm(); // Open login form again
         }
+        // If user clicked "No", do nothing (stay on dashboard)
     }
 
-    // Test the dashboard
+    // Test the dashboard (your exact test method)
     public static void main(String[] args) {
+        System.out.println("Testing MainDashboard..."); // Debug message
         new MainDashboard();
     }
 }
