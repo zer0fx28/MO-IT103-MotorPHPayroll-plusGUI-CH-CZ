@@ -143,6 +143,7 @@ public class LoginForm extends JFrame {
 
     // Helper method to create nice-looking buttons
     // This saves us from writing the same styling code over and over
+    // UPDATED: Now works on all operating systems (Windows, Mac, Linux)
     JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);
         button.setBackground(bgColor); // Set background color
@@ -151,6 +152,11 @@ public class LoginForm extends JFrame {
         button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15)); // Padding
         button.setFocusPainted(false); // Remove ugly focus border
         button.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Hand cursor on hover
+
+        // THESE 3 LINES MAKE BUTTONS WORK ON MAC:
+        button.setOpaque(true);           // Show the background color
+        button.setBorderPainted(true);    // Show the button border
+        button.setContentAreaFilled(true); // Fill the button with color
 
         // Add hover effect - button gets darker when mouse is over it
         button.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -293,7 +299,15 @@ public class LoginForm extends JFrame {
     }
 
     // Test method - this runs when you test the login form by itself
+    // FIXED: Now works on all operating systems
     public static void main(String[] args) {
+        // THIS ONE LINE MAKES IT WORK ON ALL COMPUTERS:
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch(Exception e) {
+            System.err.println("Could not set Look and Feel: " + e.getMessage());
+        }
+
         // Show what the hashed passwords look like (for learning)
         System.out.println("SHA-256 hash for 'password': " + hashPassword("password"));
         System.out.println("SHA-256 hash for '123456': " + hashPassword("123456"));

@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Handles all employee CRUD operations for the GUI system
  * Keeps the main EmployeeManagement class clean and focused on display
+ * UPDATED: Now works on all operating systems (Windows, Mac, Linux)
  */
 public class EmployeeOperationsManager {
     private final String csvFilePath;
@@ -93,10 +94,10 @@ public class EmployeeOperationsManager {
         // Create form
         JPanel formPanel = createEmployeeForm(null, false);
 
-        // Buttons
+        // Buttons - UPDATED: Now works on all operating systems
         JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton saveButton = new JButton("Add Employee");
-        JButton cancelButton = new JButton("Cancel");
+        JButton saveButton = createCrossPlatformButton("Add Employee", new Color(46, 204, 113));
+        JButton cancelButton = createCrossPlatformButton("Cancel", new Color(231, 76, 60));
 
         saveButton.addActionListener(e -> {
             if (saveNewEmployeeFromForm(formPanel)) {
@@ -230,6 +231,38 @@ public class EmployeeOperationsManager {
         // Implementation depends on your form structure
         // For now, return true as placeholder
         return true;
+    }
+
+    /**
+     * Create cross-platform compatible button
+     * ADDED: Helper method to ensure buttons work on all operating systems
+     */
+    private JButton createCrossPlatformButton(String text, Color bgColor) {
+        JButton button = new JButton(text);
+        button.setBackground(bgColor);
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Arial", Font.BOLD, 12));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // THESE 3 LINES MAKE BUTTONS WORK ON MAC:
+        button.setOpaque(true);           // Show the background color
+        button.setBorderPainted(true);    // Show the button border
+        button.setContentAreaFilled(true); // Fill the button with color
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            Color originalColor = bgColor;
+
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(originalColor.darker());
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(originalColor);
+            }
+        });
+
+        return button;
     }
 
     /**

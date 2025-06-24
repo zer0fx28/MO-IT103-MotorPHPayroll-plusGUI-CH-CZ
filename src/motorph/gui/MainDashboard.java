@@ -88,7 +88,7 @@ public class MainDashboard extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
     }
 
-    // Helper method to create professional menu buttons (your exact styling)
+    // Helper method to create professional menu buttons - CROSS-PLATFORM COMPATIBLE
     JButton createMenuButton(String text, Color bgColor) {
         JButton button = new JButton(text);
         button.setBackground(bgColor); // Set background color
@@ -98,6 +98,11 @@ public class MainDashboard extends JFrame {
         button.setFocusPainted(false); // Remove ugly focus border
         button.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Hand cursor on hover
         button.setHorizontalAlignment(SwingConstants.LEFT); // Align text to left
+
+        // THESE 3 LINES MAKE BUTTONS WORK ON MAC:
+        button.setOpaque(true);           // Show the background color
+        button.setBorderPainted(true);    // Show the button border
+        button.setContentAreaFilled(true); // Fill the button with color
 
         // Add simple hover effect (your exact design)
         button.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -204,9 +209,21 @@ public class MainDashboard extends JFrame {
         // If user clicked "No", do nothing (stay on dashboard)
     }
 
-    // Test the dashboard (your exact test method)
+    // Test the dashboard - FIXED: Now works on all operating systems
     public static void main(String[] args) {
+        // THIS ONE LINE MAKES IT WORK ON ALL COMPUTERS:
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch(Exception e) {
+            System.err.println("Could not set Look and Feel: " + e.getMessage());
+        }
+
         System.out.println("Testing MainDashboard..."); // Debug message
-        new MainDashboard();
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new MainDashboard();
+            }
+        });
     }
 }

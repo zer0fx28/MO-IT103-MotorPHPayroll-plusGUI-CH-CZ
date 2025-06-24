@@ -251,6 +251,7 @@ public class NewEmployeeForm extends JDialog {
     }
 
     // Helper method to create nice-looking buttons with hover effects
+    // UPDATED: Now works on all operating systems (Windows, Mac, Linux)
     JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(150, 40)); // Fixed size
@@ -260,6 +261,11 @@ public class NewEmployeeForm extends JDialog {
         button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Padding
         button.setFocusPainted(false); // Remove ugly focus border
         button.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Hand cursor when hovering
+
+        // THESE 3 LINES MAKE BUTTONS WORK ON MAC:
+        button.setOpaque(true);           // Show the background color
+        button.setBorderPainted(true);    // Show the button border
+        button.setContentAreaFilled(true); // Fill the button with color
 
         // Add hover effect - button gets darker when mouse is over it
         button.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -474,8 +480,15 @@ public class NewEmployeeForm extends JDialog {
         System.out.println("Successfully saved new employee to CSV!");
     }
 
-    // Test method - this runs when you test the form by itself
+    // Test method - FIXED: Now works on all operating systems
     public static void main(String[] args) {
+        // THIS ONE LINE MAKES IT WORK ON ALL COMPUTERS:
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch(Exception e) {
+            System.err.println("Could not set Look and Feel: " + e.getMessage());
+        }
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 // For testing only - normally this form is opened by EmployeeManagement
