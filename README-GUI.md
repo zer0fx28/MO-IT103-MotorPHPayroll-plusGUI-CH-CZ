@@ -203,8 +203,9 @@ The system is ready for production use in its current form and provides a solid 
 
 ---
 
-**Version:** 2.0  
-**Last Updated:** May 2025  
-**Status:** Production Ready (GUI Components)  
-**Lead Developer:** Cherwin Fernandez   
-**Team Member:** Czarina Salazar
+MotorPH Employee GUI System v2.0
+
+All rights reserved 2025. 
+MotorPH Payroll GUI System is Computer Programming 1 Project 
+by Cherwin Fernandez (Lead Developer)
+& Czarina Salazar (Team Member)
