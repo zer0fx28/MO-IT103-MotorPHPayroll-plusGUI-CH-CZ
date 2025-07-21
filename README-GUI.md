@@ -206,6 +206,6 @@ The system is ready for production use in its current form and provides a solid 
 MotorPH Employee GUI System v2.0
 
 All rights reserved 2025. 
-MotorPH Payroll GUI System is Computer Programming 1 Project 
+MotorPH Payroll GUI System is Computer Programming 2 Project 
 by Cherwin Fernandez (Lead Developer)
 & Czarina Salazar (Team Member)
