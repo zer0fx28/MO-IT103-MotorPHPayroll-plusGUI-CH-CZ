@@ -415,4 +415,109 @@ public class EmployeeCredentialsManager {
 
         return button;
     }
+
+    /**
+     * SIMPLE TEST METHOD - Add this to test credential generation without new classes
+     * Run this method to generate credentials and see the login info
+     */
+    public static void main(String[] args) {
+        System.out.println("🔧 MotorPH Employee Login System - Quick Setup");
+        System.out.println("════════════════════════════════════════════════");
+
+        Scanner scanner = new Scanner(System.in);
+
+        // Get CSV file path
+        System.out.println("📁 Enter the full path to your CSV file:");
+        System.out.println("(or press Enter to create sample data)");
+        String csvPath = scanner.nextLine().trim();
+
+        // Create sample CSV if no path provided
+        if (csvPath.isEmpty()) {
+            csvPath = createSampleCSV();
+            if (csvPath == null) {
+                System.out.println("❌ Failed to create sample CSV. Exiting.");
+                return;
+            }
+        }
+
+        // Check if file exists
+        File csvFile = new File(csvPath);
+        if (!csvFile.exists()) {
+            System.out.println("❌ File not found: " + csvPath);
+            return;
+        }
+
+        System.out.println("✅ Using CSV file: " + csvPath);
+
+        // Generate credentials
+        EmployeeCredentialsManager manager = new EmployeeCredentialsManager();
+
+        // Clear existing credentials
+        File credFile = new File("employee_credentials.txt");
+        if (credFile.exists()) {
+            System.out.println("🗑️  Removing existing credentials...");
+            credFile.delete();
+        }
+
+        System.out.println("\n🔐 Generating credentials...\n");
+        manager.generateTemporaryCredentials(csvPath);
+
+        // Display test credentials
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("📋 READY TO TEST - Use these credentials:");
+        System.out.println("=".repeat(60));
+
+        Map<String, EmployeeCredential> allCreds = manager.getAllCredentials();
+        if (!allCreds.isEmpty()) {
+            EmployeeCredential firstCred = allCreds.values().iterator().next();
+            System.out.println("👤 SAMPLE LOGIN (use any from above):");
+            System.out.println("   Username: " + firstCred.username);
+            System.out.println("   Password: (see the temporary password from the output above)");
+            System.out.println("   Employee: " + firstCred.fullName);
+        }
+
+        System.out.println("\n📋 NEXT STEPS:");
+        System.out.println("1. Run: java motorph.gui.EmployeeLoginForm");
+        System.out.println("2. Use any username/password combination shown above");
+        System.out.println("3. Change the temporary password when prompted");
+        System.out.println("4. Access the employee dashboard");
+
+        System.out.println("\n💡 Password Requirements:");
+        System.out.println("• At least 8 characters");
+        System.out.println("• At least one uppercase letter");
+        System.out.println("• At least one lowercase letter");
+        System.out.println("• At least one number");
+        System.out.println("\n✅ Setup complete! Ready to test login system.");
+    }
+
+    /**
+     * Helper method to create sample CSV file
+     */
+    private static String createSampleCSV() {
+        System.out.println("🔨 Creating sample CSV file...");
+
+        String csvContent = "Employee #,Last Name,First Name,SSS #,PhilHealth #,TIN #,Pagibig #,Status,Position,Immediate Supervisor,Basic Salary,Rice Subsidy,Phone Allowance,Clothing Allowance,Gross Semi-monthly Rate,Hourly Rate\n" +
+                "001,Cruz,Juan Dela,12-3456789-0,123456789012,123-456-789-000,123456789012,Regular,Manager,CEO,35000.00,1500.00,2000.00,1000.00,17500.00,104.17\n" +
+                "002,Santos,Maria,98-7654321-0,987654321098,987-654-321-000,987654321098,Regular,Supervisor,Manager,28000.00,1500.00,2000.00,1000.00,14000.00,83.33\n" +
+                "003,Garcia,Pedro,11-2233445-0,112233445566,112-233-445-000,112233445566,Regular,Staff,Supervisor,25000.00,1500.00,2000.00,1000.00,12500.00,74.40\n" +
+                "004,Rodriguez,Ana,55-6677889-0,556677889900,556-677-889-000,556677889900,Regular,Clerk,Supervisor,22000.00,1500.00,2000.00,1000.00,11000.00,65.48\n" +
+                "005,Martinez,Carlos,33-4455667-0,334455667788,334-455-667-000,334455667788,Regular,Assistant,Manager,20000.00,1500.00,2000.00,1000.00,10000.00,59.52";
+
+        String fileName = "sample_employee_data.csv";
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+            writer.print(csvContent);
+            System.out.println("✅ Sample CSV created: " + fileName);
+            System.out.println("📋 Sample employees:");
+            System.out.println("   001 - Juan Dela Cruz (Manager)");
+            System.out.println("   002 - Maria Santos (Supervisor)");
+            System.out.println("   003 - Pedro Garcia (Staff)");
+            System.out.println("   004 - Ana Rodriguez (Clerk)");
+            System.out.println("   005 - Carlos Martinez (Assistant)");
+
+            return new File(fileName).getAbsolutePath();
+        } catch (IOException e) {
+            System.out.println("❌ Error creating sample CSV: " + e.getMessage());
+            return null;
+        }
+    }
 }
