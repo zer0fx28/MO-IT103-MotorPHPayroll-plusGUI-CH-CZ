@@ -173,4 +173,8 @@ For bug reports, feature requests, or support inquiries, please contact the Moto
 
 ## License
 
-Copyright © 2025 MotorPH. All rights reserved.
+MotorPH Employee Portal v1.0
+
+All rights reserved 2025. 
+MotorPH Payroll GUI System is Computer Programming 1 Project 
+by Cherwin Fernandez (Lead Developer)
